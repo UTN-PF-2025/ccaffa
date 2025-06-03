@@ -33,6 +33,15 @@ buildNumber.properties
 .idea/**/uiDesigner.xml
 .idea/**/dbnavigator.xml
 
+# File-based project format
+*.iws
+
+# IntelliJ
+out/
+
+# mpeltonen/sbt-idea plugin
+.idea_modules/
+
 # Eclipse m2e generated files
 # Eclipse Core
 .project
