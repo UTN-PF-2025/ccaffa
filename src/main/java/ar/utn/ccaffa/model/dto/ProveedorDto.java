@@ -7,5 +7,5 @@ import lombok.Data;
 @Data
 public class ProveedorDto {
     private Long id;
-    private String name;
+    private String nombre;
 }

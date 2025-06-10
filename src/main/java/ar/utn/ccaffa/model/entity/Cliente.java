@@ -1,24 +1,29 @@
 package ar.utn.ccaffa.model.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "Proveedor")
+@Table(name = "Cliente")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Proveedor {
+public class Cliente {
+
     @Id
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @Column(name = "nombre", nullable = false)
-    private String nombre;
+    @Column(name = "nombre")
+    private String name;
 
+    @Column(name = "email")
+    @Email(message = "Debe ser un email valido")
+    private String email;
 }
