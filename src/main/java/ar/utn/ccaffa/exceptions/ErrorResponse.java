@@ -5,10 +5,6 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-/**
- * Clase DTO para respuestas de error estandarizadas.
- * Incluye detalles útiles para el cliente (API consumers).
- */
 @Data
 @Builder
 public class ErrorResponse {
