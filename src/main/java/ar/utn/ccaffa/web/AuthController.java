@@ -2,7 +2,7 @@ package ar.utn.ccaffa.web;
 
 import ar.utn.ccaffa.config.JwtUtil;
 import ar.utn.ccaffa.model.dto.LoginRequest;
-import ar.utn.ccaffa.model.dto.LoginResponse;
+import ar.utn.ccaffa.model.dto.LoginResponseDto;
 import ar.utn.ccaffa.model.entity.Usuario;
 import ar.utn.ccaffa.services.interfaces.UsuarioService;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class AuthController {
     private final UsuarioService usuarioService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
         );
@@ -39,6 +39,6 @@ public class AuthController {
             .map(authority -> authority.getAuthority())
             .toArray(String[]::new);
 
-        return ResponseEntity.ok(new LoginResponse(token, userDetails.getUsername(), roles));
+        return ResponseEntity.ok(new LoginResponseDto(token, userDetails.getUsername(), roles));
     }
 } 
