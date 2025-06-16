@@ -1,5 +1,7 @@
 package ar.utn.ccaffa.model.entity;
 
+import java.util.List;
+
 import ar.utn.ccaffa.enums.MaquinaTipoEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -31,4 +33,10 @@ public class Maquina {
 
     @Column(name = "velocidad_trabajo")
     private Float velocidadTrabajo;
+
+    @Column(name = "es_activa")
+    private Boolean esActiva;
+
+    @ManyToMany(mappedBy = "maquinas")
+    private List<OrdenDeTrabajo> ordenDeTrabajos;
 } 
