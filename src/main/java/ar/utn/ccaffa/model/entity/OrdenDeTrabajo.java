@@ -35,6 +35,9 @@ public class OrdenDeTrabajo {
     @Column(name = "fecha_estimada_fin")
     private Time fechaEstimadaDeFin;
 
+    @Column(name = "activa")
+    private Boolean activa = true;
+
     @OneToMany(mappedBy = "ordenDeTrabajo")
     private List<OrdenDeVenta> ordenesDeVenta;
 
