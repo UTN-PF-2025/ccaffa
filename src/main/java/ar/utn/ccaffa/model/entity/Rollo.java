@@ -54,7 +54,7 @@ public class Rollo {
     private LocalDate fechaIngreso;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "rollo_padre_id", nullable = false)
+    @JoinColumn(name = "rollo_padre_id")
     private Rollo rollo_padre;
 
 

@@ -10,11 +10,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class RolloMapperImpl implements RolloMapper {
-    private final RolloMapper rolloMapper;
-
-    public RolloMapperImpl(RolloMapper rolloMapper) {
-        this.rolloMapper = rolloMapper;
-    }
 
     @Override
     public RolloDto toDto(Rollo rollo) {
@@ -32,7 +27,7 @@ public class RolloMapperImpl implements RolloMapper {
                 .tipoMaterial(rollo.getTipoMaterial())
                 .estado(rollo.getEstado())
                 .fechaIngreso(rollo.getFechaIngreso())
-                .rollo_padre(rolloMapper.toDto(rollo.getRollo_padre()))
+                .rollo_padre(this.toDto(rollo.getRollo_padre()))
                 .build();
     }
 
@@ -52,7 +47,7 @@ public class RolloMapperImpl implements RolloMapper {
                 .tipoMaterial(rolloDto.getTipoMaterial())
                 .estado(rolloDto.getEstado())
                 .fechaIngreso(rolloDto.getFechaIngreso())
-                .rollo_padre(rolloMapper.toEntity(rolloDto.getRollo_padre()))
+                .rollo_padre(this.toEntity(rolloDto.getRollo_padre()))
                 .build();
     }
 
