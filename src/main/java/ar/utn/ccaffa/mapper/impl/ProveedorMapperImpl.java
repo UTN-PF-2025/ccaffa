@@ -14,6 +14,7 @@ public class ProveedorMapperImpl implements ProveedorMapper {
         return ProveedorDto.builder()
                 .id(entity.getId())
                 .nombre(entity.getNombre())
+                .activo(entity.getActivo())
                 .build();
     }
 
@@ -27,6 +28,7 @@ public class ProveedorMapperImpl implements ProveedorMapper {
         return Proveedor.builder()
                 .id(dto.getId())
                 .nombre(dto.getNombre())
+                .activo(dto.getActivo())
                 .build();
     }
 }
