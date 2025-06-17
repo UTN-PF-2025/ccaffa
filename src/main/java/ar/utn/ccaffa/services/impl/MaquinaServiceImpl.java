@@ -1,11 +1,9 @@
 package ar.utn.ccaffa.services.impl;
 
-import ar.utn.ccaffa.enums.MaquinaTipoEnum;
 import ar.utn.ccaffa.mapper.MaquinaMapper;
 import ar.utn.ccaffa.model.dto.MaquinaDto;
 import ar.utn.ccaffa.model.entity.Maquina;
-import ar.utn.ccaffa.repository.MaquinaRepository;
-import ar.utn.ccaffa.repository.impl.MaquinaRepositoryImpl;
+import ar.utn.ccaffa.repository.interfaces.MaquinaRepository;
 import ar.utn.ccaffa.services.interfaces.MaquinaService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,12 +18,10 @@ import java.util.stream.Collectors;
 public class MaquinaServiceImpl implements MaquinaService {
     
     private final MaquinaRepository maquinaRepository;
-    private final MaquinaRepositoryImpl maquinaRepositoryImpl;
     private final MaquinaMapper maquinaMapper;
 
-    public MaquinaServiceImpl(MaquinaRepository maquinaRepository, MaquinaRepositoryImpl maquinaRepositoryImpl, MaquinaMapper maquinaMapper) {
+    public MaquinaServiceImpl(MaquinaRepository maquinaRepository, MaquinaMapper maquinaMapper) {
         this.maquinaRepository = maquinaRepository;
-        this.maquinaRepositoryImpl = maquinaRepositoryImpl;
         this.maquinaMapper = maquinaMapper;
     }
 
@@ -44,18 +40,7 @@ public class MaquinaServiceImpl implements MaquinaService {
     public MaquinaDto obtenerPorId(Long id) {
         log.info("Iniciando búsqueda de máquina con ID: {}", id);
         
-        return maquinaRepositoryImpl.findByIdCustom(id)
-                .map(maquina -> {
-                    log.info("Máquina encontrada en la base de datos: {}", maquina);
-                    return maquinaMapper.toDto(maquina);
-                })
-                .orElse(MaquinaDto.builder()
-                        .id(9999)
-                        .name("Maquina Mock")
-                        .estado("Activa")
-                        .type(MaquinaTipoEnum.CORTADORA)
-                        .build()
-                );
+        return this.maquinaMapper.toDto(maquinaRepository.findById(id).orElse(Maquina.builder().build()));
 
     }
 
