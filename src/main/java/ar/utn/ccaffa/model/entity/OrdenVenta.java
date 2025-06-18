@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "Orden_Venta")
@@ -43,4 +44,8 @@ public class OrdenVenta {
 
     @Column(name = "observaciones")
     private String observaciones;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "orden_venta_id")
+    private List<Especificacion> especificaciones;
 }

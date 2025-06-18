@@ -21,6 +21,7 @@ public class ClienteMapperImpl implements ClienteMapper {
                 .id(cliente.getId())
                 .nombre(cliente.getName())
                 .email(cliente.getEmail())
+                .activo(cliente.isActivo())
                 .build();
     }
 
@@ -34,6 +35,7 @@ public class ClienteMapperImpl implements ClienteMapper {
                 .id(clienteDto.getId())
                 .name(clienteDto.getNombre())
                 .email(clienteDto.getEmail())
+                .activo(clienteDto.isActivo())
                 .build();
     }
 
@@ -56,4 +58,4 @@ public class ClienteMapperImpl implements ClienteMapper {
                 .map(this::toEntity)
                 .collect(Collectors.toList());
     }
-}
+} 

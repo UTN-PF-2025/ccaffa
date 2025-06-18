@@ -26,4 +26,8 @@ public class Cliente {
     @Column(name = "email")
     @Email(message = "Debe ser un email valido")
     private String email;
+
+    @Column(name = "activo")
+    private boolean activo;
+
 }
