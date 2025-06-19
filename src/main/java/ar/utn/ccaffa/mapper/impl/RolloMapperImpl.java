@@ -1,6 +1,6 @@
 package ar.utn.ccaffa.mapper.impl;
 
-import ar.utn.ccaffa.mapper.RolloMapper;
+import ar.utn.ccaffa.mapper.interfaces.RolloMapper;
 import ar.utn.ccaffa.model.dto.RolloDto;
 import ar.utn.ccaffa.model.entity.Rollo;
 import org.springframework.stereotype.Service;

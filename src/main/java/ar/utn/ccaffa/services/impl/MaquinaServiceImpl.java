@@ -1,8 +1,11 @@
 package ar.utn.ccaffa.services.impl;
 
-import ar.utn.ccaffa.mapper.MaquinaMapper;
+import ar.utn.ccaffa.mapper.impl.MaquinaMapperImpl;
+import ar.utn.ccaffa.mapper.interfaces.MaquinaMapper;
+import ar.utn.ccaffa.mapper.interfaces.RolloMapper;
 import ar.utn.ccaffa.model.dto.MaquinaDto;
 import ar.utn.ccaffa.model.entity.Maquina;
+import ar.utn.ccaffa.model.entity.Rollo;
 import ar.utn.ccaffa.repository.interfaces.MaquinaRepository;
 import ar.utn.ccaffa.services.interfaces.MaquinaService;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -20,46 +22,38 @@ public class MaquinaServiceImpl implements MaquinaService {
     private final MaquinaRepository maquinaRepository;
     private final MaquinaMapper maquinaMapper;
 
-    public MaquinaServiceImpl(MaquinaRepository maquinaRepository, MaquinaMapper maquinaMapper) {
+    public MaquinaServiceImpl(MaquinaRepository maquinaRepository, MaquinaMapperImpl maquinaMapper) {
         this.maquinaRepository = maquinaRepository;
         this.maquinaMapper = maquinaMapper;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<MaquinaDto> obtenerTodos() {
+    public List<MaquinaDto> findAll() {
         log.info("Obteniendo todas las máquinas");
-        List<Maquina> maquinas = maquinaRepository.findAll();
-        log.info("Se encontraron {} máquinas", maquinas.size());
-        return maquinas.stream()
-                .map(maquinaMapper::toDto)
-                .collect(Collectors.toList());
+        return this.maquinaMapper.toDtoList(maquinaRepository.findAll());
     }
 
     @Override
-    public MaquinaDto obtenerPorId(Long id) {
-        log.info("Iniciando búsqueda de máquina con ID: {}", id);
-        
+    public MaquinaDto findById(Long id) {
+        log.info("Buscando máquina por ID: {}", id);
         return this.maquinaMapper.toDto(maquinaRepository.findById(id).orElse(Maquina.builder().build()));
-
     }
 
     @Override
-    @Transactional
-    public MaquinaDto guardar(MaquinaDto dto) {
-        log.info("Guardando máquina: {}", dto);
-        Maquina entity = maquinaMapper.toEntity(dto);
-        log.info("Entidad convertida: {}", entity);
-        Maquina savedEntity = maquinaRepository.save(entity);
-        log.info("Máquina guardada: {}", savedEntity);
-        return maquinaMapper.toDto(savedEntity);
+    public Maquina save(MaquinaDto maquina) {
+        log.info("Guardando nuevo maquina: {}", maquina);
+        return maquinaRepository.save(this.maquinaMapper.toEntity(maquina));
     }
 
     @Override
-    @Transactional
-    public void eliminar(Long id) {
-        log.info("Eliminando máquina con ID: {}", id);
+    public boolean deleteById(Long id) {
+        log.info("Eliminando maquina con ID: {}", id);
+        if (!maquinaRepository.existsById(id)) {
+            log.warn("No se encontró el maquina con ID: {}", id);
+            return false;
+        }
         maquinaRepository.deleteById(id);
-        log.info("Máquina eliminada correctamente");
+        return true;
     }
 }

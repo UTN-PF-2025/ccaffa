@@ -1,7 +1,7 @@
 package ar.utn.ccaffa.services.impl;
 
 import ar.utn.ccaffa.exceptions.ResourceNotFoundException;
-import ar.utn.ccaffa.mapper.OrdenVentaMapper;
+import ar.utn.ccaffa.mapper.interfaces.OrdenVentaMapper;
 import ar.utn.ccaffa.model.dto.OrdenVentaDto;
 import ar.utn.ccaffa.model.entity.Defecto;
 import ar.utn.ccaffa.model.entity.OrdenVenta;

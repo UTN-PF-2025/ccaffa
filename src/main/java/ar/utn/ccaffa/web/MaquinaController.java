@@ -1,8 +1,11 @@
 package ar.utn.ccaffa.web;
 
+import ar.utn.ccaffa.model.entity.Maquina;
+import ar.utn.ccaffa.model.entity.Rol;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import ar.utn.ccaffa.model.dto.MaquinaDto;
@@ -23,25 +26,31 @@ public class MaquinaController {
 
     @GetMapping
     public ResponseEntity<List<MaquinaDto>> obtenerTodos() {
-        List<MaquinaDto> entidades = maquinaService.obtenerTodos();
+        List<MaquinaDto> entidades = maquinaService.findAll();
         return new ResponseEntity<>(entidades, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<MaquinaDto> obtenerPorId(@PathVariable Long id) {
-        MaquinaDto entidad = maquinaService.obtenerPorId(id);
+        MaquinaDto entidad = maquinaService.findById(id);
         return new ResponseEntity<>(entidad, HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<MaquinaDto> crear(@RequestBody MaquinaDto entidad) {
-        MaquinaDto nuevaEntidad = maquinaService.guardar(entidad);
+    public ResponseEntity<Maquina> crear(@RequestBody MaquinaDto entidad) {
+        Maquina nuevaEntidad = maquinaService.save(entidad);
         return new ResponseEntity<>(nuevaEntidad, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Maquina> updateMaquina(@PathVariable Long id, @RequestBody MaquinaDto maquina) {
+        maquina.setId(id);
+        return ResponseEntity.ok(maquinaService.save(maquina));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
-        maquinaService.eliminar(id);
+        maquinaService.deleteById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

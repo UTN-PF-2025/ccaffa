@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MaquinaDto {
-    private Integer id;
+    private Long id;
     private String nombre;
     private MaquinaTipoEnum tipo;
     private Float velocidadTrabajo;

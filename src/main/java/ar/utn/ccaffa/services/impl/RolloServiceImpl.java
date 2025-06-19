@@ -1,12 +1,8 @@
 package ar.utn.ccaffa.services.impl;
 
-import ar.utn.ccaffa.mapper.ProveedorMapper;
-import ar.utn.ccaffa.mapper.RolloMapper;
-import ar.utn.ccaffa.model.dto.ProveedorDto;
+import ar.utn.ccaffa.mapper.interfaces.RolloMapper;
 import ar.utn.ccaffa.model.dto.RolloDto;
-import ar.utn.ccaffa.model.entity.Proveedor;
 import ar.utn.ccaffa.model.entity.Rollo;
-import ar.utn.ccaffa.repository.interfaces.ProveedorRepository;
 import ar.utn.ccaffa.repository.interfaces.RolloRepository;
 import ar.utn.ccaffa.services.interfaces.RolloService;
 import lombok.extern.slf4j.Slf4j;

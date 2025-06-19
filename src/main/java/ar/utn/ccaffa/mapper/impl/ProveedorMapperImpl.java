@@ -1,6 +1,6 @@
 package ar.utn.ccaffa.mapper.impl;
 
-import ar.utn.ccaffa.mapper.ProveedorMapper;
+import ar.utn.ccaffa.mapper.interfaces.ProveedorMapper;
 import ar.utn.ccaffa.model.dto.ProveedorDto;
 import ar.utn.ccaffa.model.entity.Proveedor;
 import org.springframework.stereotype.Service;

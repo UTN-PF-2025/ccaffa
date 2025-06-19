@@ -1,6 +1,6 @@
 package ar.utn.ccaffa.mapper.impl;
 
-import ar.utn.ccaffa.mapper.ClienteMapper;
+import ar.utn.ccaffa.mapper.interfaces.ClienteMapper;
 import ar.utn.ccaffa.model.dto.ClienteDto;
 import ar.utn.ccaffa.model.entity.Cliente;
 import org.springframework.stereotype.Component;
