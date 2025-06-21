@@ -22,11 +22,11 @@ public class Maquina {
     private Integer id;
     
     @Column(name = "nombre", nullable = false)
-    private String name;
+    private String nombre;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", nullable = false)
-    private MaquinaTipoEnum type;
+    private MaquinaTipoEnum tipo;
 
     @Column(name = "estado")
     private String estado;

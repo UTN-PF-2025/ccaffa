@@ -2,10 +2,10 @@ package ar.utn.ccaffa.web;
 
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import ar.utn.ccaffa.model.entity.Maquina;
-import ar.utn.ccaffa.service.OrdenDeTrabajoService;
-import ar.utn.ccaffa.repository.MaquinaRepository;
-import ar.utn.ccaffa.repository.RolloRepository;
+import ar.utn.ccaffa.repository.interfaces.MaquinaRepository;
+import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoService;
 import ar.utn.ccaffa.repository.OrdenDeVentaRepository;
+import ar.utn.ccaffa.repository.RolloRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

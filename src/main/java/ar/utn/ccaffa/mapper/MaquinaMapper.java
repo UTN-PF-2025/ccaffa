@@ -10,8 +10,8 @@ public class MaquinaMapper {
     public MaquinaDto toDto(Maquina entity) {
         return MaquinaDto.builder()
                 .id(entity.getId())
-                .name(entity.getName())
-                .type(entity.getType())
+                .nombre(entity.getNombre())
+                .tipo(entity.getTipo())
                 .estado(entity.getEstado())
                 .velocidadTrabajo(entity.getVelocidadTrabajo())
                 .build();
@@ -19,9 +19,8 @@ public class MaquinaMapper {
     
     public Maquina toEntity(MaquinaDto dto) {
         return Maquina.builder()
-                .id(dto.getId() != 0 ? dto.getId() : null)
-                .name(dto.getName())
-                .type(dto.getType())
+                .nombre(dto.getNombre())
+                .tipo(dto.getTipo())
                 .estado(dto.getEstado())
                 .velocidadTrabajo(dto.getVelocidadTrabajo())
                 .build();

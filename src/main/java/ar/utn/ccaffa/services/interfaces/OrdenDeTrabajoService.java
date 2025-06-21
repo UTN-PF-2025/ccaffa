@@ -1,4 +1,4 @@
-package ar.utn.ccaffa.service;
+package ar.utn.ccaffa.services.interfaces;
 
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import java.util.List;
