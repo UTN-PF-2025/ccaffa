@@ -1,4 +1,4 @@
-package ar.utn.ccaffa.repository;
+package ar.utn.ccaffa.repository.interfaces;
 
 import java.util.Optional;
 

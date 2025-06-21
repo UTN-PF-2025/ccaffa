@@ -1,7 +1,7 @@
 package ar.utn.ccaffa.services.impl;
 
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
-import ar.utn.ccaffa.repository.OrdenDeTrabajoRepository;
+import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoRepository;
 import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package ar.utn.ccaffa.repository;
+package ar.utn.ccaffa.repository.interfaces;
 
 import ar.utn.ccaffa.model.entity.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;

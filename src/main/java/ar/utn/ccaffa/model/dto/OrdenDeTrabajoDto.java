@@ -1,19 +1,18 @@
 package ar.utn.ccaffa.model.dto;
 
 import lombok.Data;
+
+import java.sql.Time;
 import java.util.List;
+
+
 
 @Data
 public class OrdenDeTrabajoDto {
     private Long ordenDeVentaId;
     private Long rolloId;
-    private List<MaquinaDto> maquinas;
+    private List<Long> maquinas;
+    private Time fechaInicio;
+    private Time fechaFin;
     private String observaciones;
-
-    @Data
-    public static class MaquinaDto {
-        private Long id;
-        private String fechaInicio;
-        private String fechaFin;
-    }
 } 

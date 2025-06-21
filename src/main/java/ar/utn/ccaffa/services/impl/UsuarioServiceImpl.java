@@ -2,8 +2,8 @@ package ar.utn.ccaffa.services.impl;
 
 import ar.utn.ccaffa.model.entity.Usuario;
 import ar.utn.ccaffa.model.entity.Rol;
-import ar.utn.ccaffa.repository.UsuarioRepository;
-import ar.utn.ccaffa.repository.RolRepository;
+import ar.utn.ccaffa.repository.interfaces.RolRepository;
+import ar.utn.ccaffa.repository.interfaces.UsuarioRepository;
 import ar.utn.ccaffa.services.interfaces.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -39,7 +39,7 @@ public class OrdenDeTrabajo {
     private Boolean activa = true;
 
     @OneToMany(mappedBy = "ordenDeTrabajo")
-    private List<OrdenDeVenta> ordenesDeVenta;
+    private List<OrdenVenta> ordenesDeVenta;
 
     @ManyToOne
     @JoinColumn(name = "rollo_id")

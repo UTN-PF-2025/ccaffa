@@ -2,7 +2,7 @@ package ar.utn.ccaffa.model.entity;
 
 import java.time.LocalDate;
 
-import ar.utn.ccaffa.repository.RolloRepository;
+import ar.utn.ccaffa.repository.interfaces.RolloRepository;
 import jakarta.persistence.*;
 import lombok.Data;
 
