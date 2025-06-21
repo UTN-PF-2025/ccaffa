@@ -2,6 +2,7 @@ package ar.utn.ccaffa.model.entity;
 
 import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.enums.TipoMaterial;
+import ar.utn.ccaffa.repository.interfaces.RolloRepository;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -60,13 +61,13 @@ public class Rollo {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rollo_padre_id")
-    private Rollo rolloPadreId;
+    private Rollo rolloPadre;
 
     // Método helper para obtener el rollo padre cuando lo necesites
-    @Transient
+
     public Rollo getRolloPadre(RolloRepository rolloRepository) {
-        if (rolloPadreId != null) {
-            return rolloRepository.findById(rolloPadreId).orElse(null);
+        if (rolloPadre.getId() != null) {
+            return rolloRepository.findById(rolloPadre.getId()).orElse(null);
         }
         return null;
     }

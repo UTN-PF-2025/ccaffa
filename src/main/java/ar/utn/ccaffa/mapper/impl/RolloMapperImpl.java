@@ -27,7 +27,7 @@ public class RolloMapperImpl implements RolloMapper {
                 .tipoMaterial(rollo.getTipoMaterial())
                 .estado(rollo.getEstado())
                 .fechaIngreso(rollo.getFechaIngreso())
-                .rollo_padre(this.toDto(rollo.getRollo_padre()))
+                .rolloPadre(this.toDto(rollo.getRolloPadre()))
                 .build();
     }
 
@@ -47,7 +47,7 @@ public class RolloMapperImpl implements RolloMapper {
                 .tipoMaterial(rolloDto.getTipoMaterial())
                 .estado(rolloDto.getEstado())
                 .fechaIngreso(rolloDto.getFechaIngreso())
-                .rollo_padre(this.toEntity(rolloDto.getRollo_padre()))
+                .rolloPadre(this.toEntity(rolloDto.getRolloPadre()))
                 .build();
     }
 

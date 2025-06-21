@@ -27,6 +27,6 @@ public class RolloDto {
     private EstadoRollo estado;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "DEFAULT_TIMEZONE")
     private LocalDateTime fechaIngreso;
-    private RolloDto rollo_padre;
+    private RolloDto rolloPadre;
 }
 
