@@ -1,5 +1,7 @@
 package ar.utn.ccaffa.model.entity;
 
+import java.util.List;
+
 import ar.utn.ccaffa.enums.MaquinaTipoEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,7 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "Maquina")
+@Table(name = "maquina")
 @Data
 @Builder
 @NoArgsConstructor

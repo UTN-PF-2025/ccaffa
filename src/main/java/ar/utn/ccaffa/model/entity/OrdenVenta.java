@@ -48,4 +48,8 @@ public class OrdenVenta {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "orden_venta_id")
     private List<Especificacion> especificaciones;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "orden_trabajo_id")
+    private OrdenDeTrabajo ordenDeTrabajo;
 }

@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Rollo")
+@Table(name = "rollo")
 @Data
 @Builder
 @NoArgsConstructor
@@ -60,7 +60,15 @@ public class Rollo {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rollo_padre_id")
-    private Rollo rollo_padre;
+    private Rollo rolloPadreId;
 
+    // Método helper para obtener el rollo padre cuando lo necesites
+    @Transient
+    public Rollo getRolloPadre(RolloRepository rolloRepository) {
+        if (rolloPadreId != null) {
+            return rolloRepository.findById(rolloPadreId).orElse(null);
+        }
+        return null;
+    }
 
 }
