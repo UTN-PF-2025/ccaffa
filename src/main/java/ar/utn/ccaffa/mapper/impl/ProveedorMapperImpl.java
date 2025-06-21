@@ -1,6 +1,6 @@
 package ar.utn.ccaffa.mapper.impl;
 
-import ar.utn.ccaffa.mapper.ProveedorMapper;
+import ar.utn.ccaffa.mapper.interfaces.ProveedorMapper;
 import ar.utn.ccaffa.model.dto.ProveedorDto;
 import ar.utn.ccaffa.model.entity.Proveedor;
 import org.springframework.stereotype.Service;
@@ -14,6 +14,7 @@ public class ProveedorMapperImpl implements ProveedorMapper {
         return ProveedorDto.builder()
                 .id(entity.getId())
                 .nombre(entity.getNombre())
+                .activo(entity.getActivo())
                 .build();
     }
 
@@ -27,6 +28,7 @@ public class ProveedorMapperImpl implements ProveedorMapper {
         return Proveedor.builder()
                 .id(dto.getId())
                 .nombre(dto.getNombre())
+                .activo(dto.getActivo())
                 .build();
     }
 }

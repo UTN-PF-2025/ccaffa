@@ -3,13 +3,14 @@ package ar.utn.ccaffa.services.interfaces;
 import java.util.List;
 
 import ar.utn.ccaffa.model.dto.MaquinaDto;
+import ar.utn.ccaffa.model.entity.Maquina;
 
 public interface MaquinaService {
-    List<MaquinaDto> obtenerTodos();
+    List<MaquinaDto> findAll();
 
-    MaquinaDto obtenerPorId(Long id);
+    MaquinaDto findById(Long id);
 
-    MaquinaDto guardar(MaquinaDto entidad);
+    Maquina save(MaquinaDto entidad);
 
-    void eliminar(Long id);
+    boolean deleteById(Long id);
 }

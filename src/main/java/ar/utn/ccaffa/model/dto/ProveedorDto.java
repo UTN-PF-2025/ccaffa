@@ -8,4 +8,5 @@ import lombok.Data;
 public class ProveedorDto {
     private Long id;
     private String nombre;
+    private Boolean activo;
 }

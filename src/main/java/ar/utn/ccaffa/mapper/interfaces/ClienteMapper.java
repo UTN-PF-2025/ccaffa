@@ -1,4 +1,4 @@
-package ar.utn.ccaffa.mapper;
+package ar.utn.ccaffa.mapper.interfaces;
 
 import ar.utn.ccaffa.model.dto.ClienteDto;
 import ar.utn.ccaffa.model.entity.Cliente;

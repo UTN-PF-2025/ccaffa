@@ -21,4 +21,7 @@ public class Proveedor {
     @Column(name = "nombre", nullable = false)
     private String nombre;
 
+    @Column(name = "activo", nullable = false)
+    private Boolean activo;
+
 }

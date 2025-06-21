@@ -1,7 +1,7 @@
 package ar.utn.ccaffa.services.impl;
 
 import ar.utn.ccaffa.model.entity.Usuario;
-import ar.utn.ccaffa.repository.UsuarioRepository;
+import ar.utn.ccaffa.repository.interfaces.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
