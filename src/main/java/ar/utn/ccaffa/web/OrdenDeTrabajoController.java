@@ -45,7 +45,6 @@ public class OrdenDeTrabajoController {
             List<Maquina> maquinas = new ArrayList<>();
             for (OrdenDeTrabajoDto.MaquinaDto mreq : request.getMaquinas()) {
                 maquinaRepository.findById(mreq.getId()).ifPresent(maquinas::add);
-                // Puedes guardar las fechas de uso de la máquina en otra entidad si lo necesitas
             }
             orden.setMaquinas(maquinas);
         }

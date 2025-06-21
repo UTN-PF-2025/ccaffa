@@ -2,6 +2,7 @@ package ar.utn.ccaffa.model.entity;
 
 import java.time.LocalDate;
 
+import ar.utn.ccaffa.repository.RolloRepository;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -32,10 +33,15 @@ public class Rollo {
 
     @Column(name = "codigo_de_barras", length = 50)
     private char[] CodigoDeBarras;
-
     @Column(name = "rollo_padre_id")
-    private Rollo rolloPadre;
-
-
-
+    private Long rolloPadreId;
+    
+    // Método helper para obtener el rollo padre cuando lo necesites
+    @Transient
+    public Rollo getRolloPadre(RolloRepository rolloRepository) {
+        if (rolloPadreId != null) {
+            return rolloRepository.findById(rolloPadreId).orElse(null);
+        }
+        return null;
+    }
 } 

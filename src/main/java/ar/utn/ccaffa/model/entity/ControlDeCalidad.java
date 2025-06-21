@@ -17,7 +17,6 @@ public class ControlDeCalidad {
     @Column(name = "R7")
     private Integer R7;
 
-
     @Column(name = "fecha_control")
     private LocalDate fechaControl;
 
@@ -40,6 +39,6 @@ public class ControlDeCalidad {
     @JoinColumn(name = "certificado_de_calidad_id")
     private CertificadoDeCalidad certificadoDeCalidad;
 
-    @OneToMany(mappedBy = "controlDeCalidad")
+    @Transient
     private List<Defecto> defectos;
 } 

@@ -1,13 +1,10 @@
 package ar.utn.ccaffa.model.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
+@Table(name = "medidas_calidad")
 @Data
 public class MedidaDeCalidad {
     @Id
@@ -19,4 +16,7 @@ public class MedidaDeCalidad {
     private Float anchoMedido;
     @Column(name = "rebaba_medio")
     private Float rebabaMedio;
+    @ManyToOne
+    @JoinColumn(name = "control_de_calidad_id")
+    private ControlDeCalidad controlDeCalidad;
 }
