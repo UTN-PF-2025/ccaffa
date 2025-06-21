@@ -1,7 +1,8 @@
 package ar.utn.ccaffa.mapper.impl;
 
-import ar.utn.ccaffa.mapper.interfaces.ClienteMapper;
-import ar.utn.ccaffa.mapper.interfaces.OrdenVentaMapper;
+import ar.utn.ccaffa.mapper.ClienteMapper;
+import ar.utn.ccaffa.mapper.EspecificacionMapper;
+import ar.utn.ccaffa.mapper.OrdenVentaMapper;
 import ar.utn.ccaffa.model.dto.OrdenVentaDto;
 import ar.utn.ccaffa.model.entity.OrdenVenta;
 import org.springframework.stereotype.Service;
@@ -12,9 +13,11 @@ import java.util.stream.Collectors;
 @Service
 public class OrdenVentaMapperImpl implements OrdenVentaMapper {
     private final ClienteMapper clienteMapper;
+    private final EspecificacionMapper especificacionMapper;
 
-    public OrdenVentaMapperImpl(ClienteMapper clienteMapper) {
+    public OrdenVentaMapperImpl(ClienteMapper clienteMapper, EspecificacionMapper especificacionMapper) {
         this.clienteMapper = clienteMapper;
+        this.especificacionMapper = especificacionMapper;
     }
 
     @Override
@@ -32,6 +35,7 @@ public class OrdenVentaMapperImpl implements OrdenVentaMapper {
                 .estado(ordenVenta.getEstado())
                 .observaciones(ordenVenta.getObservaciones())
                 .cliente(clienteMapper.toDto(ordenVenta.getCliente()))
+                .especificaciones(especificacionMapper.toDtoList(ordenVenta.getEspecificaciones()))
                 .build();
     }
 
@@ -50,6 +54,7 @@ public class OrdenVentaMapperImpl implements OrdenVentaMapper {
                 .estado(ordenVentaDto.getEstado())
                 .observaciones(ordenVentaDto.getObservaciones())
                 .cliente(clienteMapper.toEntity(ordenVentaDto.getCliente()))
+                .especificaciones(especificacionMapper.toEntityList(ordenVentaDto.getEspecificaciones()))
                 .build();
     }
 
@@ -72,5 +77,4 @@ public class OrdenVentaMapperImpl implements OrdenVentaMapper {
                 .map(this::toEntity)
                 .collect(Collectors.toList());
     }
-
-}
+} 
