@@ -16,9 +16,13 @@ public class MaquinaMapperImpl implements MaquinaMapper {
         return MaquinaDto.builder()
                 .id(entity.getId())
                 .nombre(entity.getNombre())
+                .activo(entity.getActivo())
                 .tipo(entity.getTipo())
-                .estado(entity.getEstado())
-                .velocidadTrabajo(entity.getVelocidadTrabajo())
+                .espesorMaximoMilimetros(entity.getEspesorMaximoMilimetros())
+                .espesorMinimoMilimetros(entity.getEspesorMinimoMilimetros())
+                .anchoMinimoMilimetros(entity.getAnchoMinimoMilimetros())
+                .anchoMaximoMilimetros(entity.getAnchoMaximoMilimetros())
+                .velocidadTrabajoMetrosPorMinuto(entity.getVelocidadTrabajoMetrosPorMinuto())
                 .build();
     }
     
@@ -27,10 +31,15 @@ public class MaquinaMapperImpl implements MaquinaMapper {
             return null;
         }
         return Maquina.builder()
+                .id(dto.getId())
                 .nombre(dto.getNombre())
+                .activo(dto.getActivo())
                 .tipo(dto.getTipo())
-                .estado(dto.getEstado())
-                .velocidadTrabajo(dto.getVelocidadTrabajo())
+                .espesorMaximoMilimetros(dto.getEspesorMaximoMilimetros())
+                .espesorMinimoMilimetros(dto.getEspesorMinimoMilimetros())
+                .anchoMinimoMilimetros(dto.getAnchoMinimoMilimetros())
+                .anchoMaximoMilimetros(dto.getAnchoMaximoMilimetros())
+                .velocidadTrabajoMetrosPorMinuto(dto.getVelocidadTrabajoMetrosPorMinuto())
                 .build();
     }
 

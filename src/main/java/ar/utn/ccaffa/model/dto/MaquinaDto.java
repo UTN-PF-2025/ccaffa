@@ -13,7 +13,11 @@ import lombok.NoArgsConstructor;
 public class MaquinaDto {
     private Long id;
     private String nombre;
+    private Boolean activo;
     private MaquinaTipoEnum tipo;
-    private Float velocidadTrabajo;
-    private String estado;
+    private Float velocidadTrabajoMetrosPorMinuto;
+    private Float espesorMaximoMilimetros;
+    private Float espesorMinimoMilimetros;
+    private Float anchoMaximoMilimetros;
+    private Float anchoMinimoMilimetros;
 }

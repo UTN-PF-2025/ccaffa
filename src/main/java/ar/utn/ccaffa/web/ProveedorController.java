@@ -1,6 +1,8 @@
 package ar.utn.ccaffa.web;
 
+import ar.utn.ccaffa.model.dto.MaquinaDto;
 import ar.utn.ccaffa.model.dto.ProveedorDto;
+import ar.utn.ccaffa.model.entity.Maquina;
 import ar.utn.ccaffa.model.entity.Proveedor;
 import ar.utn.ccaffa.services.interfaces.ProveedorService;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +41,12 @@ public class ProveedorController {
         log.info("Creando nuevo proveedor: {}", proveedor);
         Proveedor savedProveedor = proveedorService.save(proveedor);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedProveedor);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Proveedor> updateProveedor(@PathVariable Long id, @RequestBody ProveedorDto proveedor) {
+        proveedor.setId(id);
+        return ResponseEntity.ok(proveedorService.save(proveedor));
     }
 
     @DeleteMapping("/{id}")

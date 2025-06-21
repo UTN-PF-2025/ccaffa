@@ -31,20 +31,27 @@ public class RolloController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RolloDto> getProveedorById(@PathVariable Long id) {
+    public ResponseEntity<RolloDto> getRollosById(@PathVariable Long id) {
         log.info("Buscando rollo con ID: {}", id);
         return ResponseEntity.ok(rolloService.findById(id));
     }
 
     @PostMapping
-    public ResponseEntity<Rollo> createProveedor(@RequestBody RolloDto rollo) {
+    public ResponseEntity<Rollo> createRollo(@RequestBody RolloDto rollo) {
         log.info("Creando nuevo rollo: {}", rollo);
         Rollo savedRollo = rolloService.save(rollo);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedRollo);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Rollo> updateRollo(@PathVariable Long id, @RequestBody RolloDto rollo) {
+        rollo.setId(id);
+        return ResponseEntity.ok(rolloService.save(rollo));
+    }
+
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProveedor(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteRollo(@PathVariable Long id) {
         log.info("Eliminando rollo con ID: {}", id);
         if (rolloService.deleteById(id)) {
             return ResponseEntity.ok().build();

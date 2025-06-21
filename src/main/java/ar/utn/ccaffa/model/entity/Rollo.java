@@ -1,5 +1,7 @@
 package ar.utn.ccaffa.model.entity;
 
+import ar.utn.ccaffa.enums.EstadoRollo;
+import ar.utn.ccaffa.enums.TipoMaterial;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -8,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "Rollo")
@@ -31,27 +34,29 @@ public class Rollo {
 
     @Column(name = "peso", nullable = false)
     @NotNull(message = "El peso es obligatorio")
-    private Float peso;
+    private Float pesoKG;
 
     @Column(name = "ancho", nullable = false)
     @NotNull(message = "El ancho es obligatorio")
-    private Float ancho;
+    private Float anchoMM;
 
     @Column(name = "espesor", nullable = false)
     @NotNull(message = "El ancho es obligatorio")
-    private Float espesor;
+    private Float espesorMM;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "tipo_material", nullable = false)
     @NotNull(message = "El tipo de material es obligatorio")
-    private String tipoMaterial;
+    private TipoMaterial tipoMaterial;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false)
     @NotNull(message = "El estado es obligatorio")
-    private String estado;
+    private EstadoRollo estado;
 
     @Column(name = "fecha_ingreso", nullable = false)
     @NotNull(message = "La fecha de ingreso es obligatoria")
-    private LocalDate fechaIngreso;
+    private LocalDateTime fechaIngreso;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rollo_padre_id")
