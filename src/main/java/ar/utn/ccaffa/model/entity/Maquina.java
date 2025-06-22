@@ -1,5 +1,6 @@
 package ar.utn.ccaffa.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 
 import ar.utn.ccaffa.enums.MaquinaTipoEnum;
@@ -15,6 +16,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Maquina {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,4 +48,9 @@ public class Maquina {
     @Column(name = "anchoMinimoMilimetros", nullable = false)
     private Float anchoMinimoMilimetros;
 
+    @Column(name = "es_activa")
+    private Boolean esActiva;
+
+    @OneToMany(mappedBy = "maquina", cascade = CascadeType.ALL)
+    private List<OrdenDeTrabajoMaquina> ordenDeTrabajoMaquinas;
 } 

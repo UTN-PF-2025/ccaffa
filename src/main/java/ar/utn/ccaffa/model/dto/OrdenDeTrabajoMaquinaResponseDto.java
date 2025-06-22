@@ -5,19 +5,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrdenVentaDto {
+public class OrdenDeTrabajoMaquinaResponseDto {
     private Long id;
-    private Long orderId;
-    private LocalDate fechaCreacion;
-    private LocalDate fechaEntregaEstimada;
+    private MaquinaDto maquina;
+    private LocalDateTime fechaInicio;
+    private LocalDateTime fechaFin;
     private String estado;
     private String observaciones;
-    private ClienteDto cliente;
-    private EspecificacionDto especificacion;
-}
+} 

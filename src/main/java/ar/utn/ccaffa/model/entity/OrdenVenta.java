@@ -1,14 +1,15 @@
 package ar.utn.ccaffa.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Table(name = "Orden_Venta")
@@ -16,6 +17,8 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(exclude = {"ordenDeTrabajo"})
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class OrdenVenta {
 
     @Id
@@ -45,11 +48,11 @@ public class OrdenVenta {
     @Column(name = "observaciones")
     private String observaciones;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "orden_venta_id")
-    private List<Especificacion> especificaciones;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "especificacion_id")
+    private Especificacion especificacion;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "orden_trabajo_id")
     private OrdenDeTrabajo ordenDeTrabajo;
 }

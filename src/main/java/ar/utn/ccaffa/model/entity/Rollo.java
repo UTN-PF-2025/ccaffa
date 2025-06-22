@@ -3,6 +3,7 @@ package ar.utn.ccaffa.model.entity;
 import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.enums.TipoMaterial;
 import ar.utn.ccaffa.repository.interfaces.RolloRepository;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Rollo {
 
     @Id

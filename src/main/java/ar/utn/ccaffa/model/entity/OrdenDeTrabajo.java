@@ -1,14 +1,18 @@
 package ar.utn.ccaffa.model.entity;
 
-import java.sql.Time;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Table(name = "ordenes_de_trabajo")
 @Data
+@EqualsAndHashCode(exclude = {"ordenDeVenta", "ordenDeTrabajoMaquinas"})
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class OrdenDeTrabajo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,10 +22,10 @@ public class OrdenDeTrabajo {
     private String nombre;
 
     @Column(name = "fecha_inicio")
-    private Time fechaInicio;
+    private LocalDateTime fechaInicio;
 
     @Column(name = "fecha_fin")
-    private Time fechaFin;
+    private LocalDateTime fechaFin;
 
     @Column(length = 50)
     private String estado;
@@ -30,31 +34,26 @@ public class OrdenDeTrabajo {
     private String observaciones;
 
     @Column(name = "fecha_estimada_inicio")
-    private Time fechaEstimadaDeInicio;
+    private LocalDateTime fechaEstimadaDeInicio;
 
     @Column(name = "fecha_estimada_fin")
-    private Time fechaEstimadaDeFin;
+    private LocalDateTime fechaEstimadaDeFin;
 
     @Column(name = "activa")
     private Boolean activa = true;
 
-    @OneToMany(mappedBy = "ordenDeTrabajo")
-    private List<OrdenVenta> ordenesDeVenta;
+    @OneToOne(mappedBy = "ordenDeTrabajo")
+    private OrdenVenta ordenDeVenta;
+
+    @OneToMany(mappedBy = "ordenDeTrabajo", cascade = CascadeType.ALL)
+    private List<OrdenDeTrabajoMaquina> ordenDeTrabajoMaquinas;
 
     @ManyToOne
-    @JoinColumn(name = "rollo_id")
+    @JoinColumn(name = "rollo_id", referencedColumnName = "id")
     private Rollo rollo;
 
     @ManyToOne
     @JoinColumn(name = "control_calidad_id")
     private ControlDeCalidad controlDeCalidad;
-
-    @ManyToMany
-    @JoinTable(
-        name = "ordenes_trabajo_maquinas",
-        joinColumns = @JoinColumn(name = "orden_trabajo_id"),
-        inverseJoinColumns = @JoinColumn(name = "maquina_id")
-    )
-    private List<Maquina> maquinas;
 
 }
