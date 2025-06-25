@@ -39,6 +39,10 @@ public class Rollo {
     @NotNull(message = "El peso es obligatorio")
     private Float pesoKG;
 
+    @Column(name = "largo", nullable = false)
+    @NotNull(message = "El largo es obligatorio")
+    private Float largoM;
+
     @Column(name = "ancho", nullable = false)
     @NotNull(message = "El ancho es obligatorio")
     private Float anchoMM;
