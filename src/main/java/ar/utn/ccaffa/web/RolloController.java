@@ -1,8 +1,7 @@
 package ar.utn.ccaffa.web;
 
-import ar.utn.ccaffa.model.dto.ProveedorDto;
+import ar.utn.ccaffa.model.dto.FiltroRolloDto;
 import ar.utn.ccaffa.model.dto.RolloDto;
-import ar.utn.ccaffa.model.entity.Proveedor;
 import ar.utn.ccaffa.model.entity.Rollo;
 import ar.utn.ccaffa.services.interfaces.RolloService;
 import lombok.extern.slf4j.Slf4j;
@@ -24,9 +23,9 @@ public class RolloController {
     }
 
     @GetMapping
-    public ResponseEntity<List<RolloDto>> getAllRollos() {
+    public ResponseEntity<List<RolloDto>> getAllRollos(FiltroRolloDto filtros) {
         log.info("Obteniendo todos los rollos");
-        List<RolloDto> rollos = rolloService.findAll();
+        List<RolloDto> rollos = rolloService.filtrarRollos(filtros);
         return ResponseEntity.ok(rollos);
     }
 
@@ -36,15 +35,27 @@ public class RolloController {
         return ResponseEntity.ok(rolloService.findById(id));
     }
 
+    @GetMapping("/{id}/conRollosPadres")
+    public ResponseEntity<RolloDto> getRolloByIdConRollosPadres(@PathVariable Long id) {
+        log.info("Buscando rollo con ID: {}", id);
+        return ResponseEntity.ok(rolloService.findByIdConRollosPadres(id));
+    }
+
+    @GetMapping("/{id}/arbolDeRollosHijos")
+    public ResponseEntity<RolloDto> getRolloByIdConArbolDeRollosHijos(@PathVariable Long id) {
+        log.info("Buscando rollo con ID: {}", id);
+        return ResponseEntity.ok(rolloService.obtenerArbolCompletoDeHijos(id));
+    }
+
     @PostMapping
-    public ResponseEntity<Rollo> createRollo(@RequestBody RolloDto rollo) {
+    public ResponseEntity<RolloDto> createRollo(@RequestBody RolloDto rollo) {
         log.info("Creando nuevo rollo: {}", rollo);
-        Rollo savedRollo = rolloService.save(rollo);
+        RolloDto savedRollo = rolloService.save(rollo);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedRollo);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Rollo> updateRollo(@PathVariable Long id, @RequestBody RolloDto rollo) {
+    public ResponseEntity<RolloDto> updateRollo(@PathVariable Long id, @RequestBody RolloDto rollo) {
         rollo.setId(id);
         return ResponseEntity.ok(rolloService.save(rollo));
     }
