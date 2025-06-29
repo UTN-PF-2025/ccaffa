@@ -1,11 +1,17 @@
 package ar.utn.ccaffa.services.impl;
 
-import ar.utn.ccaffa.exceptions.ResourceNotFoundException;
 import ar.utn.ccaffa.mapper.interfaces.RolloMapper;
+import ar.utn.ccaffa.mapper.interfaces.RolloProductoMapper;
 import ar.utn.ccaffa.model.dto.FiltroRolloDto;
+import ar.utn.ccaffa.model.dto.FiltroRolloProductoDto;
 import ar.utn.ccaffa.model.dto.RolloDto;
+import ar.utn.ccaffa.model.dto.RolloProductoDto;
+import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import ar.utn.ccaffa.model.entity.Rollo;
+import ar.utn.ccaffa.model.entity.RolloProducto;
+import ar.utn.ccaffa.repository.interfaces.RolloProductoRepository;
 import ar.utn.ccaffa.repository.interfaces.RolloRepository;
+import ar.utn.ccaffa.services.interfaces.RolloProductoService;
 import ar.utn.ccaffa.services.interfaces.RolloService;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
@@ -14,46 +20,40 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
 @Transactional
-public class RolloServiceImpl implements RolloService {
+public class RolloProductoServiceImpl implements RolloProductoService {
 
-    private final RolloRepository rolloRepository;
-    private final RolloMapper rolloMapper;
+    private final RolloProductoRepository rolloRepository;
+    private final RolloProductoMapper rolloMapper;
 
-    public RolloServiceImpl(RolloRepository rolloRepository, RolloMapper rolloMapper) {
+    public RolloProductoServiceImpl(RolloProductoRepository rolloRepository, RolloProductoMapper rolloMapper) {
         this.rolloRepository = rolloRepository;
         this.rolloMapper = rolloMapper;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<RolloDto> findAll() {
+    public List<RolloProductoDto> findAll() {
         log.info("Buscando todos los rollos");
         return this.rolloMapper.toDtoList(rolloRepository.findAll());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public RolloDto findById(Long id) {
+    public RolloProductoDto findById(Long id) {
         log.info("Buscando rollo por ID: {}", id);
-        return this.rolloMapper.toDtoOnlyWithRolloPadreID(rolloRepository.findById(id).orElse(Rollo.builder().build()));
+        return this.rolloMapper.toDto(rolloRepository.findById(id).orElse(RolloProducto.builder().build()));
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public RolloDto findByIdConRollosPadres(Long id) {
-        log.info("Buscando rollo por ID: {}", id);
-        return this.rolloMapper.toDto(rolloRepository.findById(id).orElse(Rollo.builder().build()));
-    }
+
 
     @Override
-    public RolloDto save(RolloDto rollo) {
+    public RolloProductoDto save(RolloProductoDto rollo) {
         log.info("Guardando nuevo rollo: {}", rollo);
-        Rollo rolloEntity = this.rolloMapper.toEntity(rollo);
+        RolloProducto rolloEntity = this.rolloMapper.toEntity(rollo);
 
         if (rollo.getRolloPadreId() != null) {
             Rollo padre = new Rollo();
@@ -63,8 +63,16 @@ public class RolloServiceImpl implements RolloService {
             rolloEntity.setRolloPadre(null);
         }
 
-        Rollo guardado = rolloRepository.save(rolloEntity);
-        return this.rolloMapper.toDtoOnlyWithRolloPadreID(guardado);
+        if (rollo.getOrdenDeTrabajoId() != null) {
+            OrdenDeTrabajo orden = new OrdenDeTrabajo();
+            orden.setId(rollo.getOrdenDeTrabajoId());
+            rolloEntity.setOrdenDeTrabajo(orden);
+        } else {
+            rolloEntity.setOrdenDeTrabajo(null);
+        }
+
+        RolloProducto guardado = rolloRepository.save(rolloEntity);
+        return this.rolloMapper.toDto(guardado);
     }
 
     @Override
@@ -79,57 +87,43 @@ public class RolloServiceImpl implements RolloService {
     }
 
     @Override
-    public RolloDto obtenerArbolCompletoDeHijos(Long rolloId) {
+    public List<RolloProductoDto> findByRolloPadreId(Long rolloId){
+        return this.rolloMapper.toDtoList(rolloRepository.findByRolloPadreId(rolloId));
+    };
 
-        Rollo root = rolloRepository.findById(rolloId).orElse(Rollo.builder().build());
-
-        inicializarRecursivamente(root);
-
-        return rolloMapper.toDtoWithRolloHijos(root);
-    }
-    private void inicializarRecursivamente(Rollo rollo) {
-        Hibernate.initialize(rollo.getHijos());
-        if (rollo.getHijos() != null) {
-            for (Rollo hijo : rollo.getHijos()) {
-                inicializarRecursivamente(hijo);
-            }
-        }
-    }
     @Override
-    public List<RolloDto> filtrarRollos(FiltroRolloDto filtros) {
+    public List<RolloProductoDto> findByOrdenDeTrabajoId(Long ordenId){
+        return this.rolloMapper.toDtoList(rolloRepository.findByOrdenDeTrabajoId(ordenId));
+    };
 
-        Specification<Rollo> spec = Specification.where(null);
 
-        if (filtros.getProveedorId() != null) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("proveedorId"), filtros.getProveedorId()));
-        }
+    @Override
+    public List<RolloProductoDto> filtrarRollosProducto(FiltroRolloProductoDto filtros) {
 
-        if (filtros.getCodigoProveedor() != null && !filtros.getCodigoProveedor().isEmpty()) {
-            spec = spec.and((root, query, cb) -> cb.like(cb.lower(root.get("codigoProveedor")), "%" + filtros.getCodigoProveedor().toLowerCase() + "%"));
-        }
+        Specification<RolloProducto> spec = Specification.where(null);
 
         if (filtros.getPesoMin() != null) {
-            spec = spec.and((root, query, cb) -> cb.ge(root.get("pesoKG"), filtros.getPesoMin()));
+            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("pesoKG"), filtros.getPesoMin()));
         }
 
         if (filtros.getPesoMax() != null) {
-            spec = spec.and((root, query, cb) -> cb.le(root.get("pesoKG"), filtros.getPesoMax()));
+            spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("pesoKG"), filtros.getPesoMax()));
         }
 
         if (filtros.getAnchoMin() != null) {
-            spec = spec.and((root, query, cb) -> cb.ge(root.get("anchoMM"), filtros.getAnchoMin()));
+            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("anchoMM"), filtros.getAnchoMin()));
         }
 
         if (filtros.getAnchoMax() != null) {
-            spec = spec.and((root, query, cb) -> cb.le(root.get("anchoMM"), filtros.getAnchoMax()));
+            spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("anchoMM"), filtros.getAnchoMax()));
         }
 
         if (filtros.getEspesorMin() != null) {
-            spec = spec.and((root, query, cb) -> cb.ge(root.get("espesorMM"), filtros.getEspesorMin()));
+            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("espesorMM"), filtros.getEspesorMin()));
         }
 
         if (filtros.getEspesorMax() != null) {
-            spec = spec.and((root, query, cb) -> cb.le(root.get("espesorMM"), filtros.getEspesorMax()));
+            spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("espesorMM"), filtros.getEspesorMax()));
         }
 
         if (filtros.getTipoMaterial() != null) {
@@ -152,7 +146,12 @@ public class RolloServiceImpl implements RolloService {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("rolloPadre").get("id"), filtros.getRolloPadreId()));
         }
 
-        return this.rolloMapper.toDtoListOnlyWithRolloPadreID(rolloRepository.findAll(spec));
+        if (filtros.getOrdenDeTrabajoId() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("ordenDeTrabajo").get("id"), filtros.getOrdenDeTrabajoId()));
+        }
+
+
+        return this.rolloMapper.toDtoList(rolloRepository.findAll(spec));
     }
 
 }

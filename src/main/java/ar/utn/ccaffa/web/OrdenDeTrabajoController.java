@@ -100,6 +100,7 @@ public class OrdenDeTrabajoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+
     @GetMapping
     public ResponseEntity<List<OrdenDeTrabajoResponseDto>> obtenerTodasLasOrdenes() {
         List<OrdenDeTrabajo> ordenes = ordenDeTrabajoService.findAll();
@@ -122,4 +123,13 @@ public class OrdenDeTrabajoController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/obtenerOrdenesConRollo/{id}")
+    public ResponseEntity<List<OrdenDeTrabajoResponseDto>> obtenerOrdenesDeTrabajoConRolloID(@PathVariable Long id) {
+        List<OrdenDeTrabajo> ordenes = ordenDeTrabajoService.findByRolloId(id);
+        List<OrdenDeTrabajoResponseDto> ordenesDto = ordenDeTrabajoResponseMapper.toDtoList(ordenes);
+        return ResponseEntity.ok(ordenesDto);
+
+    }
+
 } 
