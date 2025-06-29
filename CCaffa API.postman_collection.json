@@ -1,10 +1,11 @@
 {
 	"info": {
-		"_postman_id": "630767da-89fd-44c6-85d4-ac3319c7eacd",
+		"_postman_id": "d6fc9702-3b7b-4807-9a60-4955d12aacae",
 		"name": "CCaffa API",
 		"description": "Colección de endpoints para la API de CCaffa",
-		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
-		"_exporter_id": "36725469"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "45944283",
+		"_collection_link": "https://gabrielrodriguez-3962015.postman.co/workspace/Gabriel-Rodriguez's-Workspace~8fd34103-25c0-49e6-82ac-a7f18773f9ff/collection/45944283-d6fc9702-3b7b-4807-9a60-4955d12aacae?action=share&source=collection_link&creator=45944283"
 	},
 	"item": [
 		{
@@ -24,7 +25,19 @@
 							"mode": "raw",
 							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\"\n}"
 						},
-						"url": "http://localhost:8080/api/auth/login"
+						"url": {
+							"raw": "http://localhost:8080/api/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
 					},
 					"response": []
 				}
@@ -43,7 +56,18 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"url": "http://localhost:8080/api/roles"
+						"url": {
+							"raw": "http://localhost:8080/api/roles",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"roles"
+							]
+						}
 					},
 					"response": []
 				},
@@ -57,7 +81,19 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"url": "http://localhost:8080/api/roles/1"
+						"url": {
+							"raw": "http://localhost:8080/api/roles/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"roles",
+								"1"
+							]
+						}
 					},
 					"response": []
 				},
@@ -79,7 +115,18 @@
 							"mode": "raw",
 							"raw": "{\n    \"nombre\": \"NUEVO_ROL\"\n}"
 						},
-						"url": "http://localhost:8080/api/roles"
+						"url": {
+							"raw": "http://localhost:8080/api/roles",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"roles"
+							]
+						}
 					},
 					"response": []
 				},
@@ -101,7 +148,19 @@
 							"mode": "raw",
 							"raw": "{\n    \"nombre\": \"ROL_ACTUALIZADO\"\n}"
 						},
-						"url": "http://localhost:8080/api/roles/1"
+						"url": {
+							"raw": "http://localhost:8080/api/roles/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"roles",
+								"1"
+							]
+						}
 					},
 					"response": []
 				},
@@ -115,7 +174,19 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"url": "http://localhost:8080/api/roles/1"
+						"url": {
+							"raw": "http://localhost:8080/api/roles/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"roles",
+								"1"
+							]
+						}
 					},
 					"response": []
 				}
@@ -134,7 +205,18 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"url": "http://localhost:8080/api/usuarios"
+						"url": {
+							"raw": "http://localhost:8080/api/usuarios",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"usuarios"
+							]
+						}
 					},
 					"response": []
 				},
@@ -148,7 +230,19 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"url": "http://localhost:8080/api/usuarios/1"
+						"url": {
+							"raw": "http://localhost:8080/api/usuarios/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"usuarios",
+								"1"
+							]
+						}
 					},
 					"response": []
 				},
@@ -168,9 +262,20 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\",\n    \"roles\": [\n        {\n            \"nombre\": \"ADMIN\"\n        }\n    ]\n}"
+							"raw": "{\n    \"username\": \"nuevo_usuario\",\n    \"password\": \"password123\",\n    \"roles\": [\n        {\n            \"nombre\": \"USER\"\n        }\n    ]\n}"
 						},
-						"url": "http://localhost:8080/api/usuarios"
+						"url": {
+							"raw": "http://localhost:8080/api/usuarios",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"usuarios"
+							]
+						}
 					},
 					"response": []
 				},
@@ -192,7 +297,19 @@
 							"mode": "raw",
 							"raw": "{\n    \"username\": \"usuario_actualizado\",\n    \"password\": \"nuevo_password\",\n    \"roles\": [\n        {\n            \"nombre\": \"ADMIN\"\n        }\n    ]\n}"
 						},
-						"url": "http://localhost:8080/api/usuarios/1"
+						"url": {
+							"raw": "http://localhost:8080/api/usuarios/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"usuarios",
+								"1"
+							]
+						}
 					},
 					"response": []
 				},
@@ -206,7 +323,19 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"url": "http://localhost:8080/api/usuarios/1"
+						"url": {
+							"raw": "http://localhost:8080/api/usuarios/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"usuarios",
+								"1"
+							]
+						}
 					},
 					"response": []
 				}
@@ -220,9 +349,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc1MDYyNjU0NSwiZXhwIjoxNzUwNjQ0NTQ1fQ.Ey1Fng7-E1sGjcmQUuG9dPNZnB4t5fqNa6AVCRf8Jr0"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc1MDIxNzA2MSwiZXhwIjoxNzUwMjM1MDYxfQ.uaKF6pKv5QOT_u0za0W1w4SK4-Ez8B7N3SU8zZ1Fr6A",
+									"type": "string"
+								}
+							]
 						},
 						"method": "POST",
 						"header": [],
@@ -235,7 +368,18 @@
 								}
 							}
 						},
-						"url": "http://localhost:8080/api/ordenes-venta"
+						"url": {
+							"raw": "http://localhost:8080/api/ordenes-venta",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"ordenes-venta"
+							]
+						}
 					},
 					"response": []
 				},
@@ -244,7 +388,19 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "http://localhost:8080/api/ordenes-venta/1"
+						"url": {
+							"raw": "http://localhost:8080/api/ordenes-venta/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"ordenes-venta",
+								"1"
+							]
+						}
 					},
 					"response": []
 				}
@@ -258,7 +414,18 @@
 					"request": {
 						"method": "POST",
 						"header": [],
-						"url": "http://localhost:8080/api/imagenes"
+						"url": {
+							"raw": "http://localhost:8080/api/imagenes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"imagenes"
+							]
+						}
 					},
 					"response": []
 				},
@@ -267,7 +434,18 @@
 					"request": {
 						"method": "POST",
 						"header": [],
-						"url": "http://localhost:8080/api/imagenes"
+						"url": {
+							"raw": "http://localhost:8080/api/imagenes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"imagenes"
+							]
+						}
 					},
 					"response": []
 				}
@@ -286,7 +464,18 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"url": "http://localhost:8080/api/rollos"
+						"url": {
+							"raw": "http://localhost:8080/api/rollos",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"rollos"
+							]
+						}
 					},
 					"response": []
 				},
@@ -300,19 +489,79 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"url": "http://localhost:8080/api/rollos/1"
+						"url": {
+							"raw": "http://localhost:8080/api/rollos/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"rollos",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Rollos by ID con Padres",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/rollos/5/conRollosPadres",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"rollos",
+								"5",
+								"conRollosPadres"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Rollos by ID con Arbol De Hijos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/rollos/1/arbolDeRollosHijos",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"rollos",
+								"1",
+								"arbolDeRollosHijos"
+							]
+						}
 					},
 					"response": []
 				},
 				{
 					"name": "Create Rollos",
 					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": {
-								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc1MDYyNDkxOCwiZXhwIjoxNzUwNjQyOTE4fQ.kowwhzrEBaUmMZ1gJ0EEagciJNY-Ws1st9OnmljkEv0"
-							}
-						},
 						"method": "POST",
 						"header": [
 							{
@@ -328,7 +577,18 @@
 							"mode": "raw",
 							"raw": "{\n    \"codigoProveedor\": \"0XBDKJ2222R\",\n    \"proveedorId\": 2,\n    \"pesoKG\": 20,\n    \"anchoMM\": 200,\n    \"espesorMM\": 40,\n    \"tipoMaterial\": \"LAMINADO_EN_FRIO\",\n    \"estado\": \"DISPONIBLE\",\n    \"fechaIngreso\": \"2025-06-21 18:34:00\"\n\n}\n"
 						},
-						"url": "http://localhost:8080/api/rollos"
+						"url": {
+							"raw": "http://localhost:8080/api/rollos",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"rollos"
+							]
+						}
 					},
 					"response": []
 				},
@@ -348,9 +608,21 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"codigoProveedor\": \"0XBDKJ2222R\",\n    \"proveedorId\": 2,\n    \"pesoKG\": 20,\n    \"anchoMM\": 200,\n    \"espesorMM\": 40,\n    \"tipoMaterial\": \"LAMINADO_EN_FRIO\",\n    \"estado\": \"AGOTADO\",\n    \"fechaIngreso\": \"2025-06-21 18:34:00\"\n\n}"
+							"raw": "{\n        \"proveedorId\": 2,\n        \"codigoProveedor\": \"0XBDKJ2222R_HIJO\",\n        \"pesoKG\": 18,\n        \"anchoMM\": 22.44,\n        \"espesorMM\": 40,\n        \"tipoMaterial\": \"LAMINADO_EN_FRIO\",\n        \"estado\": \"DISPONIBLE\",\n        \"fechaIngreso\": \"2025-06-25 14:00:00\",\n        \"rolloPadreId\": 1\n}"
 						},
-						"url": "http://localhost:8080/api/rollos/2"
+						"url": {
+							"raw": "http://localhost:8080/api/rollos/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"rollos",
+								"2"
+							]
+						}
 					},
 					"response": []
 				},
@@ -364,7 +636,19 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"url": "http://localhost:8080/api/rollos/2"
+						"url": {
+							"raw": "http://localhost:8080/api/rollos/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"rollos",
+								"2"
+							]
+						}
 					},
 					"response": []
 				}
@@ -383,7 +667,18 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"url": "http://localhost:8080/api/proveedores"
+						"url": {
+							"raw": "http://localhost:8080/api/proveedores",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"proveedores"
+							]
+						}
 					},
 					"response": []
 				},
@@ -397,7 +692,19 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"url": "http://localhost:8080/api/proveedores/1"
+						"url": {
+							"raw": "http://localhost:8080/api/proveedores/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"proveedores",
+								"1"
+							]
+						}
 					},
 					"response": []
 				},
@@ -419,7 +726,18 @@
 							"mode": "raw",
 							"raw": "    {\n        \"nombre\": \"Proveedor_2\",\n        \"activo\": true\n    }"
 						},
-						"url": "http://localhost:8080/api/proveedores"
+						"url": {
+							"raw": "http://localhost:8080/api/proveedores",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"proveedores"
+							]
+						}
 					},
 					"response": []
 				},
@@ -441,7 +759,19 @@
 							"mode": "raw",
 							"raw": "    {\n        \"nombre\": \"Proveedor_2\",\n        \"activo\": false\n    }"
 						},
-						"url": "http://localhost:8080/api/proveedores/2"
+						"url": {
+							"raw": "http://localhost:8080/api/proveedores/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"proveedores",
+								"2"
+							]
+						}
 					},
 					"response": []
 				},
@@ -455,7 +785,51 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"url": "http://localhost:8080/api/proveedores/2"
+						"url": {
+							"raw": "http://localhost:8080/api/proveedores/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"proveedores",
+								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Ordenes de Trabajo",
+			"item": [
+				{
+					"name": "Get Ordenes by Rollo ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/ordenes-trabajo/obtenerOrdenesConRollo/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"ordenes-trabajo",
+								"obtenerOrdenesConRollo",
+								"1"
+							]
+						}
 					},
 					"response": []
 				}
@@ -474,7 +848,18 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"url": "http://localhost:8080/api/maquinas"
+						"url": {
+							"raw": "http://localhost:8080/api/maquinas",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"maquinas"
+							]
+						}
 					},
 					"response": []
 				},
@@ -488,19 +873,25 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"url": "http://localhost:8080/api/maquinas/2"
+						"url": {
+							"raw": "http://localhost:8080/api/maquinas/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"maquinas",
+								"2"
+							]
+						}
 					},
 					"response": []
 				},
 				{
 					"name": "Create Maquina",
 					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": {
-								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc1MDYyNDkxOCwiZXhwIjoxNzUwNjQyOTE4fQ.kowwhzrEBaUmMZ1gJ0EEagciJNY-Ws1st9OnmljkEv0"
-							}
-						},
 						"method": "POST",
 						"header": [
 							{
@@ -516,7 +907,18 @@
 							"mode": "raw",
 							"raw": "    {\n        \"nombre\": \"Maquina2\",\n        \"activo\": true,\n        \"tipo\": \"CORTADORA\",\n        \"velocidadTrabajoMetrosPorMinuto\": 5.0,\n        \"espesorMaximoMilimetros\": 5,\n        \"espesorMinimoMilimetros\": 100,\n        \"anchoMaximoMilimetros\": 500,\n        \"anchoMinimoMilimetros\": 20\n    }"
 						},
-						"url": "http://localhost:8080/api/maquinas"
+						"url": {
+							"raw": "http://localhost:8080/api/maquinas",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"maquinas"
+							]
+						}
 					},
 					"response": []
 				},
@@ -538,7 +940,19 @@
 							"mode": "raw",
 							"raw": "    {\n        \"nombre\": \"MAQUINA_2_CORTADORA\",\n        \"activo\": true,\n        \"tipo\": \"CORTADORA\",\n        \"velocidadTrabajoMetrosPorMinuto\": 5.0,\n        \"espesorMaximoMilimetros\": 5,\n        \"espesorMinimoMilimetros\": 100,\n        \"anchoMaximoMilimetros\": 500,\n        \"anchoMinimoMilimetros\": 20        \n    }"
 						},
-						"url": "http://localhost:8080/api/maquinas/2"
+						"url": {
+							"raw": "http://localhost:8080/api/maquinas/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"maquinas",
+								"2"
+							]
+						}
 					},
 					"response": []
 				},
@@ -552,84 +966,8 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"url": "http://localhost:8080/api/maquinas/3"
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Orden de Trabajo",
-			"item": [
-				{
-					"name": "Create orden de trabajo",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": {
-								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc1MDYzMTQ2MiwiZXhwIjoxNzUwNjQ5NDYyfQ._FxUQwYx7MalII-puYK_1dvTEjorcKqFxWj1RTvI0x0"
-							}
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc1MDIxNzA2MSwiZXhwIjoxNzUwMjM1MDYxfQ.uaKF6pKv5QOT_u0za0W1w4SK4-Ez8B7N3SU8zZ1Fr6A",
-								"disabled": true
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"ordenDeVentaId\": 1,\n    \"rolloId\": 1,\n    \"fechaInicio\": \"2025-06-23T10:00:00\",\n    \"fechaFin\": \"2025-06-23T18:00:00\",\n    \"observaciones\": \"Orden de trabajo de prueba\",\n    \"maquinas\": [\n      {\n        \"id\": 1,\n        \"fechaInicio\": \"2025-06-23T10:00:00\",\n        \"fechaFin\": \"2025-06-23T14:00:00\",\n        \"estado\": \"En Proceso\",\n        \"observaciones\": \"Máquina 1 asignada\"\n      }\n    ]\n  }",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": "http://localhost:8080/api/ordenes-trabajo"
-					},
-					"response": []
-				},
-				{
-					"name": "Get orden de trabajo",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": {
-								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc1MDYyNjU0NSwiZXhwIjoxNzUwNjQ0NTQ1fQ.Ey1Fng7-E1sGjcmQUuG9dPNZnB4t5fqNa6AVCRf8Jr0"
-							}
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc1MDIxNzA2MSwiZXhwIjoxNzUwMjM1MDYxfQ.uaKF6pKv5QOT_u0za0W1w4SK4-Ez8B7N3SU8zZ1Fr6A",
-								"disabled": true
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"ordenDeVentaId\": 1,\n    \"rolloId\": 1,\n    \"fechaInicio\": \"2025-06-22T10:00:00\",\n    \"fechaFin\": \"2025-06-22T18:00:00\",\n    \"observaciones\": \"Orden de trabajo de prueba\",\n    \"maquinas\": [\n      {\n        \"id\": 1,\n        \"fechaInicio\": \"2025-06-22T10:00:00\",\n        \"fechaFin\": \"2025-06-22T14:00:00\",\n        \"estado\": \"En Proceso\",\n        \"observaciones\": \"Máquina 1 asignada\"\n      }\n    ]\n  }",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
-							"raw": "http://localhost:8080/api/ordenes-trabajo/:id",
+							"raw": "http://localhost:8080/api/maquinas/3",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -637,69 +975,212 @@
 							"port": "8080",
 							"path": [
 								"api",
-								"ordenes-trabajo",
-								":id"
+								"maquinas",
+								"3"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Rollos Productos",
+			"item": [
+				{
+					"name": "Get All Productos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/rollos_productos",
+							"protocol": "http",
+							"host": [
+								"localhost"
 							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "4"
-								}
+							"port": "8080",
+							"path": [
+								"api",
+								"rollos_productos"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Actualizar orden de trabajo",
+					"name": "Get Productos by ID",
 					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": {
-								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc1MDYyNjU0NSwiZXhwIjoxNzUwNjQ0NTQ1fQ.Ey1Fng7-E1sGjcmQUuG9dPNZnB4t5fqNa6AVCRf8Jr0"
-							}
-						},
-						"method": "PUT",
+						"method": "GET",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "Authorization",
-								"value": "Bearer TU_TOKEN_JWT"
+								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"id\": 1,\n    \"nombre\": \"Orden de trabajo actualizada\",\n    \"fechaInicio\": \"2025-06-22T10:00:00\",\n    \"fechaFin\": \"2025-06-22T18:00:00\",\n    \"estado\": \"En Proceso\",\n    \"observaciones\": \"Observaciones actualizadas\",\n    \"fechaEstimadaDeInicio\": \"2025-06-22T10:00:00\",\n    \"fechaEstimadaDeFin\": \"2025-06-22T18:00:00\",\n    \"activa\": true\n  }",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": "http://localhost:8080/api/ordenes-trabajo/1"
+						"url": {
+							"raw": "http://localhost:8080/api/rollos_productos/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"rollos_productos",
+								"1"
+							]
+						}
 					},
 					"response": []
 				},
 				{
-					"name": "Cancelar orden de trabajo",
+					"name": "Get Productos by Rollo Padre ID",
 					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": {
-								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc1MDYyNjU0NSwiZXhwIjoxNzUwNjQ0NTQ1fQ.Ey1Fng7-E1sGjcmQUuG9dPNZnB4t5fqNa6AVCRf8Jr0"
-							}
-						},
-						"method": "PATCH",
+						"method": "GET",
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer TU_TOKEN_JWT"
+								"value": "Bearer {{token}}"
 							}
 						],
-						"url": "http://localhost:8080/api/ordenes-trabajo/1/cancelar"
+						"url": {
+							"raw": "http://localhost:8080/api/rollos_productos/obtenerProductosGeneradosPorOrdenDeTrabajo/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"rollos_productos",
+								"obtenerProductosGeneradosPorOrdenDeTrabajo",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Productos by Orden De Trabajo ID Copy",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/rollos_productos/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"rollos_productos",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Producto",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pesoKG\": 20,\n    \"anchoMM\": 200,\n    \"espesorMM\": 40,\n    \"tipoMaterial\": \"LAMINADO_EN_FRIO\",\n    \"estado\": \"CONFIRMADO\",\n    \"fechaIngreso\": \"2025-06-21 18:34:00\",\n    \"rolloPadreId\": 1,\n    \"ordenDeTrabajoId\": 1    \n}\n"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/rollos_productos",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"rollos_productos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Producto",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pesoKG\": 19,\n    \"anchoMM\": 200,\n    \"espesorMM\": 40,\n    \"tipoMaterial\": \"LAMINADO_EN_FRIO\",\n    \"estado\": \"CONFIRMADO\",\n    \"fechaIngreso\": \"2025-06-21 18:34:00\",\n    \"rolloPadreId\": 1,\n    \"ordenDeTrabajoId\": 1    \n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/rollos_productos/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"rollos_productos",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Producto",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/rollos_productos/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"rollos_productos",
+								"2"
+							]
+						}
 					},
 					"response": []
 				}
