@@ -33,18 +33,18 @@ public class OrdenDeTrabajoController {
     public ResponseEntity<OrdenDeTrabajoResponseDto> crearOrdenDeTrabajo(@RequestBody OrdenDeTrabajoDto request) {
         try {
             OrdenDeTrabajo orden = crearOrdenBasica(request);
-            
+
             OrdenVenta ordenVenta = procesarOrdenVenta(request, orden);
-            
+
             procesarMaquinas(request, orden);
-            
+
             procesarRollo(request, orden, ordenVenta);
-            
+
             configurarOrdenFinal(orden, request);
-            
+
             OrdenDeTrabajo guardada = guardarOrdenCompleta(orden, ordenVenta);
             return ResponseEntity.ok(ordenDeTrabajoResponseMapper.toDto(guardada));
-            
+
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         }
@@ -57,6 +57,7 @@ public class OrdenDeTrabajoController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
 
     @GetMapping
     public ResponseEntity<List<OrdenDeTrabajoResponseDto>> obtenerTodasLasOrdenes() {
@@ -85,7 +86,7 @@ public class OrdenDeTrabajoController {
                         validarCancelacion(existingOrden);
                         cancelarOrden(existingOrden);
                         OrdenDeTrabajo cancelada = ordenDeTrabajoService.save(existingOrden);
-                        
+
                         // Si la orden tiene un rollo, manejarlo según su estado
                         if (cancelada.getRollo() != null) {
                             if (cancelada.getRollo().getEstado() == EstadoRollo.DIVIDO) {
@@ -96,12 +97,12 @@ public class OrdenDeTrabajoController {
                                 rolloRepository.save(cancelada.getRollo());
                             }
                         }
-                        
+
                         // Replanificar la orden de venta asociada si existe
                         if (cancelada.getOrdenDeVenta() != null) {
                             replanificarOrdenVenta(cancelada);
                         }
-                        
+
                         return ResponseEntity.ok(ordenDeTrabajoResponseMapper.toDto(cancelada));
                     } catch (Exception e) {
                         throw new RuntimeException("Error al cancelar la orden de trabajo: " + e.getMessage(), e);
@@ -109,6 +110,16 @@ public class OrdenDeTrabajoController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/obtenerOrdenesConRollo/{id}")
+    public ResponseEntity<List<OrdenDeTrabajoResponseDto>> obtenerOrdenesDeTrabajoConRolloID(@PathVariable Long id) {
+        List<OrdenDeTrabajo> ordenes = ordenDeTrabajoService.findByRolloId(id);
+        List<OrdenDeTrabajoResponseDto> ordenesDto = ordenDeTrabajoResponseMapper.toDtoList(ordenes);
+        return ResponseEntity.ok(ordenesDto);
+
+    }
+
+}
 
     // Métodos privados para crear orden de trabajo
     private OrdenDeTrabajo crearOrdenBasica(OrdenDeTrabajoDto request) {
@@ -121,12 +132,12 @@ public class OrdenDeTrabajoController {
         if (request.getOrdenDeVentaId() == null) {
             return null;
         }
-        
+
         Optional<OrdenVenta> ordenVentaOpt = ordenDeVentaRepository.findById(request.getOrdenDeVentaId());
         if (ordenVentaOpt.isEmpty()) {
             throw new IllegalArgumentException("Orden de venta no encontrada");
         }
-        
+
         OrdenVenta ordenVenta = ordenVentaOpt.get();
         orden.setOrdenDeVenta(ordenVenta);
         return ordenVenta;
@@ -136,19 +147,19 @@ public class OrdenDeTrabajoController {
         if (request.getMaquinas() == null) {
             return;
         }
-        
+
         List<OrdenDeTrabajoMaquina> ordenDeTrabajoMaquinas = new ArrayList<>();
-        
+
         for (OrdenDeTrabajoDto.MaquinaDto mreq : request.getMaquinas()) {
             Optional<Maquina> maquinaOpt = maquinaRepository.findById(mreq.getId());
             if (maquinaOpt.isEmpty()) {
                 throw new IllegalArgumentException("Máquina no encontrada: " + mreq.getId());
             }
-            
+
             OrdenDeTrabajoMaquina otm = crearOrdenDeTrabajoMaquina(orden, maquinaOpt.get(), mreq);
             ordenDeTrabajoMaquinas.add(otm);
         }
-        
+
         orden.setOrdenDeTrabajoMaquinas(ordenDeTrabajoMaquinas);
     }
 
@@ -167,12 +178,12 @@ public class OrdenDeTrabajoController {
         if (request.getRolloId() == null) {
             return;
         }
-        
+
         Optional<Rollo> rolloOpt = rolloRepository.findById(request.getRolloId());
         if (rolloOpt.isEmpty()) {
             throw new IllegalArgumentException("Rollo no encontrado");
         }
-        
+
         Rollo rollo = rolloOpt.get();
         orden.setRollo(rollo);
         rollo.setEstado(EstadoRollo.DIVIDO);
@@ -193,12 +204,12 @@ public class OrdenDeTrabajoController {
 
     private OrdenDeTrabajo guardarOrdenCompleta(OrdenDeTrabajo orden, OrdenVenta ordenVenta) {
         OrdenDeTrabajo guardada = ordenDeTrabajoService.save(orden);
-        
+
         if (ordenVenta != null) {
             ordenVenta.setOrdenDeTrabajo(guardada);
             ordenDeVentaRepository.save(ordenVenta);
         }
-        
+
         return guardada;
     }
 
@@ -233,16 +244,16 @@ public class OrdenDeTrabajoController {
     private List<Rollo> crearRollosHijos(Rollo rollo, Especificacion especificacion) {
         List<Rollo> rolloHijos = new ArrayList<>();
         List<Bloque> bloques = cortarBloque(
-            new Bloque(0f, 0f, rollo.getAnchoMM(), rollo.getPesoKG()), 
-            especificacion.getAncho(), 
+            new Bloque(0f, 0f, rollo.getAnchoMM(), rollo.getPesoKG()),
+            especificacion.getAncho(),
             especificacion.getPesoMaximoPorRollo()
         );
-        
+
         for (Bloque bloque : bloques) {
             Rollo rolloHijo = crearRolloHijo(rollo, bloque);
             rolloHijos.add(rolloHijo);
         }
-        
+
         return rolloHijos;
     }
 
@@ -264,7 +275,7 @@ public class OrdenDeTrabajoController {
         if (maquinas == null || maquinas.isEmpty()) {
             return;
         }
-        
+
         LocalDateTime fechaIngreso = calcularFechaIngreso(maquinas);
         rolloHijos.forEach(rollo -> rollo.setFechaIngreso(fechaIngreso));
     }
@@ -273,7 +284,7 @@ public class OrdenDeTrabajoController {
         if (maquinas == null || maquinas.isEmpty()) {
             throw new IllegalArgumentException("La lista de máquinas no puede estar vacía");
         }
-        
+
         return maquinas.stream()
                 .filter(m -> m.getMaquina() != null && MaquinaTipoEnum.CORTADORA.equals(m.getMaquina().getTipo()))
                 .findFirst()
@@ -308,7 +319,7 @@ public class OrdenDeTrabajoController {
         if (orden.getRollo() == null) {
             return;
         }
-        
+
         Rollo rollo = orden.getRollo();
         if (rollo.getEstado().equals(EstadoRollo.AGOTADO)) {
             rollo.setEstado(EstadoRollo.DISPONIBLE);
@@ -321,30 +332,30 @@ public class OrdenDeTrabajoController {
     private void procesarRolloDividido(Rollo rollo) {
         // Buscar todos los rollos hijos
         List<Rollo> rollosHijos = rolloRepository.findByRolloPadreId(rollo.getId());
-        
+
         // Para cada rollo hijo, buscar sus órdenes de trabajo y cancelarlas
         for (Rollo rolloHijo : rollosHijos) {
             // Buscar órdenes de trabajo asociadas al rollo hijo
             List<OrdenDeTrabajo> ordenesTrabajoHijo = ordenDeTrabajoService.findByRolloId(rolloHijo.getId());
-            
+
             // Cancelar cada orden de trabajo asociada
             for (OrdenDeTrabajo ordenHijo : ordenesTrabajoHijo) {
                 if (!"Cancelada".equals(ordenHijo.getEstado())) {
                     cancelarOrden(ordenHijo);
                     ordenDeTrabajoService.save(ordenHijo);
-                    
+
                     // Replanificar la orden de venta asociada si existe
                     if (ordenHijo.getOrdenDeVenta() != null) {
                         replanificarOrdenVenta(ordenHijo);
                     }
                 }
             }
-            
+
             // Actualizar el estado del rollo hijo
             rolloHijo.setEstado(EstadoRollo.CANCELADO);
             rolloRepository.save(rolloHijo);
         }
-        
+
         // Actualizar el estado del rollo padre
         rollo.setEstado(EstadoRollo.DISPONIBLE);
         rolloRepository.save(rollo);
@@ -361,15 +372,15 @@ public class OrdenDeTrabajoController {
     // Métodos estáticos para corte de bloques
     public static List<Bloque> cortarBloque(Bloque original, Float reqAncho, Float reqAlto) {
         validarDimensiones(original, reqAncho, reqAlto);
-        
+
         List<Bloque> resultado = new ArrayList<>();
-        
+
         // Sobrante vertical
         agregarSobranteVertical(resultado, original, reqAncho, reqAlto);
-        
+
         // Sobrante horizontal
         agregarSobranteHorizontal(resultado, original, reqAncho, reqAlto);
-        
+
         return resultado;
     }
 
