@@ -11,13 +11,17 @@ import ar.utn.ccaffa.model.dto.Bloque;
 import ar.utn.ccaffa.model.dto.OrdenDeTrabajoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/ordenes-trabajo")
 @RequiredArgsConstructor
@@ -81,34 +85,158 @@ public class OrdenDeTrabajoController {
     @PatchMapping("/{id}/cancelar")
     public ResponseEntity<OrdenDeTrabajoResponseDto> cancelarOrdenDeTrabajo(@PathVariable Long id) {
         return ordenDeTrabajoService.findById(id)
-                .map(existingOrden -> {
+                .map(ordenACancelar -> {
                     try {
-                        validarCancelacion(existingOrden);
-                        cancelarOrden(existingOrden);
-                        OrdenDeTrabajo cancelada = ordenDeTrabajoService.save(existingOrden);
+                        validarCancelacion(ordenACancelar);
+                        
+                        // 1. Obtener el rollo actual y su padre si existe
+                        Rollo rolloActual = ordenACancelar.getRollo();
+                        Rollo rolloPadre = rolloActual != null ? rolloActual.getRolloPadre() : null;
 
-                        // Si la orden tiene un rollo, manejarlo según su estado
-                        if (cancelada.getRollo() != null) {
-                            if (cancelada.getRollo().getEstado() == EstadoRollo.DIVIDO) {
-                                procesarRolloDividido(cancelada.getRollo());
+                        // 2. Inicializar conjuntos para órdenes de venta y trabajo a procesar
+                        Set<OrdenVenta> ordenesVentaAReplanificar = new HashSet<>();
+                        Set<OrdenDeTrabajo> ordenesTrabajoACancelar = new HashSet<>();
+                        Set<Rollo> rollosACancelar = new HashSet<>(); // Para manejar el estado de los rollos
+                        
+                        // 3. Agregar la orden actual a las órdenes a cancelar
+                        ordenesTrabajoACancelar.add(ordenACancelar);
+                        if (rolloActual != null) {
+                            rollosACancelar.add(rolloActual);
+                        }
+                        
+                        // 4. Si tiene un rollo, procesar la jerarquía completa
+                        if (rolloActual != null) {
+                            // 4.1. Si tiene padre, procesar ancestros, hermanos y descendientes
+                            if (rolloPadre != null) {
+                                // 4.1.1. Procesar ancestros (padre, abuelo, etc.)
+                                procesarAncestros(rolloPadre, ordenesVentaAReplanificar, ordenesTrabajoACancelar);
+                                
+                                // 4.1.2. Obtener todos los rollos del mismo nivel (hermanos)
+                                List<Rollo> rollosHermanos = rolloRepository.findByRolloPadreId(rolloPadre.getId());
+                                
+                                // 4.1.3. Procesar cada rollo hermano
+                                for (Rollo rolloHermano : rollosHermanos) {
+                                    // Agregar el rollo hermano a la lista de rollos a cancelar
+                                    rollosACancelar.add(rolloHermano);
+                                    
+                                    // Obtener todas las órdenes de trabajo del hermano
+                                    List<OrdenDeTrabajo> ordenesHermano = ordenDeTrabajoService.findByRolloId(rolloHermano.getId());
+                                    for (OrdenDeTrabajo ordenHermano : ordenesHermano) {
+                                        // Agregar la orden de venta a replanificar si existe
+                                        if (ordenHermano.getOrdenDeVenta() != null) {
+                                            ordenesVentaAReplanificar.add(ordenHermano.getOrdenDeVenta());
+                                        }
+                                        // Agregar la orden de trabajo a cancelar
+                                        ordenesTrabajoACancelar.add(ordenHermano);
+                                    }
+                                    
+                                    // Procesar descendientes del hermano (hijos, nietos, etc.)
+                                    procesarDescendientes(rolloHermano, ordenesVentaAReplanificar, ordenesTrabajoACancelar, rollosACancelar);
+                                }
+                                
+                                // 4.1.4. Marcar el padre como disponible
+                                rolloPadre.setEstado(EstadoRollo.DISPONIBLE);
+                                rolloRepository.save(rolloPadre);
                             } else {
-                                // Si el rollo no está dividido, simplemente marcarlo como disponible
-                                cancelada.getRollo().setEstado(EstadoRollo.DISPONIBLE);
-                                rolloRepository.save(cancelada.getRollo());
+                                // 4.2. Si no tiene padre, procesar solo los descendientes del rollo actual
+                                procesarDescendientes(rolloActual, ordenesVentaAReplanificar, ordenesTrabajoACancelar, rollosACancelar);
+                            }
+                        }
+                        
+                        // 5. Cancelar todas las órdenes de trabajo
+                        for (OrdenDeTrabajo orden : ordenesTrabajoACancelar) {
+                            if (!orden.getEstado().equals("Cancelada")) {
+                                cancelarOrden(orden);
+                                ordenDeTrabajoService.save(orden);
+                                
+                                // Agregar la orden de venta a replanificar si existe
+                                if (orden.getOrdenDeVenta() != null) {
+                                    ordenesVentaAReplanificar.add(orden.getOrdenDeVenta());
+                                }
+                            }
+                        }
+                        
+                        // 6. Actualizar el estado de los rollos
+                        for (Rollo rollo : rollosACancelar) {
+                            // Solo actualizar si no es el rollo padre
+                            if (rolloPadre == null || !rollo.getId().equals(rolloPadre.getId())) {
+                                rollo.setEstado(EstadoRollo.CANCELADO);
+                                rolloRepository.save(rollo);
                             }
                         }
 
-                        // Replanificar la orden de venta asociada si existe
-                        if (cancelada.getOrdenDeVenta() != null) {
-                            replanificarOrdenVenta(cancelada);
+                        // 7. Replanificar todas las órdenes de venta afectadas
+                        for (OrdenVenta ordenVenta : ordenesVentaAReplanificar) {
+                            ordenVenta.setEstado("Replanificar");
+                            ordenDeVentaRepository.save(ordenVenta);
                         }
 
-                        return ResponseEntity.ok(ordenDeTrabajoResponseMapper.toDto(cancelada));
+                        return ResponseEntity.ok(ordenDeTrabajoResponseMapper.toDto(ordenACancelar));
                     } catch (Exception e) {
                         throw new RuntimeException("Error al cancelar la orden de trabajo: " + e.getMessage(), e);
                     }
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+    
+    /**
+     * Procesa recursivamente los ancestros de un rollo (padre, abuelo, etc.)
+     * para recolectar órdenes de venta y trabajo
+     */
+    private void procesarAncestros(Rollo rollo, Set<OrdenVenta> ordenesVenta, Set<OrdenDeTrabajo> ordenesTrabajo) {
+        if (rollo == null) {
+            return;
+        }
+        
+        // Obtener todas las órdenes de trabajo del ancestro actual
+        List<OrdenDeTrabajo> ordenesAncestro = ordenDeTrabajoService.findByRolloId(rollo.getId());
+        
+        for (OrdenDeTrabajo orden : ordenesAncestro) {
+            // Agregar la orden de venta si existe
+            if (orden.getOrdenDeVenta() != null) {
+                ordenesVenta.add(orden.getOrdenDeVenta());
+            }
+            // Agregar la orden de trabajo a cancelar
+            ordenesTrabajo.add(orden);
+        }
+        
+        // Continuar con el siguiente ancestro
+        if (rollo.getRolloPadre() != null) {
+            procesarAncestros(rollo.getRolloPadre(), ordenesVenta, ordenesTrabajo);
+        }
+    }
+
+    /**
+     * Procesa recursivamente los descendientes de un rollo para recolectar órdenes de venta y trabajo
+     * @param rollo Rollo del que se procesarán los descendientes
+     * @param ordenesVenta Conjunto donde se agregarán las órdenes de venta encontradas
+     * @param ordenesTrabajo Conjunto donde se agregarán las órdenes de trabajo encontradas
+     * @param rollosACancelar Conjunto donde se agregarán los rollos que deben ser cancelados
+     */
+    private void procesarDescendientes(Rollo rollo, Set<OrdenVenta> ordenesVenta, 
+                                     Set<OrdenDeTrabajo> ordenesTrabajo, Set<Rollo> rollosACancelar) {
+        // Obtener todos los hijos directos
+        List<Rollo> hijos = rolloRepository.findByRolloPadreId(rollo.getId());
+        
+        for (Rollo hijo : hijos) {
+            // Agregar el rollo hijo a la lista de rollos a cancelar
+            rollosACancelar.add(hijo);
+            
+            // Obtener todas las órdenes de trabajo del hijo
+            List<OrdenDeTrabajo> ordenesHijo = ordenDeTrabajoService.findByRolloId(hijo.getId());
+            
+            for (OrdenDeTrabajo orden : ordenesHijo) {
+                // Agregar la orden de venta si existe
+                if (orden.getOrdenDeVenta() != null) {
+                    ordenesVenta.add(orden.getOrdenDeVenta());
+                }
+                // Agregar la orden de trabajo a cancelar
+                ordenesTrabajo.add(orden);
+            }
+            
+            // Procesar recursivamente los descendientes
+            procesarDescendientes(hijo, ordenesVenta, ordenesTrabajo, rollosACancelar);
+        }
     }
 
     @GetMapping("/obtenerOrdenesConRollo/{id}")
@@ -118,8 +246,6 @@ public class OrdenDeTrabajoController {
         return ResponseEntity.ok(ordenesDto);
 
     }
-
-}
 
     // Métodos privados para crear orden de trabajo
     private OrdenDeTrabajo crearOrdenBasica(OrdenDeTrabajoDto request) {
@@ -191,7 +317,7 @@ public class OrdenDeTrabajoController {
         if (ordenVenta != null && ordenVenta.getEspecificacion() != null) {
             List<Rollo> rolloHijos = crearRollosHijos(rollo, ordenVenta.getEspecificacion());
             asignarFechasRollosHijos(rolloHijos, orden.getOrdenDeTrabajoMaquinas());
-            guardarRollosHijos(rolloHijos);
+            rolloRepository.saveAll(rolloHijos);
         }
     }
 
@@ -214,6 +340,21 @@ public class OrdenDeTrabajoController {
     }
 
     // Métodos privados para validaciones
+    private void actualizarOrden(OrdenDeTrabajo existingOrden, OrdenDeTrabajo nuevaOrden) {
+        // Actualizar los campos necesarios de la orden existente con los valores de la nueva orden
+        // Asegúrate de solo actualizar los campos que deberían ser modificables
+        if (nuevaOrden.getFechaInicio() != null) {
+            existingOrden.setFechaInicio(nuevaOrden.getFechaInicio());
+        }
+        if (nuevaOrden.getFechaFin() != null) {
+            existingOrden.setFechaFin(nuevaOrden.getFechaFin());
+        }
+        if (nuevaOrden.getEstado() != null) {
+            existingOrden.setEstado(nuevaOrden.getEstado());
+        }
+        // Agrega aquí cualquier otro campo que necesites actualizar
+    }
+
     private void validarModificacion(OrdenDeTrabajo orden) {
         if ("En Ejecucion".equals(orden.getEstado()) || "Ejecutando".equals(orden.getEstado())) {
             throw new IllegalStateException("No se puede modificar una orden de trabajo que está en ejecución");
@@ -226,18 +367,37 @@ public class OrdenDeTrabajoController {
         }
     }
 
-    private void actualizarOrden(OrdenDeTrabajo existingOrden, OrdenDeTrabajo orden) {
-        existingOrden.setNombre(orden.getNombre());
-        existingOrden.setObservaciones(orden.getObservaciones());
-        existingOrden.setFechaEstimadaDeInicio(orden.getFechaEstimadaDeInicio());
-        existingOrden.setFechaEstimadaDeFin(orden.getFechaEstimadaDeFin());
-        existingOrden.setEstado(orden.getEstado());
-    }
 
-    private void cancelarOrden(OrdenDeTrabajo orden) {
+    private OrdenDeTrabajo cancelarOrden(OrdenDeTrabajo orden) {
         orden.setEstado("Cancelada");
         orden.setActiva(false);
         liberarRecursos(orden);
+        return orden;
+    }
+
+    private void replanificarOrdenVenta(OrdenVenta ordenVenta) {
+        // 1. Verificar si la orden de venta ya está completada o cancelada
+        if (ordenVenta.getEstado().equalsIgnoreCase("Completada") || 
+            ordenVenta.getEstado().equalsIgnoreCase("Cancelada")) {
+            return; // No es necesario replanificar si ya está en un estado final
+        }
+
+        // 2. Obtener todas las órdenes de trabajo asociadas a esta orden de venta
+        // Como no tenemos un método directo, primero obtenemos la orden de trabajo relacionada
+        // a través de la relación bidireccional
+        OrdenDeTrabajo ordenTrabajo = ordenVenta.getOrdenDeTrabajo();
+        
+        // 3. Verificar si la orden de trabajo está activa
+        if (ordenTrabajo != null && (ordenTrabajo.getActiva() == null || !ordenTrabajo.getActiva())) {
+            // 4. Si no hay orden de trabajo activa, marcar la orden de venta como pendiente
+            ordenVenta.setEstado("Pendiente");
+            ordenDeVentaRepository.save(ordenVenta);
+            
+            // 5. Opcional: Aquí podrías agregar lógica adicional para notificar
+            // al sistema o a los usuarios que la orden de venta necesita ser replanificada
+            // Usamos el logger de Lombok
+            log.info("Orden de venta {} marcada como pendiente de replanificación", ordenVenta.getId());
+        }
     }
 
     // Métodos privados para gestión de rollos
@@ -272,12 +432,15 @@ public class OrdenDeTrabajoController {
     }
 
     private void asignarFechasRollosHijos(List<Rollo> rolloHijos, List<OrdenDeTrabajoMaquina> maquinas) {
-        if (maquinas == null || maquinas.isEmpty()) {
+        if (maquinas == null || maquinas.isEmpty() || rolloHijos == null) {
             return;
         }
 
         LocalDateTime fechaIngreso = calcularFechaIngreso(maquinas);
-        rolloHijos.forEach(rollo -> rollo.setFechaIngreso(fechaIngreso));
+        rolloHijos.forEach(rollo -> {
+            rollo.setFechaIngreso(fechaIngreso);
+            rolloRepository.save(rollo);
+        });
     }
 
     private LocalDateTime calcularFechaIngreso(List<OrdenDeTrabajoMaquina> maquinas) {
@@ -290,10 +453,6 @@ public class OrdenDeTrabajoController {
                 .findFirst()
                 .map(OrdenDeTrabajoMaquina::getFechaFin)
                 .orElseGet(() -> maquinas.get(0).getFechaFin());
-    }
-
-    private void guardarRollosHijos(List<Rollo> rolloHijos) {
-        rolloHijos.forEach(rolloRepository::save);
     }
 
     // Métodos privados para liberación de recursos
@@ -401,6 +560,48 @@ public class OrdenDeTrabajoController {
         Float sobranteAncho = original.getAncho() - reqAncho;
         if (sobranteAncho > 0) {
             resultado.add(new Bloque(original.getX() + reqAncho, original.getY(), sobranteAncho, reqLargo));
+        }
+    }
+
+    /**
+     * Método auxiliar para cancelar solo las órdenes de trabajo de un rollo
+     */
+    private void cancelarOrdenesDeTrabajo(Rollo rollo, Set<OrdenVenta> ordenesVentaAReplanificar) {
+        List<OrdenDeTrabajo> ordenesDelRollo = ordenDeTrabajoService.findByRolloId(rollo.getId());
+        for (OrdenDeTrabajo orden : ordenesDelRollo) {
+            if (!orden.getEstado().equals("Cancelada")) {
+                cancelarOrden(orden);
+                ordenDeTrabajoService.save(orden);
+                
+                if (orden.getOrdenDeVenta() != null) {
+                    ordenesVentaAReplanificar.add(orden.getOrdenDeVenta());
+                }
+            }
+        }
+    }
+
+    /**
+     * Método auxiliar recursivo para procesar la cancelación de un rollo y todos sus descendientes
+     * @param esRolloActual Indica si es el rollo que inició la cancelación (se marca como DISPONIBLE)
+     */
+    private void procesarCancelacionRolloYDescendientes(Rollo rollo, Set<OrdenVenta> ordenesVentaAReplanificar, boolean esRolloActual) {
+        // 1. Cancelar todas las órdenes de trabajo de este rollo
+        cancelarOrdenesDeTrabajo(rollo, ordenesVentaAReplanificar);
+
+        // 2. Actualizar el estado del rollo
+        if (esRolloActual) {
+            // Solo el rollo que inició la cancelación queda como DISPONIBLE
+            rollo.setEstado(EstadoRollo.DISPONIBLE);
+        } else {
+            // Todos los demás rollos (hijos, nietos, etc.) quedan como CANCELADO
+            rollo.setEstado(EstadoRollo.CANCELADO);
+        }
+        rolloRepository.save(rollo);
+
+        // 3. Procesar recursivamente a los hijos (si existen)
+        List<Rollo> hijos = rolloRepository.findByRolloPadreId(rollo.getId());
+        for (Rollo hijo : hijos) {
+            procesarCancelacionRolloYDescendientes(hijo, ordenesVentaAReplanificar, false);
         }
     }
 }
