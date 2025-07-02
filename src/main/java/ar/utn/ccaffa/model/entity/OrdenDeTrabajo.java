@@ -56,4 +56,7 @@ public class OrdenDeTrabajo {
     @JoinColumn(name = "control_calidad_id")
     private ControlDeCalidad controlDeCalidad;
 
+    public boolean yaComenzo() {
+        return !getEstado().equalsIgnoreCase("Pendiente");
+    }
 }
