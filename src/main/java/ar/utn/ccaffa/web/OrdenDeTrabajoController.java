@@ -78,14 +78,34 @@ public class OrdenDeTrabajoController {
     }
 
     @PatchMapping("/{id}/cancelar")
-    public ResponseEntity<OrdenDeTrabajoResponseDto> cancelarOrdenDeTrabajo(@PathVariable Long id){
-        //buscar rollos hijos y ordenes de trabajo para cancelarlas. Dejo el rollo padre y mando a replanificar la orden de venta y las que cancele
+    public ResponseEntity<OrdenDeTrabajoResponseDto> cancelarOrdenDeTrabajo(@PathVariable Long id) {
         return ordenDeTrabajoService.findById(id)
                 .map(existingOrden -> {
-                    validarCancelacion(existingOrden);
-                    cancelarOrden(existingOrden);
-                    OrdenDeTrabajo cancelada = ordenDeTrabajoService.save(existingOrden);
-                    return ResponseEntity.ok(ordenDeTrabajoResponseMapper.toDto(cancelada));
+                    try {
+                        validarCancelacion(existingOrden);
+                        cancelarOrden(existingOrden);
+                        OrdenDeTrabajo cancelada = ordenDeTrabajoService.save(existingOrden);
+                        
+                        // Si la orden tiene un rollo, manejarlo según su estado
+                        if (cancelada.getRollo() != null) {
+                            if (cancelada.getRollo().getEstado() == EstadoRollo.DIVIDO) {
+                                procesarRolloDividido(cancelada.getRollo());
+                            } else {
+                                // Si el rollo no está dividido, simplemente marcarlo como disponible
+                                cancelada.getRollo().setEstado(EstadoRollo.DISPONIBLE);
+                                rolloRepository.save(cancelada.getRollo());
+                            }
+                        }
+                        
+                        // Replanificar la orden de venta asociada si existe
+                        if (cancelada.getOrdenDeVenta() != null) {
+                            replanificarOrdenVenta(cancelada);
+                        }
+                        
+                        return ResponseEntity.ok(ordenDeTrabajoResponseMapper.toDto(cancelada));
+                    } catch (Exception e) {
+                        throw new RuntimeException("Error al cancelar la orden de trabajo: " + e.getMessage(), e);
+                    }
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -290,20 +310,44 @@ public class OrdenDeTrabajoController {
         }
         
         Rollo rollo = orden.getRollo();
-        if (rollo.getEstado() == EstadoRollo.AGOTADO) {
+        if (rollo.getEstado().equals(EstadoRollo.AGOTADO)) {
             rollo.setEstado(EstadoRollo.DISPONIBLE);
             rolloRepository.save(rollo);
-        } else if (rollo.getEstado() == EstadoRollo.DIVIDO) {
-            // TODO: Implementar lógica para rollos divididos
+        } else if (rollo.getEstado().equals(EstadoRollo.DIVIDO)) {
             procesarRolloDividido(rollo);
         }
     }
 
     private void procesarRolloDividido(Rollo rollo) {
-        // TODO: Implementar lógica completa para rollos divididos
-        // - Buscar rollos hijos
-        // - Cancelar órdenes asociadas
-        // - Replanificar órdenes de venta
+        // Buscar todos los rollos hijos
+        List<Rollo> rollosHijos = rolloRepository.findByRolloPadreId(rollo.getId());
+        
+        // Para cada rollo hijo, buscar sus órdenes de trabajo y cancelarlas
+        for (Rollo rolloHijo : rollosHijos) {
+            // Buscar órdenes de trabajo asociadas al rollo hijo
+            List<OrdenDeTrabajo> ordenesTrabajoHijo = ordenDeTrabajoService.findByRolloId(rolloHijo.getId());
+            
+            // Cancelar cada orden de trabajo asociada
+            for (OrdenDeTrabajo ordenHijo : ordenesTrabajoHijo) {
+                if (!"Cancelada".equals(ordenHijo.getEstado())) {
+                    cancelarOrden(ordenHijo);
+                    ordenDeTrabajoService.save(ordenHijo);
+                    
+                    // Replanificar la orden de venta asociada si existe
+                    if (ordenHijo.getOrdenDeVenta() != null) {
+                        replanificarOrdenVenta(ordenHijo);
+                    }
+                }
+            }
+            
+            // Actualizar el estado del rollo hijo
+            rolloHijo.setEstado(EstadoRollo.CANCELADO);
+            rolloRepository.save(rolloHijo);
+        }
+        
+        // Actualizar el estado del rollo padre
+        rollo.setEstado(EstadoRollo.DISPONIBLE);
+        rolloRepository.save(rollo);
     }
 
     private void replanificarOrdenVenta(OrdenDeTrabajo orden) {

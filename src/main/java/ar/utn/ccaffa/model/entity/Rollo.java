@@ -41,7 +41,8 @@ public class Rollo {
 
     @Column(name = "largo", nullable = false)
     @NotNull(message = "El largo es obligatorio")
-    private Float largoM;
+    @Builder.Default
+    private Float largoM = 0.0f;
 
     @Column(name = "ancho", nullable = false)
     @NotNull(message = "El ancho es obligatorio")
