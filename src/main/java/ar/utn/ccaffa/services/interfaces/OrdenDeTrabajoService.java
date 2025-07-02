@@ -1,5 +1,6 @@
 package ar.utn.ccaffa.services.interfaces;
 
+import ar.utn.ccaffa.model.dto.FiltroOrdenDeTrabajoDto;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import java.util.List;
 import java.util.Optional;
@@ -11,4 +12,5 @@ public interface OrdenDeTrabajoService {
     Optional<OrdenDeTrabajo> update(Long id, OrdenDeTrabajo orden);
     Optional<OrdenDeTrabajo> cancelar(Long id);
     List<OrdenDeTrabajo> findByRolloId(Long rolloId);
+    List<OrdenDeTrabajo> filtrarOrdenes(FiltroOrdenDeTrabajoDto filtros);
 }

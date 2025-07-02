@@ -8,6 +8,7 @@ import ar.utn.ccaffa.model.entity.*;
 import ar.utn.ccaffa.repository.interfaces.*;
 import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoService;
 import ar.utn.ccaffa.model.dto.Bloque;
+import ar.utn.ccaffa.model.dto.FiltroOrdenDeTrabajoDto;
 import ar.utn.ccaffa.model.dto.OrdenDeTrabajoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -64,8 +65,8 @@ public class OrdenDeTrabajoController {
 
 
     @GetMapping
-    public ResponseEntity<List<OrdenDeTrabajoResponseDto>> obtenerTodasLasOrdenes() {
-        List<OrdenDeTrabajo> ordenes = ordenDeTrabajoService.findAll();
+    public ResponseEntity<List<OrdenDeTrabajoResponseDto>> obtenerTodasLasOrdenes(FiltroOrdenDeTrabajoDto filtros) {
+        List<OrdenDeTrabajo> ordenes = ordenDeTrabajoService.filtrarOrdenes(filtros);
         List<OrdenDeTrabajoResponseDto> ordenesDto = ordenDeTrabajoResponseMapper.toDtoList(ordenes);
         return ResponseEntity.ok(ordenesDto);
     }
@@ -178,7 +179,16 @@ public class OrdenDeTrabajoController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
-    
+
+    @GetMapping("/obtenerOrdenesConRollo/{id}")
+    public ResponseEntity<List<OrdenDeTrabajoResponseDto>> obtenerOrdenesDeTrabajoConRolloID(@PathVariable Long id) {
+        List<OrdenDeTrabajo> ordenes = ordenDeTrabajoService.findByRolloId(id);
+        List<OrdenDeTrabajoResponseDto> ordenesDto = ordenDeTrabajoResponseMapper.toDtoList(ordenes);
+        return ResponseEntity.ok(ordenesDto);
+
+    }
+
+
     /**
      * Procesa recursivamente los ancestros de un rollo (padre, abuelo, etc.)
      * para recolectar órdenes de venta y trabajo
@@ -238,15 +248,6 @@ public class OrdenDeTrabajoController {
             procesarDescendientes(hijo, ordenesVenta, ordenesTrabajo, rollosACancelar);
         }
     }
-
-    @GetMapping("/obtenerOrdenesConRollo/{id}")
-    public ResponseEntity<List<OrdenDeTrabajoResponseDto>> obtenerOrdenesDeTrabajoConRolloID(@PathVariable Long id) {
-        List<OrdenDeTrabajo> ordenes = ordenDeTrabajoService.findByRolloId(id);
-        List<OrdenDeTrabajoResponseDto> ordenesDto = ordenDeTrabajoResponseMapper.toDtoList(ordenes);
-        return ResponseEntity.ok(ordenesDto);
-
-    }
-
     // Métodos privados para crear orden de trabajo
     private OrdenDeTrabajo crearOrdenBasica(OrdenDeTrabajoDto request) {
         OrdenDeTrabajo orden = new OrdenDeTrabajo();
@@ -373,31 +374,6 @@ public class OrdenDeTrabajoController {
         orden.setActiva(false);
         liberarRecursos(orden);
         return orden;
-    }
-
-    private void replanificarOrdenVenta(OrdenVenta ordenVenta) {
-        // 1. Verificar si la orden de venta ya está completada o cancelada
-        if (ordenVenta.getEstado().equalsIgnoreCase("Completada") || 
-            ordenVenta.getEstado().equalsIgnoreCase("Cancelada")) {
-            return; // No es necesario replanificar si ya está en un estado final
-        }
-
-        // 2. Obtener todas las órdenes de trabajo asociadas a esta orden de venta
-        // Como no tenemos un método directo, primero obtenemos la orden de trabajo relacionada
-        // a través de la relación bidireccional
-        OrdenDeTrabajo ordenTrabajo = ordenVenta.getOrdenDeTrabajo();
-        
-        // 3. Verificar si la orden de trabajo está activa
-        if (ordenTrabajo != null && (ordenTrabajo.getActiva() == null || !ordenTrabajo.getActiva())) {
-            // 4. Si no hay orden de trabajo activa, marcar la orden de venta como pendiente
-            ordenVenta.setEstado("Pendiente");
-            ordenDeVentaRepository.save(ordenVenta);
-            
-            // 5. Opcional: Aquí podrías agregar lógica adicional para notificar
-            // al sistema o a los usuarios que la orden de venta necesita ser replanificada
-            // Usamos el logger de Lombok
-            log.info("Orden de venta {} marcada como pendiente de replanificación", ordenVenta.getId());
-        }
     }
 
     // Métodos privados para gestión de rollos
@@ -577,31 +553,6 @@ public class OrdenDeTrabajoController {
                     ordenesVentaAReplanificar.add(orden.getOrdenDeVenta());
                 }
             }
-        }
-    }
-
-    /**
-     * Método auxiliar recursivo para procesar la cancelación de un rollo y todos sus descendientes
-     * @param esRolloActual Indica si es el rollo que inició la cancelación (se marca como DISPONIBLE)
-     */
-    private void procesarCancelacionRolloYDescendientes(Rollo rollo, Set<OrdenVenta> ordenesVentaAReplanificar, boolean esRolloActual) {
-        // 1. Cancelar todas las órdenes de trabajo de este rollo
-        cancelarOrdenesDeTrabajo(rollo, ordenesVentaAReplanificar);
-
-        // 2. Actualizar el estado del rollo
-        if (esRolloActual) {
-            // Solo el rollo que inició la cancelación queda como DISPONIBLE
-            rollo.setEstado(EstadoRollo.DISPONIBLE);
-        } else {
-            // Todos los demás rollos (hijos, nietos, etc.) quedan como CANCELADO
-            rollo.setEstado(EstadoRollo.CANCELADO);
-        }
-        rolloRepository.save(rollo);
-
-        // 3. Procesar recursivamente a los hijos (si existen)
-        List<Rollo> hijos = rolloRepository.findByRolloPadreId(rollo.getId());
-        for (Rollo hijo : hijos) {
-            procesarCancelacionRolloYDescendientes(hijo, ordenesVentaAReplanificar, false);
         }
     }
 }
