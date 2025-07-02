@@ -1,11 +1,11 @@
 {
 	"info": {
-		"_postman_id": "d6fc9702-3b7b-4807-9a60-4955d12aacae",
+		"_postman_id": "c3ebf675-caae-4e14-8918-5b7cac59f212",
 		"name": "CCaffa API",
 		"description": "Colección de endpoints para la API de CCaffa",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "45944283",
-		"_collection_link": "https://gabrielrodriguez-3962015.postman.co/workspace/Gabriel-Rodriguez's-Workspace~8fd34103-25c0-49e6-82ac-a7f18773f9ff/collection/45944283-d6fc9702-3b7b-4807-9a60-4955d12aacae?action=share&source=collection_link&creator=45944283"
+		"_exporter_id": "45716994",
+		"_collection_link": "https://juani-2165688.postman.co/workspace/a2fc2525-08a8-4a1c-81ea-674a08049f9f/collection/45716994-c3ebf675-caae-4e14-8918-5b7cac59f212?action=share&source=collection_link&creator=45716994"
 	},
 	"item": [
 		{
@@ -13,7 +13,24 @@
 			"item": [
 				{
 					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"token\", jsonData.token);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "POST",
 						"header": [
 							{
@@ -352,7 +369,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc1MDIxNzA2MSwiZXhwIjoxNzUwMjM1MDYxfQ.uaKF6pKv5QOT_u0za0W1w4SK4-Ez8B7N3SU8zZ1Fr6A",
+									"value": "{{token}}",
 									"type": "string"
 								}
 							]
@@ -361,7 +378,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"orderId\":99,\n    \"fechaCreacion\": \"2025-06-08\",\n    \"fechaEntregaEstimada\":\"2025-06-28\",\n    \"estado\": \"Inactiva\",\n    \"observaciones\":\"No puede tener ningun tipo de defecto\",\n    \"cliente\": {\n        \"id\":1\n    },\n\"especificaciones\": [\n           {\n            \"ancho\":22.44,\n            \"espesor\": 8.0,\n            \"cantidad\":1,\n            \"tipoMaterial\":\"GALVANIZADO\",\n            \"pesoMaximoPorRollo\":2.0,\n            \"tipoDeEmbalaje\":\"tipoEmbalaje\",\n            \"toleranciaAncho\": 1.22,\n            \"toleranciaEspesor\": 0.33,\n            \"diametroInterno\": 10,\n            \"diametroExterno\":100\n        }\n    ]\n}",
+							"raw": "{\n    \"orderId\":101,\n    \"fechaCreacion\": \"2025-07-01\",\n    \"fechaEntregaEstimada\":\"2025-07-28\",\n    \"estado\": \"Pendiente\",\n    \"observaciones\":\"Ninguna\",\n    \"cliente\": {\n        \"id\":1\n    },\n\"especificaciones\": [\n           {\n            \"ancho\":22.44,\n            \"espesor\": 8.0,\n            \"cantidad\":1,\n            \"tipoMaterial\":\"GALVANIZADO\",\n            \"pesoMaximoPorRollo\":2.0,\n            \"tipoDeEmbalaje\":\"tipoEmbalaje\",\n            \"toleranciaAncho\": 1.22,\n            \"toleranciaEspesor\": 0.33,\n            \"diametroInterno\": 10,\n            \"diametroExterno\":100\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -386,6 +403,16 @@
 				{
 					"name": "Obtener orden de venta",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
@@ -399,6 +426,94 @@
 								"api",
 								"ordenes-venta",
 								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Consulta",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\n        \"nombre\": \"MAQUINA_2_CORTADORA\",\n        \"activo\": true,\n        \"tipo\": \"CORTADORA\",\n        \"velocidadTrabajoMetrosPorMinuto\": 5.0,\n        \"espesorMaximoMilimetros\": 5,\n        \"espesorMinimoMilimetros\": 100,\n        \"anchoMaximoMilimetros\": 500,\n        \"anchoMinimoMilimetros\": 20        \n    }"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/ordenes-venta/consulta",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"ordenes-venta",
+								"consulta"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Anular",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/ordenes-venta/anular/17",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"ordenes-venta",
+								"anular",
+								"17"
 							]
 						}
 					},
@@ -832,6 +947,14 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
 				}
 			]
 		},
@@ -1187,11 +1310,36 @@
 			]
 		}
 	],
-	"variable": [
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
 		{
-			"key": "token",
-			"value": "tu_token_jwt_aqui",
-			"type": "string"
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
 		}
 	]
 }
