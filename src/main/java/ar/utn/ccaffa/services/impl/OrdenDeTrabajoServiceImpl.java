@@ -45,7 +45,7 @@ public class OrdenDeTrabajoServiceImpl implements OrdenDeTrabajoService {
     }
 
     @Override
-    public List<OrdenDeTrabajo> findByRolloId(Long rolloId){
+    public List<OrdenDeTrabajo> findByRolloId(Long rolloId) {
         return repository.findByRolloId(rolloId);
-    };
-} 
+    }
+}

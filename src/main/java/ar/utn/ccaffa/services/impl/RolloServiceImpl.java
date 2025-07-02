@@ -9,6 +9,7 @@ import ar.utn.ccaffa.repository.interfaces.RolloRepository;
 import ar.utn.ccaffa.services.interfaces.RolloService;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -152,7 +153,7 @@ public class RolloServiceImpl implements RolloService {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("rolloPadre").get("id"), filtros.getRolloPadreId()));
         }
 
-        return this.rolloMapper.toDtoListOnlyWithRolloPadreID(rolloRepository.findAll(spec));
+        return this.rolloMapper.toDtoListOnlyWithRolloPadreID(rolloRepository.findAll((Sort) spec));
     }
 
 }

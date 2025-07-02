@@ -11,4 +11,4 @@ public interface OrdenDeTrabajoService {
     Optional<OrdenDeTrabajo> update(Long id, OrdenDeTrabajo orden);
     Optional<OrdenDeTrabajo> cancelar(Long id);
     List<OrdenDeTrabajo> findByRolloId(Long rolloId);
-} 
+}
