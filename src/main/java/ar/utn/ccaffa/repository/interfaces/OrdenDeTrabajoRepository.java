@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface OrdenDeTrabajoRepository extends JpaRepository<OrdenDeTrabajo, Long>, JpaSpecificationExecutor<OrdenDeTrabajo> {
     List<OrdenDeTrabajo> findByRolloId(Long rolloId);
+    List<OrdenDeTrabajo> findByOrdenDeVenta_Id(Long ordenDeVentaId);
+
 }
