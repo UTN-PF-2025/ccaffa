@@ -3,32 +3,30 @@ package ar.utn.ccaffa.services.impl;
 import ar.utn.ccaffa.exceptions.ResourceNotFoundException;
 import ar.utn.ccaffa.exceptions.UnprocessableContentException;
 import ar.utn.ccaffa.mapper.interfaces.OrdenVentaMapper;
+import ar.utn.ccaffa.model.dto.FiltroOrdenVentaDTO;
 import ar.utn.ccaffa.model.dto.OrdenVentaDto;
-import ar.utn.ccaffa.model.entity.Defecto;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import ar.utn.ccaffa.model.entity.OrdenVenta;
-import ar.utn.ccaffa.repository.interfaces.DefectoRepository;
 import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoRepository;
 import ar.utn.ccaffa.repository.interfaces.OrdenVentaRepository;
 import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoService;
 import ar.utn.ccaffa.services.interfaces.OrdenVentaService;
+
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
 public class OrdenVentaServiceImpl implements OrdenVentaService {
     private final OrdenVentaRepository ordenVentaRepository;
     private final OrdenVentaMapper ordenVentaMapper;
-    private final DefectoRepository defectoRepository;
     private final OrdenDeTrabajoRepository ordenDeTrabajoRepository;
     private final OrdenDeTrabajoService ordenDeTrabajoService;
 
-    public OrdenVentaServiceImpl(OrdenVentaRepository ordenVentaRepository, OrdenVentaMapper ordenVentaMapper, DefectoRepository defectoRepository, OrdenDeTrabajoRepository ordenDeTrabajoRepository, OrdenDeTrabajoService ordenDeTrabajoService) {
+    public OrdenVentaServiceImpl(OrdenVentaRepository ordenVentaRepository, OrdenVentaMapper ordenVentaMapper, OrdenDeTrabajoRepository ordenDeTrabajoRepository, OrdenDeTrabajoService ordenDeTrabajoService) {
         this.ordenVentaRepository = ordenVentaRepository;
         this.ordenVentaMapper = ordenVentaMapper;
-        this.defectoRepository = defectoRepository;
         this.ordenDeTrabajoRepository = ordenDeTrabajoRepository;
         this.ordenDeTrabajoService = ordenDeTrabajoService;
     }
@@ -43,47 +41,6 @@ public class OrdenVentaServiceImpl implements OrdenVentaService {
         return this.ordenVentaMapper.toDto(this.ordenVentaRepository.findById(id).orElseThrow(() ->new ResourceNotFoundException("Orden de venta", "id", id)));
     }
 
-    @Override
-    public List<OrdenVentaDto> searchByDate(LocalDate fecha) {
-        return this.ordenVentaMapper.toDtoList(this.ordenVentaRepository.findByFechaCreacion(fecha));
-    }
-
-    @Override
-    public List<OrdenVentaDto> searchByDateRange(LocalDate fechaInicio, LocalDate fechaFin) {
-        return this.ordenVentaMapper.toDtoList(this.ordenVentaRepository.findByFechaCreacionBetween(fechaInicio, fechaFin));
-    }
-
-    @Override
-    public List<OrdenVentaDto> searchByEstado(String estado) {
-        return this.ordenVentaMapper.toDtoList(this.ordenVentaRepository.findByEstado(estado));
-    }
-
-    @Override
-    public List<OrdenVentaDto> searchByEstados(List<String> estados) {
-        return this.ordenVentaMapper.toDtoList(this.ordenVentaRepository.findByEstadoIn(estados));
-    }
-
-    @Override
-    public List<OrdenVentaDto> searchByCliente(Long clienteId) {
-        return this.ordenVentaMapper.toDtoList(this.ordenVentaRepository.findByClienteId(clienteId));
-    }
-
-    @Override
-    public List<OrdenVentaDto> searchByClienteAndEstado(Long clienteId, String estado) {
-        return null;
-        //corregir
-        //this.ordenVentaMapper.toDtoList(this.ordenVentaRepository.findByClienteAndEstado(this.clienteRepository.findById(clienteId).orElseThrow(() -> new ResourceNotFoundException("Cliente", "id", clienteId)), estado));
-    }
-
-    @Override
-    public List<OrdenVentaDto> searchByObservaciones(String observaciones) {
-        return this.ordenVentaMapper.toDtoList(this.ordenVentaRepository.findByObservacionesContainingIgnoreCase(observaciones));
-    }
-
-    @Override
-    public OrdenVentaDto searchByOrderId(Long orderId) {
-        return this.ordenVentaMapper.toDto(this.ordenVentaRepository.findByOrderId(orderId).orElseThrow(() -> new ResourceNotFoundException("Orden de venta", "orderId", orderId)));
-    }
 
     @Override
     public OrdenVenta save(OrdenVentaDto ordenVenta) {
@@ -93,16 +50,6 @@ public class OrdenVentaServiceImpl implements OrdenVentaService {
     @Override
     public void deleteById(Long id) {
         this.ordenVentaRepository.deleteById(id);
-    }
-
-    @Override
-    public Defecto obtenerDefectoPorId(Long id) {
-        return this.defectoRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Defecto", "id", id));
-    }
-
-    @Override
-    public void crearDefecto(Defecto defecto) {
-        this.defectoRepository.save(defecto);
     }
 
     @Override
@@ -121,6 +68,52 @@ public class OrdenVentaServiceImpl implements OrdenVentaService {
                 ordenVentaAAnular.setEstado("Cancelada");
                 this.save(ordenVentaAAnular);
             }
+        }
+    }
+
+    @Override
+    public List<OrdenVentaDto> searchByFiltros(FiltroOrdenVentaDTO filtros) {
+        Specification<OrdenVenta> spec = Specification.where(null);
+        if (filtros.getFechaCreacion() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("fechaCreacion"), filtros.getFechaCreacion()));
+        }
+        if (filtros.getFechaInicio() != null && filtros.getFechaFin() != null) {
+            spec = spec.and((root, query, cb) -> cb.between(root.get("fechaCreacion"), filtros.getFechaInicio(), filtros.getFechaFin()));
+        }
+        if (filtros.getEstado() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("estado"), filtros.getEstado()));
+        }
+        if (filtros.getEstados() != null) {
+            spec = spec.and((root, query, cb) -> cb.in(root.get("estado")).value(filtros.getEstados()));
+        }
+        if (filtros.getClienteId() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("cliente").get("id"), filtros.getClienteId()));
+        }
+        if (filtros.getObservaciones() != null) {
+            spec = spec.and((root, query, cb) -> cb.like(root.get("observaciones"), "%" + filtros.getObservaciones() + "%"));
+        }
+        if (filtros.getOrderId() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("orderId"), filtros.getOrderId()));
+        }
+        if(filtros.getClienteId() != null){
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("cliente").get("id"), filtros.getClienteId()));
+        }
+        return this.ordenVentaMapper.toDtoList(this.ordenVentaRepository.findAll(spec));
+    }
+
+    @Override
+    public void finalizar(Long ordenVentaId) {
+        OrdenVenta ordenVenta = this.ordenVentaRepository.findById(ordenVentaId).orElseThrow(() -> new ResourceNotFoundException("Orden de venta", "id", ordenVentaId));
+        if(ordenVenta.getEstado().equals("Finalizada")){
+            throw new UnprocessableContentException("Orden de Venta - Finalizar");
+        }
+        List<OrdenDeTrabajo> ordenesDeTrabajo = this.ordenDeTrabajoRepository.findByOrdenDeVenta_Id(ordenVentaId);
+        
+        if(ordenesDeTrabajo.getFirst().getEstado().equals("Finalizada")){
+            ordenVenta.setEstado("Finalizada");
+            this.ordenVentaRepository.save(ordenVenta);
+        } else {
+            throw new UnprocessableContentException("Orden de Venta - Finalizar");
         }
     }
 

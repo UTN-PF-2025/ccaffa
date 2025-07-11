@@ -1,5 +1,6 @@
 package ar.utn.ccaffa.web;
 
+import ar.utn.ccaffa.model.dto.FiltroOrdenVentaDTO;
 import ar.utn.ccaffa.model.dto.OrdenVentaDto;
 import ar.utn.ccaffa.model.entity.Defecto;
 import ar.utn.ccaffa.model.entity.OrdenVenta;
@@ -24,8 +25,8 @@ public class OrdenVentaController {
     private final OrdenVentaService ordenVentaService;
 
     @GetMapping
-    public ResponseEntity<List<OrdenVentaDto>> obtenerTodasLasOrdenes() {
-        List<OrdenVentaDto> ordenes = ordenVentaService.findAll();
+    public ResponseEntity<List<OrdenVentaDto>> obtenerTodasLasOrdenes(FiltroOrdenVentaDTO filtroOrdenVentaDTO) {
+        List<OrdenVentaDto> ordenes = ordenVentaService.searchByFiltros(filtroOrdenVentaDTO);
         return ResponseEntity.ok(ordenes);
     }
 
@@ -37,64 +38,10 @@ public class OrdenVentaController {
                 ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/consulta")
-    public ResponseEntity<List<OrdenVentaDto>> buscarConFiltros(
-        @RequestParam(required = false) LocalDate fecha,
-        @RequestParam(required = false) LocalDate fechaInicio,
-        @RequestParam(required = false) LocalDate fechaFin,
-        @RequestParam(required = false) String estado,
-        @RequestParam(required = false) List<String> estados,
-        @RequestParam(required = false) Long clienteId,
-        @RequestParam(required = false) String observaciones,
-        @RequestParam(required = false) Long orderId) {
-    
-    if (fecha != null) {
-        return ResponseEntity.ok(ordenVentaService.searchByDate(fecha));
-    }
-    if (fechaInicio != null && fechaFin != null) {
-        return ResponseEntity.ok(ordenVentaService.searchByDateRange(fechaInicio, fechaFin));
-    }
-    if (estado != null && clienteId != null) {
-        return ResponseEntity.ok(ordenVentaService.searchByClienteAndEstado(clienteId, estado));
-    }
-    if (estado != null) {
-        return ResponseEntity.ok(ordenVentaService.searchByEstado(estado));
-    }
-    if (estados != null && !estados.isEmpty()) {
-        return ResponseEntity.ok(ordenVentaService.searchByEstados(estados));
-    }
-    if (clienteId != null) {
-        return ResponseEntity.ok(ordenVentaService.searchByCliente(clienteId));
-    }
-    if (observaciones != null) {
-        return ResponseEntity.ok(ordenVentaService.searchByObservaciones(observaciones));
-    }
-    if (orderId != null) {
-        return ResponseEntity.ok(List.of(ordenVentaService.searchByOrderId(orderId)));
-    }
-    
-    return ResponseEntity.ok(ordenVentaService.findAll());
-}
-
-    
-    @GetMapping("/{id}/defecto")
-    public ResponseEntity<Defecto> obtenerDefectoPorId(@PathVariable Long id) {
-        Defecto defecto = ordenVentaService.obtenerDefectoPorId(id);
-        return defecto != null ?
-                ResponseEntity.ok(defecto) :
-                ResponseEntity.notFound().build();
-    }
-
     @PostMapping
     public ResponseEntity<OrdenVenta> crearOrden(@Valid @RequestBody OrdenVentaDto ordenVentaDto) {
         OrdenVenta nuevaOrden = ordenVentaService.save(ordenVentaDto);
         return new ResponseEntity<>(nuevaOrden, HttpStatus.CREATED);
-    }
-
-    @PostMapping("/defecto")
-    public ResponseEntity<String> crearDefecto(@Valid @RequestBody Defecto defecto) {
-        ordenVentaService.crearDefecto(defecto);
-        return ResponseEntity.ok("qweqw");
     }
 
     @PutMapping("/{id}")
@@ -118,5 +65,11 @@ public class OrdenVentaController {
     public ResponseEntity<Object> anular(@PathVariable Long id) throws BadRequestException {
         this.ordenVentaService.anular(id);
         return ResponseEntity.ok("Orden de Venta anulada correctamente");
+    }
+
+    @PostMapping("/finalizar/{id}")
+    public ResponseEntity<Object> finalizar(@PathVariable Long id) throws BadRequestException {
+        this.ordenVentaService.finalizar(id);
+        return ResponseEntity.ok("Orden de Venta finalizada correctamente");
     }
 }
