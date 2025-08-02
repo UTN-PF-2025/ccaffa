@@ -2,6 +2,8 @@ package ar.utn.ccaffa.model.entity;
 
 import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.enums.TipoMaterial;
+import ar.utn.ccaffa.repository.interfaces.RolloRepository;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -11,13 +13,16 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "Rollo")
+@Table(name = "rollo")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Rollo {
 
     @Id
@@ -35,6 +40,11 @@ public class Rollo {
     @Column(name = "peso", nullable = false)
     @NotNull(message = "El peso es obligatorio")
     private Float pesoKG;
+
+    @Column(name = "largo", nullable = false)
+    @NotNull(message = "El largo es obligatorio")
+    @Builder.Default
+    private Float largoM = 0.0f;
 
     @Column(name = "ancho", nullable = false)
     @NotNull(message = "El ancho es obligatorio")
@@ -58,9 +68,16 @@ public class Rollo {
     @NotNull(message = "La fecha de ingreso es obligatoria")
     private LocalDateTime fechaIngreso;
 
+    @Column(name = "rollo_padre_id", insertable = false, updatable = false)
+    private Long rolloPadreId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rollo_padre_id")
-    private Rollo rollo_padre;
+    private Rollo rolloPadre;
+
+    @OneToMany(mappedBy = "rolloPadre", fetch = FetchType.LAZY)
+    private List<Rollo> hijos = new ArrayList<>();
+    // Método helper para obtener el rollo padre cuando se necesite
 
 
 }

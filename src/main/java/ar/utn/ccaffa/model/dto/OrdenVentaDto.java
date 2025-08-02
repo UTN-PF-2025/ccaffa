@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Data
 @Builder
@@ -20,5 +19,5 @@ public class OrdenVentaDto {
     private String estado;
     private String observaciones;
     private ClienteDto cliente;
-    private List<EspecificacionDto> especificaciones;
+    private EspecificacionDto especificacion;
 }

@@ -35,7 +35,7 @@ public class OrdenVentaMapperImpl implements OrdenVentaMapper {
                 .estado(ordenVenta.getEstado())
                 .observaciones(ordenVenta.getObservaciones())
                 .cliente(clienteMapper.toDto(ordenVenta.getCliente()))
-                .especificaciones(especificacionMapper.toDtoList(ordenVenta.getEspecificaciones()))
+                .especificacion(especificacionMapper.toDto(ordenVenta.getEspecificacion()))
                 .build();
     }
 
@@ -54,7 +54,7 @@ public class OrdenVentaMapperImpl implements OrdenVentaMapper {
                 .estado(ordenVentaDto.getEstado())
                 .observaciones(ordenVentaDto.getObservaciones())
                 .cliente(clienteMapper.toEntity(ordenVentaDto.getCliente()))
-                .especificaciones(especificacionMapper.toEntityList(ordenVentaDto.getEspecificaciones()))
+                .especificacion(especificacionMapper.toEntity(ordenVentaDto.getEspecificacion()))
                 .build();
     }
 
