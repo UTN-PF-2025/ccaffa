@@ -119,7 +119,7 @@ public class OrdenDeTrabajoResponseMapperImpl implements OrdenDeTrabajoResponseM
         
         return ControlDeCalidadDto.builder()
                 .id(controlDeCalidad.getId())
-                .R7(controlDeCalidad.getR7())
+                .R7(controlDeCalidad.getEmpleado())
                 .fechaControl(controlDeCalidad.getFechaControl())
                 .espesorMedido(controlDeCalidad.getEspesorMedido())
                 .anchoMedido(controlDeCalidad.getAnchoMedido())

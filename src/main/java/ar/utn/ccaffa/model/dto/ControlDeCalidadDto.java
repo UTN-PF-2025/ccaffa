@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ControlDeCalidadDto {
     private Long id;
-    private Integer R7;
+    private EmpleadoDto empleado;
     private LocalDate fechaControl;
     private Float espesorMedido;
     private Float anchoMedido;
@@ -22,17 +22,6 @@ public class ControlDeCalidadDto {
     private String estado;
     private List<MedidaDeCalidadDto> medidasDeCalidad;
     private CertificadoDeCalidadDto certificadoDeCalidad;
-    
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class MedidaDeCalidadDto {
-        private Long id;
-        private String tipo;
-        private Float valor;
-        private String unidad;
-    }
     
     @Data
     @Builder
