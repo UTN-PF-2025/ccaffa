@@ -12,6 +12,7 @@ public interface RolloService {
     RolloDto findById(Long id);
     RolloDto findByIdConRollosPadres(Long id);
     RolloDto obtenerArbolCompletoDeHijos(Long rolloId);
+    List<RolloDto> obtenerRollosDisponiblesParaOrdenVenta(Long ordenVentaId);
     RolloDto save(RolloDto rollo);
     boolean deleteById(Long id);
 } 

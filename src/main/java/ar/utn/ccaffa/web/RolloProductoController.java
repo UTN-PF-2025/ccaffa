@@ -1,9 +1,7 @@
 package ar.utn.ccaffa.web;
 
 import ar.utn.ccaffa.model.dto.*;
-import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import ar.utn.ccaffa.services.interfaces.RolloProductoService;
-import ar.utn.ccaffa.services.interfaces.RolloService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

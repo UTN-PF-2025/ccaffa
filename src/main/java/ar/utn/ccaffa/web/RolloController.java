@@ -47,6 +47,12 @@ public class RolloController {
         return ResponseEntity.ok(rolloService.obtenerArbolCompletoDeHijos(id));
     }
 
+    @GetMapping("/{id}/rollosDisponibles")
+    public ResponseEntity<List<RolloDto>> getRollosDisponibles(@PathVariable Long id) {
+        log.info("Buscando rollos disponibles para la orden de venta con ID: {}", id);
+        return ResponseEntity.ok(rolloService.obtenerRollosDisponiblesParaOrdenVenta(id));
+    }
+
     @PostMapping
     public ResponseEntity<RolloDto> createRollo(@RequestBody RolloDto rollo) {
         log.info("Creando nuevo rollo: {}", rollo);

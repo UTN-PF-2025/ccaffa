@@ -5,7 +5,7 @@
 		"description": "Colección de endpoints para la API de CCaffa",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "45716994",
-		"_collection_link": "https://juani-2165688.postman.co/workspace/a2fc2525-08a8-4a1c-81ea-674a08049f9f/collection/45716994-c3ebf675-caae-4e14-8918-5b7cac59f212?action=share&source=collection_link&creator=45716994"
+		"_collection_link": "https://juani-2165688.postman.co/workspace/Juani's-Workspace~a2fc2525-08a8-4a1c-81ea-674a08049f9f/collection/45716994-c3ebf675-caae-4e14-8918-5b7cac59f212?action=share&source=collection_link&creator=45716994"
 	},
 	"item": [
 		{
@@ -514,6 +514,28 @@
 								"ordenes-venta",
 								"anular",
 								"17"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Finalizar",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/ordenes-venta/finalizar/8",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"ordenes-venta",
+								"finalizar",
+								"8"
 							]
 						}
 					},
@@ -1302,6 +1324,106 @@
 								"api",
 								"rollos_productos",
 								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Clientes",
+			"item": [
+				{
+					"name": "Get All Clientes",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/clientes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"clientes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Cliente",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\n        \"nombre\": \"cliente nuevo\",\n        \"activo\": true,\n        \"email\": \"cliente2@mail.com\"\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/clientes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"clientes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Cliente",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/clientes/999",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"clientes",
+								"999"
 							]
 						}
 					},
