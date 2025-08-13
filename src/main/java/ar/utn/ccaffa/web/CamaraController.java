@@ -1,12 +1,17 @@
 package ar.utn.ccaffa.web;
 
 import ar.utn.ccaffa.model.dto.CamaraDto;
+import ar.utn.ccaffa.services.interfaces.AnalysisService;
 import ar.utn.ccaffa.services.interfaces.CamaraService;
 import lombok.RequiredArgsConstructor;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import org.springframework.web.multipart.MultipartFile;
+
 
 import java.util.List;
 
@@ -17,6 +22,7 @@ import java.util.List;
 public class CamaraController {
 
     private final CamaraService camaraService;
+    private final AnalysisService analysisService;
 
     @PostMapping
     public ResponseEntity<CamaraDto> createCamara(@RequestBody CamaraDto camaraDto) {
@@ -51,5 +57,21 @@ public class CamaraController {
         log.info("Eliminando camara con ID: {}", id);
         camaraService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
+        log.info("Recibiendo archivo: {} para enviar a análisis", file.getOriginalFilename());
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("Por favor seleccione un archivo para subir.");
+        }
+
+        try {
+            analysisService.analyzeAndNotifyMock(file);
+            return ResponseEntity.ok("Archivo enviado a análisis exitosamente.");
+        } catch (Exception e) {
+            log.error("Error al procesar el archivo y enviarlo a análisis", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al procesar el archivo: " + e.getMessage());
+        }
     }
 } 
