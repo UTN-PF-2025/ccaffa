@@ -788,6 +788,43 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Rollos Disponibles",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/rollos/1/rollosDisponibles",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"rollos",
+								"1",
+								"rollosDisponibles"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -1424,6 +1461,41 @@
 								"api",
 								"clientes",
 								"999"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Control de Calidad",
+			"item": [
+				{
+					"name": "iniciar",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"ordenTrabajoId\":1,\n    \"medidas\":[\n       {\n            \"tipo\":\"espesor\",\n            \"valor\":10,\n            \"unidad\":\"mm\"\n        },\n                {\n            \"tipo\":\"rebaba\",\n            \"valor\":15,\n            \"unidad\":\"mm\"\n        },\n                {\n            \"tipo\":\"ancho\",\n            \"valor\":8,\n            \"unidad\":\"mm\"\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/control-calidad/iniciar",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"control-calidad",
+								"iniciar"
 							]
 						}
 					},
