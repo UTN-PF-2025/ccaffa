@@ -5,7 +5,11 @@ import ar.utn.ccaffa.mapper.interfaces.RolloMapper;
 import ar.utn.ccaffa.model.dto.FiltroRolloDto;
 import ar.utn.ccaffa.model.dto.RolloDto;
 import ar.utn.ccaffa.model.entity.Rollo;
+import ar.utn.ccaffa.model.entity.OrdenVenta;
+import ar.utn.ccaffa.model.entity.Especificacion;
+import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.repository.interfaces.RolloRepository;
+import ar.utn.ccaffa.repository.interfaces.OrdenVentaRepository;
 import ar.utn.ccaffa.services.interfaces.RolloService;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
@@ -24,10 +28,12 @@ public class RolloServiceImpl implements RolloService {
 
     private final RolloRepository rolloRepository;
     private final RolloMapper rolloMapper;
+    private final OrdenVentaRepository ordenVentaRepository;
 
-    public RolloServiceImpl(RolloRepository rolloRepository, RolloMapper rolloMapper) {
+    public RolloServiceImpl(RolloRepository rolloRepository, RolloMapper rolloMapper, OrdenVentaRepository ordenVentaRepository) {
         this.rolloRepository = rolloRepository;
         this.rolloMapper = rolloMapper;
+        this.ordenVentaRepository = ordenVentaRepository;
     }
 
     @Override
@@ -156,4 +162,44 @@ public class RolloServiceImpl implements RolloService {
         return this.rolloMapper.toDtoListOnlyWithRolloPadreID(rolloRepository.findAll((Sort) spec));
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<RolloDto> obtenerRollosDisponiblesParaOrdenVenta(Long ordenVentaId) {
+        log.info("Buscando rollos disponibles para orden de venta ID: {}", ordenVentaId);
+        
+        OrdenVenta ordenVenta = ordenVentaRepository.findById(ordenVentaId)
+                .orElseThrow(() -> new ResourceNotFoundException("Orden de venta", "id", ordenVentaId));
+        
+        if (ordenVenta.getEspecificacion() == null) {
+            log.warn("La orden de venta {} no tiene especificaciones", ordenVentaId);
+            return List.of();
+        }
+        
+        Especificacion especificacion = ordenVenta.getEspecificacion();
+        
+        Specification<Rollo> spec = Specification.where(null);
+        
+        spec = spec.and((root, query, cb) -> cb.equal(root.get("estado"), EstadoRollo.DISPONIBLE));
+        
+        if (especificacion.getTipoMaterial() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("tipoMaterial"), especificacion.getTipoMaterial()));
+        }
+        
+        if (especificacion.getAncho() != null) {
+            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("anchoMM"), especificacion.getAncho()));
+        }
+        
+        if (especificacion.getEspesor() != null) {
+            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("espesorMM"), especificacion.getEspesor()));
+        }
+        
+        if (especificacion.getPesoMaximoPorRollo() != null) {
+            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("pesoKG"), especificacion.getPesoMaximoPorRollo()));
+        }
+        
+        List<Rollo> rollosDisponibles = rolloRepository.findAll(spec);
+        log.info("Encontrados {} rollos disponibles para la orden de venta {}", rollosDisponibles.size(), ordenVentaId);
+        
+        return this.rolloMapper.toDtoListOnlyWithRolloPadreID(rollosDisponibles);
+    }
 }

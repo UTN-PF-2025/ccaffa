@@ -6,6 +6,7 @@ import ar.utn.ccaffa.mapper.interfaces.MaquinaMapper;
 import ar.utn.ccaffa.mapper.interfaces.OrdenDeTrabajoResponseMapper;
 import ar.utn.ccaffa.mapper.interfaces.RolloMapper;
 import ar.utn.ccaffa.model.dto.*;
+import ar.utn.ccaffa.model.entity.ControlDeCalidad;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajoMaquina;
 import ar.utn.ccaffa.model.entity.OrdenVenta;
@@ -112,14 +113,17 @@ public class OrdenDeTrabajoResponseMapperImpl implements OrdenDeTrabajoResponseM
                 .build();
     }
     
-    private ControlDeCalidadDto mapControlDeCalidad(ar.utn.ccaffa.model.entity.ControlDeCalidad controlDeCalidad) {
+    private ControlDeCalidadDto mapControlDeCalidad(ControlDeCalidad controlDeCalidad) {
         if (controlDeCalidad == null) {
             return null;
         }
         
         return ControlDeCalidadDto.builder()
                 .id(controlDeCalidad.getId())
-                .R7(controlDeCalidad.getR7())
+                .empleado(controlDeCalidad.getEmpleado() != null ? 
+                    ControlDeCalidadDto.EmpleadoDto.builder()
+                        .id(controlDeCalidad.getEmpleado().getId())
+                        .build() : null)
                 .fechaControl(controlDeCalidad.getFechaControl())
                 .espesorMedido(controlDeCalidad.getEspesorMedido())
                 .anchoMedido(controlDeCalidad.getAnchoMedido())

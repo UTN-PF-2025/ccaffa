@@ -14,8 +14,9 @@ public class ControlDeCalidad {
     @Column(name = "control_calidad_id")
     private Long id;
 
-    @Column(name = "R7")
-    private Integer R7;
+    @ManyToOne
+    @JoinColumn(name = "empleado_id")
+    private Empleado empleado;
 
     @Column(name = "fecha_control")
     private LocalDate fechaControl;
