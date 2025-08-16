@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.multipart.MultipartFile;
 
-
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -67,8 +67,11 @@ public class CamaraController {
         }
 
         try {
-            analysisService.analyzeAndNotifyMock(file);
+            analysisService.analyzeAndNotify(file);
             return ResponseEntity.ok("Archivo enviado a análisis exitosamente.");
+        } catch (IOException e) {
+            log.error("Error al leer el archivo para el análisis", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al leer el archivo.");
         } catch (Exception e) {
             log.error("Error al procesar el archivo y enviarlo a análisis", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al procesar el archivo: " + e.getMessage());

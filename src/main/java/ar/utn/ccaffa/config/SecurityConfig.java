@@ -35,7 +35,7 @@ public class SecurityConfig {
             .cors(withDefaults())
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/ws/**").permitAll()
+                .requestMatchers("/api/auth/**", "/api/camaras/**", "/ws/**").permitAll()
                 .requestMatchers("/api/roles/**").hasRole("ADMIN")
                 .requestMatchers("/api/usuarios/**").hasAnyRole("ADMIN", "USER")
                 .requestMatchers("/api/rolLos/**").hasAnyRole("RESPONSABLE_DE_DEPOSITO", "RESPONSABLE_DE_PRODUCCION")
@@ -62,7 +62,7 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:8080", "http://localhost:5174"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
         configuration.setAllowCredentials(true);

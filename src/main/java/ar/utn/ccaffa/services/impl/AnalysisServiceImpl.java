@@ -1,21 +1,24 @@
 package ar.utn.ccaffa.services.impl;
 
+import ar.utn.ccaffa.grpc.ImageClassifierGrpc;
+import ar.utn.ccaffa.grpc.ImageRequest;
+import ar.utn.ccaffa.grpc.ImageResponses;
 import ar.utn.ccaffa.model.dto.AnalysisResponse;
 import ar.utn.ccaffa.services.interfaces.AnalysisService;
+import ar.utn.ccaffa.services.interfaces.FileStorageService;
+import com.google.protobuf.ByteString;
+import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ByteArrayResource;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
-import org.springframework.http.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Random;
 
@@ -24,54 +27,65 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class AnalysisServiceImpl implements AnalysisService {
 
-    private final RestTemplate restTemplate;
-    private final GridFsTemplate gridFsTemplate;
+    private final GridFsTemplate gridFsTemplate; // Se mantiene por si se usa en otro lado
     private final SimpMessagingTemplate messagingTemplate;
+    private final FileStorageService fileStorageService;
 
-    @Value("${python.service.url}")
-    private String pythonServiceUrl;
+
+    @Override
+    public void analyzeAndNotify(MultipartFile file) throws IOException {
+        byte[] fileBytes = file.getBytes();
+        processAnalysis(fileBytes, file.getOriginalFilename(), file.getContentType());
+    }
 
     @Async
     @Override
-    public void analyzeAndNotify(MultipartFile file) {
-        log.info("Iniciando análisis asíncrono para el archivo: {}", file.getOriginalFilename());
+    public void processAnalysis(byte[] fileBytes, String originalFilename, String contentType) {
+        log.info("Iniciando análisis asíncrono para el archivo: {}", originalFilename);
+        ManagedChannel channel = null;
         try {
-            // 1. Preparar la petición para el servicio de Python
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-            ByteArrayResource fileAsResource = new ByteArrayResource(file.getBytes()) {
-                @Override
-                public String getFilename() {
-                    return file.getOriginalFilename();
-                }
-            };
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-            body.add("file", fileAsResource);
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+            // 1. Conectarse al servidor gRPC
+            channel = ManagedChannelBuilder.forAddress("localhost", 50051)
+                    .usePlaintext()
+                    .build();
 
-            // 2. Llamar al servicio de Python
-            log.info("Enviando a análisis a: {}", pythonServiceUrl);
-            ResponseEntity<AnalysisResponse> response = restTemplate.postForEntity(pythonServiceUrl, requestEntity, AnalysisResponse.class);
+            // 2. Crear el stub
+            ImageClassifierGrpc.ImageClassifierBlockingStub stub = ImageClassifierGrpc.newBlockingStub(channel);
 
-            // 3. Procesar la respuesta
-            AnalysisResponse analysis = response.getBody();
-            if (analysis != null && analysis.isDefect()) {
-                log.info("¡Defecto detectado! Detalles: {}", analysis.getDetails());
+            // 3. Construir la petición
+            ByteString imageBytes = ByteString.copyFrom(fileBytes);
+            ImageRequest request = ImageRequest.newBuilder()
+                    .setImage(imageBytes)
+                    .build();
 
-                // 4. Guardar la imagen en GridFS
-                Object fileId = gridFsTemplate.store(file.getInputStream(), file.getOriginalFilename(), file.getContentType());
-                log.info("Imagen con defecto guardada en GridFS con ID: {}", fileId.toString());
-                analysis.setImageId(fileId.toString());
+            // 4. Llamar al servicio gRPC
+            log.info("Enviando imagen a análisis a través de gRPC");
+            ImageResponses response = stub.classifyImage(request);
 
-                // 5. Enviar notificación por WebSocket
+            // 5. Procesar la respuesta
+            if (response != null && response.getFound()) {
+                log.info("¡Defecto detectado! Detalles: {}", response.getResponsesList());
+
+                // 6. Guardar la imagen en el sistema de archivos
+                String filePath = fileStorageService.save(fileBytes, originalFilename);
+                log.info("Imagen con defecto guardada en: {}", filePath);
+
+                // 7. Enviar notificación por WebSocket
+                AnalysisResponse analysis = new AnalysisResponse();
+                analysis.setDefect(true);
+                analysis.setDetails("Defecto detectado en " + originalFilename);
+                analysis.setImageId(filePath); // Usamos la ruta del archivo como ID
                 messagingTemplate.convertAndSend("/topic/defects", analysis);
                 log.info("Notificación de defecto enviada a /topic/defects");
             }
-
-        } catch (IOException e) {
-            log.error("Error de IO durante el análisis asíncrono", e);
+        } catch (StatusRuntimeException e) {
+            log.error("Error durante la llamada gRPC: {}", e.getStatus(), e);
         } catch (Exception e) {
             log.error("Error inesperado durante el análisis asíncrono", e);
+        } finally {
+            if (channel != null) {
+                channel.shutdown();
+            }
         }
     }
 
