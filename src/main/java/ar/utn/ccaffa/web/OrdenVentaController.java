@@ -1,15 +1,20 @@
 package ar.utn.ccaffa.web;
 
+import ar.utn.ccaffa.model.dto.FiltroOrdenVentaDTO;
 import ar.utn.ccaffa.model.dto.OrdenVentaDto;
 import ar.utn.ccaffa.model.entity.Defecto;
 import ar.utn.ccaffa.model.entity.OrdenVenta;
 import ar.utn.ccaffa.services.interfaces.OrdenVentaService;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -20,8 +25,8 @@ public class OrdenVentaController {
     private final OrdenVentaService ordenVentaService;
 
     @GetMapping
-    public ResponseEntity<List<OrdenVentaDto>> obtenerTodasLasOrdenes() {
-        List<OrdenVentaDto> ordenes = ordenVentaService.findAll();
+    public ResponseEntity<List<OrdenVentaDto>> obtenerTodasLasOrdenes(FiltroOrdenVentaDTO filtroOrdenVentaDTO) {
+        List<OrdenVentaDto> ordenes = ordenVentaService.searchByFiltros(filtroOrdenVentaDTO);
         return ResponseEntity.ok(ordenes);
     }
 
@@ -33,24 +38,10 @@ public class OrdenVentaController {
                 ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/{id}/defecto")
-    public ResponseEntity<Defecto> obtenerDefectoPorId(@PathVariable Long id) {
-        Defecto defecto = ordenVentaService.obtenerDefectoPorId(id);
-        return defecto != null ?
-                ResponseEntity.ok(defecto) :
-                ResponseEntity.notFound().build();
-    }
-
     @PostMapping
     public ResponseEntity<OrdenVenta> crearOrden(@Valid @RequestBody OrdenVentaDto ordenVentaDto) {
         OrdenVenta nuevaOrden = ordenVentaService.save(ordenVentaDto);
         return new ResponseEntity<>(nuevaOrden, HttpStatus.CREATED);
-    }
-
-    @PostMapping("/defecto")
-    public ResponseEntity<String> crearDefecto(@Valid @RequestBody Defecto defecto) {
-        ordenVentaService.crearDefecto(defecto);
-        return ResponseEntity.ok("qweqw");
     }
 
     @PutMapping("/{id}")
@@ -68,5 +59,17 @@ public class OrdenVentaController {
     public ResponseEntity<Void> eliminarOrden(@PathVariable Long id) {
         ordenVentaService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/anular/{id}")
+    public ResponseEntity<Object> anular(@PathVariable Long id) throws BadRequestException {
+        this.ordenVentaService.anular(id);
+        return ResponseEntity.ok("Orden de Venta anulada correctamente");
+    }
+
+    @PostMapping("/finalizar/{id}")
+    public ResponseEntity<Object> finalizar(@PathVariable Long id) throws BadRequestException {
+        this.ordenVentaService.finalizar(id);
+        return ResponseEntity.ok("Orden de Venta finalizada correctamente");
     }
 }

@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -27,6 +28,8 @@ public class RolloDto {
     private EstadoRollo estado;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "DEFAULT_TIMEZONE")
     private LocalDateTime fechaIngreso;
-    private RolloDto rollo_padre;
+    private RolloDto rolloPadre;
+    private Long rolloPadreId;
+    private List<RolloDto> hijos;
 }
 

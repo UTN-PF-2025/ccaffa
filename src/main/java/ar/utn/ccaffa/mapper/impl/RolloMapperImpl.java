@@ -27,8 +27,58 @@ public class RolloMapperImpl implements RolloMapper {
                 .tipoMaterial(rollo.getTipoMaterial())
                 .estado(rollo.getEstado())
                 .fechaIngreso(rollo.getFechaIngreso())
-                .rollo_padre(this.toDto(rollo.getRollo_padre()))
+                .rolloPadre(this.toDto(rollo.getRolloPadre()))
+                .rolloPadreId(rollo.getRolloPadreId())
                 .build();
+    }
+
+    @Override
+    public RolloDto toDtoOnlyWithRolloPadreID(Rollo rollo) {
+        if (rollo == null) {
+            return null;
+        }
+
+        return RolloDto.builder()
+                .id(rollo.getId())
+                .proveedorId(rollo.getProveedorId())
+                .codigoProveedor(rollo.getCodigoProveedor())
+                .pesoKG(rollo.getPesoKG())
+                .anchoMM(rollo.getAnchoMM())
+                .espesorMM(rollo.getEspesorMM())
+                .tipoMaterial(rollo.getTipoMaterial())
+                .estado(rollo.getEstado())
+                .fechaIngreso(rollo.getFechaIngreso())
+                .rolloPadreId(rollo.getRolloPadreId())
+                .build();
+    }
+
+    @Override
+    public RolloDto toDtoWithRolloHijos(Rollo rollo) {
+        if (rollo == null) {
+            return null;
+        }
+
+        RolloDto dto = RolloDto.builder()
+                        .id(rollo.getId())
+                        .proveedorId(rollo.getProveedorId())
+                        .codigoProveedor(rollo.getCodigoProveedor())
+                        .pesoKG(rollo.getPesoKG())
+                        .anchoMM(rollo.getAnchoMM())
+                        .espesorMM(rollo.getEspesorMM())
+                        .tipoMaterial(rollo.getTipoMaterial())
+                        .estado(rollo.getEstado())
+                        .fechaIngreso(rollo.getFechaIngreso())
+                        .rolloPadreId(rollo.getRolloPadreId())
+                        .build();
+
+        if (rollo.getHijos() != null && !rollo.getHijos().isEmpty()) {
+            List<RolloDto> hijosDto = rollo.getHijos().stream()
+                    .map(this::toDtoWithRolloHijos)
+                    .collect(Collectors.toList());
+            dto.setHijos(hijosDto);
+        }
+
+        return dto;
     }
 
     @Override
@@ -47,8 +97,9 @@ public class RolloMapperImpl implements RolloMapper {
                 .tipoMaterial(rolloDto.getTipoMaterial())
                 .estado(rolloDto.getEstado())
                 .fechaIngreso(rolloDto.getFechaIngreso())
-                .rollo_padre(this.toEntity(rolloDto.getRollo_padre()))
+                .rolloPadre(this.toEntity(rolloDto.getRolloPadre()))
                 .build();
+
     }
 
     @Override
@@ -58,6 +109,16 @@ public class RolloMapperImpl implements RolloMapper {
         }
         return rollos.stream()
                 .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<RolloDto> toDtoListOnlyWithRolloPadreID(List<Rollo> rollos) {
+        if (rollos == null) {
+            return List.of();
+        }
+        return rollos.stream()
+                .map(this::toDtoOnlyWithRolloPadreID)
                 .collect(Collectors.toList());
     }
 
