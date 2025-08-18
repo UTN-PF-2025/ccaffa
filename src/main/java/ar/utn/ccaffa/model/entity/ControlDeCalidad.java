@@ -42,4 +42,7 @@ public class ControlDeCalidad {
 
     @Transient
     private List<Defecto> defectos;
+
+    @Column(name = "orden_de_trabajo_id")
+    private String ordenDeTrabajoId;
 } 

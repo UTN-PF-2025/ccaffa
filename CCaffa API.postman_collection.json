@@ -4,8 +4,7 @@
 		"name": "CCaffa API",
 		"description": "Colección de endpoints para la API de CCaffa",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "45716994",
-		"_collection_link": "https://juani-2165688.postman.co/workspace/Juani's-Workspace~a2fc2525-08a8-4a1c-81ea-674a08049f9f/collection/45716994-c3ebf675-caae-4e14-8918-5b7cac59f212?action=share&source=collection_link&creator=45716994"
+		"_exporter_id": "36725469"
 	},
 	"item": [
 		{
@@ -1011,7 +1010,10 @@
 					"name": "New Request",
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": ""
+						}
 					},
 					"response": []
 				}
@@ -1496,6 +1498,349 @@
 								"api",
 								"control-calidad",
 								"iniciar"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Orden de Trabajo",
+			"item": [
+				{
+					"name": "Create orden de trabajo",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc1MTQyMDc4NywiZXhwIjoxNzUxNDM4Nzg3fQ.mv_TiMZ0aO8ZGFMIXBY_nphasxq8MRUf0eXgyuNnd-s",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc1MDIxNzA2MSwiZXhwIjoxNzUwMjM1MDYxfQ.uaKF6pKv5QOT_u0za0W1w4SK4-Ez8B7N3SU8zZ1Fr6A",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"ordenDeVentaId\": 16,\n    \"rolloId\": 25,\n    \"fechaInicio\": \"2025-06-23T10:00:00\",\n    \"fechaFin\": \"2025-06-23T18:00:00\",\n    \"observaciones\": \"Orden de trabajo de prueba\",\n    \"maquinas\": [\n      {\n        \"id\": 1,\n        \"fechaInicio\": \"2025-06-23T10:00:00\",\n        \"fechaFin\": \"2025-06-23T14:00:00\",\n        \"estado\": \"En Proceso\",\n        \"observaciones\": \"Máquina 1 asignada\"\n      }\n    ]\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/ordenes-trabajo",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"ordenes-trabajo"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get orden de trabajo",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc1MDgyMzcxMCwiZXhwIjoxNzUwODQxNzEwfQ.R9BTBHzBflmmeV8qu24OULULu92a4LhgoTgOWNdeLRE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc1MDIxNzA2MSwiZXhwIjoxNzUwMjM1MDYxfQ.uaKF6pKv5QOT_u0za0W1w4SK4-Ez8B7N3SU8zZ1Fr6A",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"ordenDeVentaId\": 5,\n    \"rolloId\": 5,\n    \"fechaInicio\": \"2025-06-22T10:00:00\",\n    \"fechaFin\": \"2025-06-22T18:00:00\",\n    \"observaciones\": \"Orden de trabajo de prueba\",\n    \"maquinas\": [\n      {\n        \"id\": 1,\n        \"fechaInicio\": \"2025-06-22T10:00:00\",\n        \"fechaFin\": \"2025-06-22T14:00:00\",\n        \"estado\": \"En Proceso\",\n        \"observaciones\": \"Máquina 1 asignada\"\n      }\n    ]\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/ordenes-trabajo/:id",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"ordenes-trabajo",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "4"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar orden de trabajo",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc1MDYyNjU0NSwiZXhwIjoxNzUwNjQ0NTQ1fQ.Ey1Fng7-E1sGjcmQUuG9dPNZnB4t5fqNa6AVCRf8Jr0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer TU_TOKEN_JWT"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"nombre\": \"Orden de trabajo actualizada\",\n    \"fechaInicio\": \"2025-06-22T10:00:00\",\n    \"fechaFin\": \"2025-06-22T18:00:00\",\n    \"estado\": \"En Proceso\",\n    \"observaciones\": \"Observaciones actualizadas\",\n    \"fechaEstimadaDeInicio\": \"2025-06-22T10:00:00\",\n    \"fechaEstimadaDeFin\": \"2025-06-22T18:00:00\",\n    \"activa\": true\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/ordenes-trabajo/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"ordenes-trabajo",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancelar orden de trabajo",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc1MTQyMDc4NywiZXhwIjoxNzUxNDM4Nzg3fQ.mv_TiMZ0aO8ZGFMIXBY_nphasxq8MRUf0eXgyuNnd-s",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer TU_TOKEN_JWT"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/ordenes-trabajo/23/cancelar",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"ordenes-trabajo",
+								"23",
+								"cancelar"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Camaras",
+			"item": [
+				{
+					"name": "Crear camara",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Camara de Vigilancia 1\",\n  \"descripcion\": \"Camara en la entrada principal\",\n  \"url\": \"rtsp://192.168.1.100:554/stream1\",\n  \"ubicacion\": \"Entrada Principal\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/camaras",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"camaras"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET all camaras",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/camaras",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"camaras"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/camaras/{id}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"camaras",
+								"{id}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE camara",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Camara de Vigilancia 1 (Actualizada)\",\n  \"descripcion\": \"Camara actualizada en la entrada principal\",\n  \"url\": \"rtsp://192.168.1.100:554/stream1_updated\",\n  \"ubicacion\": \"Entrada Principal - Sector A\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/camaras/{id}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"camaras",
+								"{id}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE camara",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/camaras/{id}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"camaras",
+								"{id}"
 							]
 						}
 					},
