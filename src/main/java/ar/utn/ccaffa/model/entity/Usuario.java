@@ -15,6 +15,8 @@ import lombok.Data;
 public class Usuario {
     @Id @GeneratedValue
     private Long id;
+    @Column(name = "nombre")
+    private String nombre;
     @Column(name = "username")
     private String username;
     @Column(name = "password")
