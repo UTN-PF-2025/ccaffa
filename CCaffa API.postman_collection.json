@@ -1847,6 +1847,116 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Control de Calidad",
+			"item": [
+				{
+					"name": "Crear Control de Calidad",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"empleadoId\": 1,\n    \"ordenDeTrabajoId\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/controles-calidad",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"controles-calidad"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Añadir Medida a Control de Calidad",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"espesorMedido\": 5.2,\n    \"anchoMedido\": 100.5,\n    \"rebabaMedio\": 0.1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/controles-calidad/1/medidas",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"controles-calidad",
+								"1",
+								"medidas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Control de Proceso",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/controles-calidad/1/proceso",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"controles-calidad",
+								"1",
+								"proceso"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"auth": {

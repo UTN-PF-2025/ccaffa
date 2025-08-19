@@ -1,6 +1,7 @@
 package ar.utn.ccaffa.web;
 
 import ar.utn.ccaffa.model.dto.AddMedidaRequest;
+import ar.utn.ccaffa.model.dto.ControlDeProcesoDto;
 import ar.utn.ccaffa.model.dto.CreateControlDeCalidadRequest;
 import ar.utn.ccaffa.model.entity.ControlDeCalidad;
 import ar.utn.ccaffa.services.interfaces.ControlDeCalidadService;
@@ -28,5 +29,11 @@ public class ControlDeCalidadController {
             @RequestBody AddMedidaRequest request) {
         ControlDeCalidad updatedControl = controlDeCalidadService.addMedida(controlDeCalidadId, request);
         return ResponseEntity.ok(updatedControl);
+    }
+
+    @GetMapping("/{id}/proceso")
+    public ResponseEntity<ControlDeProcesoDto> getControlDeProceso(@PathVariable("id") Long controlDeCalidadId) {
+        ControlDeProcesoDto procesoDto = controlDeCalidadService.getControlDeProceso(controlDeCalidadId);
+        return ResponseEntity.ok(procesoDto);
     }
 }

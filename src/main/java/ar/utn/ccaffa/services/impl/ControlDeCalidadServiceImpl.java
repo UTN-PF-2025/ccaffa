@@ -6,10 +6,12 @@ import ar.utn.ccaffa.model.entity.Empleado;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import ar.utn.ccaffa.repository.interfaces.ControlDeCalidadRepository;
 import ar.utn.ccaffa.model.dto.AddMedidaRequest;
-import ar.utn.ccaffa.model.entity.MedidaDeCalidad;
+import ar.utn.ccaffa.model.dto.ControlDeProcesoDto;
+import ar.utn.ccaffa.model.entity.*;
 import ar.utn.ccaffa.repository.interfaces.EmpleadoRepository;
 import ar.utn.ccaffa.repository.interfaces.MedidaDeCalidadRepository;
 import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoRepository;
+import ar.utn.ccaffa.repository.interfaces.ProveedorRepository;
 import ar.utn.ccaffa.services.interfaces.ControlDeCalidadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
     private final EmpleadoRepository empleadoRepository;
     private final OrdenDeTrabajoRepository ordenDeTrabajoRepository;
     private final MedidaDeCalidadRepository medidaDeCalidadRepository;
+    private final ProveedorRepository proveedorRepository;
 
     @Override
     public ControlDeCalidad createControlDeCalidad(CreateControlDeCalidadRequest request) {
@@ -74,5 +77,49 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
         control.setRebabaMedio((float) avgRebaba);
 
         return controlDeCalidadRepository.save(control);
+    }
+
+    @Override
+    public ControlDeProcesoDto getControlDeProceso(Long controlDeCalidadId) {
+        ControlDeCalidad control = controlDeCalidadRepository.findById(controlDeCalidadId)
+                .orElseThrow(() -> new RuntimeException("Control de Calidad no encontrado con ID: " + controlDeCalidadId));
+
+        OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoRepository.findById(Long.parseLong(control.getOrdenDeTrabajoId()))
+                .orElseThrow(() -> new RuntimeException("Orden de Trabajo no encontrada con ID: " + control.getOrdenDeTrabajoId()));
+
+        Rollo rollo = ordenDeTrabajo.getRollo();
+        Proveedor proveedor = null;
+        if (rollo != null && rollo.getProveedorId() != null) {
+            proveedor = proveedorRepository.findById(rollo.getProveedorId()).orElse(null);
+        }
+
+        OrdenVenta ordenDeVenta = ordenDeTrabajo.getOrdenDeVenta();
+        Cliente cliente = ordenDeVenta != null ? ordenDeVenta.getCliente() : null;
+        Especificacion especificacion = ordenDeVenta != null ? ordenDeVenta.getEspecificacion() : null;
+        OrdenDeTrabajoMaquina maquinaAsignada = (ordenDeTrabajo.getOrdenDeTrabajoMaquinas() != null && !ordenDeTrabajo.getOrdenDeTrabajoMaquinas().isEmpty()) ? ordenDeTrabajo.getOrdenDeTrabajoMaquinas().getLast() : null;
+
+        return ControlDeProcesoDto.builder()
+                .idControl(control.getId())
+                .idCliente(cliente != null ? cliente.getId() : null)
+                .nombreCliente(cliente != null ? cliente.getName() : null)
+                .idOrden(ordenDeTrabajo.getId())
+                .fechaInicio(ordenDeTrabajo.getFechaInicio())
+                .fechaFin(ordenDeTrabajo.getFechaFin())
+                .idMaquina(maquinaAsignada != null ? maquinaAsignada.getMaquina().getId() : null)
+                .nombreMaquina(maquinaAsignada != null ? maquinaAsignada.getMaquina().getNombre() : null)
+                .idOperario(control.getEmpleado().getId())
+                .nombreOperario(control.getEmpleado().getNombre())
+                .cantidad(rollo != null ? rollo.getPesoKG().doubleValue() : null)
+                .tipoMaterial(rollo != null ? rollo.getTipoMaterial().name() : null)
+                .ancho(rollo != null ? rollo.getAnchoMM() : null)
+                .toleranciaAncho(especificacion != null ? especificacion.getToleranciaAncho() : null)
+                .espesor(rollo != null ? rollo.getEspesorMM() : null)
+                .toleranciaEspesor(especificacion != null ? especificacion.getToleranciaEspesor() : null)
+                .dureza(null) // Campo no disponible en el modelo actual
+                .tamanoRebaba(control.getRebabaMedio())
+                .idProveedor(proveedor != null ? proveedor.getId() : null)
+                .nombreProveedor(proveedor != null ? proveedor.getNombre() : null)
+                .codigoEtiquetaMp(rollo != null ? rollo.getCodigoProveedor() : null)
+                .build();
     }
 }
