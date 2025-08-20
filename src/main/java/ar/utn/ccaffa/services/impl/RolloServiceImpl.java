@@ -159,7 +159,7 @@ public class RolloServiceImpl implements RolloService {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("rolloPadre").get("id"), filtros.getRolloPadreId()));
         }
 
-        return this.rolloMapper.toDtoListOnlyWithRolloPadreID(rolloRepository.findAll((Sort) spec));
+        return this.rolloMapper.toDtoListOnlyWithRolloPadreID(rolloRepository.findAll(spec));
     }
 
     @Override
