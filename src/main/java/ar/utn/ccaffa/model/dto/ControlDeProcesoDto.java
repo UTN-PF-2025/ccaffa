@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import ar.utn.ccaffa.model.entity.MedidaDeCalidad;
 
 @Data
 @Builder
@@ -29,4 +31,5 @@ public class ControlDeProcesoDto {
     private Long idProveedor;
     private String nombreProveedor;
     private String codigoEtiquetaMp;
+    private List<MedidaDeCalidad> medidas;
 }

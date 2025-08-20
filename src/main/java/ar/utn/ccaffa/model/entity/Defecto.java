@@ -1,6 +1,9 @@
 package ar.utn.ccaffa.model.entity;
 
-import jakarta.persistence.Column;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,17 +12,17 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
-import org.springframework.data.mongodb.core.mapping.Document;
-
-@Document
+@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class Defecto {
     @Id
-    private String id;
-    private byte[] imagen;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(name = "imagen_ubicacion")
+    private String imagen;
     @Column(name = "fecha")
     private LocalDate fecha;
     @Column(name = "tipo")
@@ -28,4 +31,9 @@ public class Defecto {
     private String descripcion;
     @Column(name = "es_rechazado")
     private Boolean esRechazado;
+
+    @ManyToOne
+    @JoinColumn(name = "control_de_calidad_id")
+    @JsonBackReference
+    private ControlDeCalidad controlDeCalidad;
 }

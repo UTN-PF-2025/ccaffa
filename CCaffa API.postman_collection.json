@@ -1955,6 +1955,31 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Obtener Todos los Controles de Calidad",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/controles-calidad",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"controles-calidad"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}

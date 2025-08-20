@@ -2,45 +2,47 @@ package ar.utn.ccaffa.services.impl;
 
 import ar.utn.ccaffa.model.dto.CreateControlDeCalidadRequest;
 import ar.utn.ccaffa.model.entity.ControlDeCalidad;
-import ar.utn.ccaffa.model.entity.Empleado;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import ar.utn.ccaffa.repository.interfaces.ControlDeCalidadRepository;
 import ar.utn.ccaffa.model.dto.AddMedidaRequest;
 import ar.utn.ccaffa.model.dto.ControlDeProcesoDto;
 import ar.utn.ccaffa.model.entity.*;
-import ar.utn.ccaffa.repository.interfaces.EmpleadoRepository;
 import ar.utn.ccaffa.repository.interfaces.MedidaDeCalidadRepository;
 import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoRepository;
+import ar.utn.ccaffa.repository.interfaces.OrdenVentaRepository;
 import ar.utn.ccaffa.repository.interfaces.ProveedorRepository;
+import ar.utn.ccaffa.repository.interfaces.UsuarioRepository;
 import ar.utn.ccaffa.services.interfaces.ControlDeCalidadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
 
     private final ControlDeCalidadRepository controlDeCalidadRepository;
-    private final EmpleadoRepository empleadoRepository;
+    private final UsuarioRepository usuarioRepository;
     private final OrdenDeTrabajoRepository ordenDeTrabajoRepository;
     private final MedidaDeCalidadRepository medidaDeCalidadRepository;
     private final ProveedorRepository proveedorRepository;
+    private final OrdenVentaRepository ordenDeVentaRepository;
 
     @Override
     public ControlDeCalidad createControlDeCalidad(CreateControlDeCalidadRequest request) {
-        Empleado empleado = empleadoRepository.findById(request.getEmpleadoId())
-                .orElseThrow(() -> new RuntimeException("Empleado no encontrado con ID: " + request.getEmpleadoId()));
+        Usuario usuario = usuarioRepository.findById(request.getEmpleadoId())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + request.getEmpleadoId()));
 
         OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoRepository.findById(request.getOrdenDeTrabajoId())
                 .orElseThrow(() -> new RuntimeException("Orden de Trabajo no encontrada con ID: " + request.getOrdenDeTrabajoId()));
 
         ControlDeCalidad control = new ControlDeCalidad();
-        control.setEmpleado(empleado);
+        control.setUsuario(usuario);
         control.setOrdenDeTrabajoId(ordenDeTrabajo.getId().toString());
-        control.setFechaControl(LocalDate.now());
         control.setEstado("listo");
 
         control.setAnchoMedido(0.0f); // Valor por defecto
@@ -58,7 +60,6 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
                 .orElseThrow(() -> new RuntimeException("Control de Calidad no encontrado con ID: " + controlDeCalidadId));
 
         MedidaDeCalidad nuevaMedida = new MedidaDeCalidad();
-        nuevaMedida.setControlDeCalidad(control);
         nuevaMedida.setEspesorMedido(request.getEspesorMedido());
         nuevaMedida.setAnchoMedido(request.getAnchoMedido());
         nuevaMedida.setRebabaMedio(request.getRebabaMedio());
@@ -93,9 +94,13 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
             proveedor = proveedorRepository.findById(rollo.getProveedorId()).orElse(null);
         }
 
-        OrdenVenta ordenDeVenta = ordenDeTrabajo.getOrdenDeVenta();
-        Cliente cliente = ordenDeVenta != null ? ordenDeVenta.getCliente() : null;
-        Especificacion especificacion = ordenDeVenta != null ? ordenDeVenta.getEspecificacion() : null;
+        OrdenVenta ordenDeVenta = ordenDeVentaRepository.findByOrdenDeTrabajoId(ordenDeTrabajo.getId());
+        Cliente cliente = null;
+        Especificacion especificacion = null;
+        if (ordenDeVenta != null) {
+            cliente = ordenDeVenta.getCliente();
+            especificacion = ordenDeVenta.getEspecificacion();
+        }
         OrdenDeTrabajoMaquina maquinaAsignada = (ordenDeTrabajo.getOrdenDeTrabajoMaquinas() != null && !ordenDeTrabajo.getOrdenDeTrabajoMaquinas().isEmpty()) ? ordenDeTrabajo.getOrdenDeTrabajoMaquinas().getLast() : null;
 
         return ControlDeProcesoDto.builder()
@@ -103,12 +108,12 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
                 .idCliente(cliente != null ? cliente.getId() : null)
                 .nombreCliente(cliente != null ? cliente.getName() : null)
                 .idOrden(ordenDeTrabajo.getId())
-                .fechaInicio(ordenDeTrabajo.getFechaInicio())
-                .fechaFin(ordenDeTrabajo.getFechaFin())
+                .fechaInicio(control.getFechaControl())
+                .fechaFin(control.getFechaFinalizacion())
                 .idMaquina(maquinaAsignada != null ? maquinaAsignada.getMaquina().getId() : null)
                 .nombreMaquina(maquinaAsignada != null ? maquinaAsignada.getMaquina().getNombre() : null)
-                .idOperario(control.getEmpleado().getId())
-                .nombreOperario(control.getEmpleado().getNombre())
+                .idOperario(control.getUsuario().getId())
+                .nombreOperario(control.getUsuario().getNombre())
                 .cantidad(rollo != null ? rollo.getPesoKG().doubleValue() : null)
                 .tipoMaterial(rollo != null ? rollo.getTipoMaterial().name() : null)
                 .ancho(rollo != null ? rollo.getAnchoMM() : null)
@@ -120,6 +125,29 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
                 .idProveedor(proveedor != null ? proveedor.getId() : null)
                 .nombreProveedor(proveedor != null ? proveedor.getNombre() : null)
                 .codigoEtiquetaMp(rollo != null ? rollo.getCodigoProveedor() : null)
+                .medidas(control.getMedidasDeCalidad())
                 .build();
+    }
+
+    @Override
+    public List<ControlDeCalidad> getAllControlesCalidad() {
+        return controlDeCalidadRepository.findAll();
+    }
+
+    @Override
+    public ControlDeCalidad finalizarControl(Long id) {
+        ControlDeCalidad control = controlDeCalidadRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Control de Calidad no encontrado con ID: " + id));
+        control.setEstado("Finalizado");
+        control.setFechaFinalizacion(LocalDateTime.now());
+        return controlDeCalidadRepository.save(control);
+    }
+
+    @Override
+    public ControlDeCalidad iniciarControl(Long id) {
+        ControlDeCalidad control = controlDeCalidadRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Control de Calidad no encontrado con ID: " + id));
+        control.setFechaControl(LocalDateTime.now());
+        return controlDeCalidadRepository.save(control);
     }
 }

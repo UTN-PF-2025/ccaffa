@@ -37,17 +37,27 @@ public class OrdenDeTrabajoController {
     @PostMapping
     public ResponseEntity<OrdenDeTrabajoResponseDto> crearOrdenDeTrabajo(@RequestBody OrdenDeTrabajoDto request) {
         try {
+            // 1. Crear y guardar la orden de trabajo básica para obtener un ID
             OrdenDeTrabajo orden = crearOrdenBasica(request);
+            ordenDeTrabajoService.save(orden); // Guardado inicial
 
+            // 2. Procesar y asociar la orden de venta
             OrdenVenta ordenVenta = procesarOrdenVenta(request, orden);
+            if (ordenVenta != null) {
+                ordenDeVentaRepository.save(ordenVenta);
+            }
 
+            // 3. Procesar y asociar máquinas
             procesarMaquinas(request, orden);
 
+            // 4. Procesar y asociar el rollo y sus hijos
             procesarRollo(request, orden, ordenVenta);
 
+            // 5. Configurar los datos finales de la orden
             configurarOrdenFinal(orden, request);
 
-            OrdenDeTrabajo guardada = guardarOrdenCompleta(orden, ordenVenta);
+            // 6. Guardar la orden de trabajo completa con todas sus asociaciones
+            OrdenDeTrabajo guardada = ordenDeTrabajoService.save(orden);
             return ResponseEntity.ok(ordenDeTrabajoResponseMapper.toDto(guardada));
 
         } catch (IllegalArgumentException e) {
@@ -266,6 +276,7 @@ public class OrdenDeTrabajoController {
         }
 
         OrdenVenta ordenVenta = ordenVentaOpt.get();
+        ordenVenta.setOrdenDeTrabajo(orden);
         orden.setOrdenDeVenta(ordenVenta);
         return ordenVenta;
     }
@@ -329,16 +340,6 @@ public class OrdenDeTrabajoController {
         orden.setEstado("En Proceso");
     }
 
-    private OrdenDeTrabajo guardarOrdenCompleta(OrdenDeTrabajo orden, OrdenVenta ordenVenta) {
-        OrdenDeTrabajo guardada = ordenDeTrabajoService.save(orden);
-
-        if (ordenVenta != null) {
-            ordenVenta.setOrdenDeTrabajo(guardada);
-            ordenDeVentaRepository.save(ordenVenta);
-        }
-
-        return guardada;
-    }
 
     // Métodos privados para validaciones
     private void actualizarOrden(OrdenDeTrabajo existingOrden, OrdenDeTrabajo nuevaOrden) {

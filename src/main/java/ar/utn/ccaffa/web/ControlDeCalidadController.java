@@ -6,6 +6,9 @@ import ar.utn.ccaffa.model.dto.CreateControlDeCalidadRequest;
 import ar.utn.ccaffa.model.entity.ControlDeCalidad;
 import ar.utn.ccaffa.services.interfaces.ControlDeCalidadService;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,5 +38,23 @@ public class ControlDeCalidadController {
     public ResponseEntity<ControlDeProcesoDto> getControlDeProceso(@PathVariable("id") Long controlDeCalidadId) {
         ControlDeProcesoDto procesoDto = controlDeCalidadService.getControlDeProceso(controlDeCalidadId);
         return ResponseEntity.ok(procesoDto);
+    }
+
+    @GetMapping()
+    public ResponseEntity<List<ControlDeCalidad>> getAllControlesCalidad() {
+        List<ControlDeCalidad> controlesCalidad = controlDeCalidadService.getAllControlesCalidad();
+        return ResponseEntity.ok(controlesCalidad);
+    }
+
+    @PutMapping("/{id}/finalizar")
+    public ResponseEntity<ControlDeCalidad> finalizarControl(@PathVariable Long id) {
+        ControlDeCalidad controlDeCalidad = controlDeCalidadService.finalizarControl(id);
+        return ResponseEntity.ok(controlDeCalidad);
+    }
+
+    @PutMapping("/{id}/iniciar")
+    public ResponseEntity<ControlDeCalidad> iniciarControl(@PathVariable Long id) {
+        ControlDeCalidad controlDeCalidad = controlDeCalidadService.iniciarControl(id);
+        return ResponseEntity.ok(controlDeCalidad);
     }
 }

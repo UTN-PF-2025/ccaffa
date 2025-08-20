@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface OrdenVentaRepository extends JpaRepository<OrdenVenta, Long>, JpaSpecificationExecutor<OrdenVenta> {
-
+    OrdenVenta findByOrdenDeTrabajoId(Long ordenDeTrabajoId);
 }

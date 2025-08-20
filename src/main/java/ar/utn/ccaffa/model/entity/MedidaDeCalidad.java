@@ -16,7 +16,4 @@ public class MedidaDeCalidad {
     private Float anchoMedido;
     @Column(name = "rebaba_medio")
     private Float rebabaMedio;
-    @ManyToOne
-    @JoinColumn(name = "control_de_calidad_id")
-    private ControlDeCalidad controlDeCalidad;
 }

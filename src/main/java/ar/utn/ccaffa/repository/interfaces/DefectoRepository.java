@@ -1,7 +1,7 @@
 package ar.utn.ccaffa.repository.interfaces;
 
 import ar.utn.ccaffa.model.entity.Defecto;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface DefectoRepository extends MongoRepository<Defecto, Long> {
+public interface DefectoRepository extends JpaRepository<Defecto, Long> {
 }

@@ -59,15 +59,15 @@ public class CamaraController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/upload")
-    public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
+    @PostMapping("/{id}/upload")
+    public ResponseEntity<String> uploadImage(@PathVariable String id, @RequestParam("file") MultipartFile file) {
         log.info("Recibiendo archivo: {} para enviar a análisis", file.getOriginalFilename());
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body("Por favor seleccione un archivo para subir.");
         }
 
         try {
-            analysisService.analyzeAndNotify(file);
+            analysisService.analyzeAndNotify(file, id);
             return ResponseEntity.ok("Archivo enviado a análisis exitosamente.");
         } catch (IOException e) {
             log.error("Error al leer el archivo para el análisis", e);

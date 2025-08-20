@@ -4,6 +4,9 @@ import ar.utn.ccaffa.grpc.ImageClassifierGrpc;
 import ar.utn.ccaffa.grpc.ImageRequest;
 import ar.utn.ccaffa.grpc.ImageResponses;
 import ar.utn.ccaffa.model.dto.AnalysisResponse;
+import ar.utn.ccaffa.model.entity.ControlDeCalidad;
+import ar.utn.ccaffa.model.entity.Defecto;
+import ar.utn.ccaffa.repository.interfaces.ControlDeCalidadRepository;
 import ar.utn.ccaffa.services.interfaces.AnalysisService;
 import ar.utn.ccaffa.services.interfaces.FileStorageService;
 import com.google.protobuf.ByteString;
@@ -12,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Random;
 
 @Service
@@ -27,20 +30,19 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class AnalysisServiceImpl implements AnalysisService {
 
-    private final GridFsTemplate gridFsTemplate; // Se mantiene por si se usa en otro lado
     private final SimpMessagingTemplate messagingTemplate;
     private final FileStorageService fileStorageService;
-
+    private final ControlDeCalidadRepository controlDeCalidadRepository;
 
     @Override
-    public void analyzeAndNotify(MultipartFile file) throws IOException {
+    public void analyzeAndNotify(MultipartFile file, String id) throws IOException {
         byte[] fileBytes = file.getBytes();
-        processAnalysis(fileBytes, file.getOriginalFilename(), file.getContentType());
+        processAnalysis(fileBytes, file.getOriginalFilename(), file.getContentType(), id);
     }
 
     @Async
     @Override
-    public void processAnalysis(byte[] fileBytes, String originalFilename, String contentType) {
+    public void processAnalysis(byte[] fileBytes, String originalFilename, String contentType, String id) {
         log.info("Iniciando análisis asíncrono para el archivo: {}", originalFilename);
         ManagedChannel channel = null;
         try {
@@ -74,7 +76,27 @@ public class AnalysisServiceImpl implements AnalysisService {
                 AnalysisResponse analysis = new AnalysisResponse();
                 analysis.setDefect(true);
                 analysis.setDetails("Defecto detectado en " + originalFilename);
-                analysis.setImageId(filePath); // Usamos la ruta del archivo como ID
+                analysis.setImageId(filePath);
+
+                // Buscar el control de calidad y añadir el nuevo defecto
+                ControlDeCalidad controlDeCalidad = controlDeCalidadRepository.findById(Long.valueOf(id))
+                        .orElseThrow(() -> new RuntimeException("Control de Calidad no encontrado con ID: " + id));
+
+                Defecto defecto = new Defecto();
+                defecto.setImagen(filePath);
+                defecto.setFecha(LocalDate.now());
+                defecto.setTipo("Defecto de Fleje");
+                defecto.setDescripcion("Defecto detectado por el sistema de visión.");
+                defecto.setEsRechazado(false);
+                defecto.setControlDeCalidad(controlDeCalidad); // Establecer la relación
+
+                controlDeCalidad.getDefectos().add(defecto);
+
+                // Guardar la entidad actualizada
+                controlDeCalidadRepository.save(controlDeCalidad);
+                log.info("Defecto guardado para el control de calidad ID: {}", id);
+
+                // Enviar notificación por WebSocket
                 messagingTemplate.convertAndSend("/topic/defects", analysis);
                 log.info("Notificación de defecto enviada a /topic/defects");
             }

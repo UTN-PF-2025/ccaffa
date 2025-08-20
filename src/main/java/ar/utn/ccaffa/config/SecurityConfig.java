@@ -36,9 +36,10 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**", "/api/camaras/**", "/ws/**").permitAll()
-                .requestMatchers("/api/roles/**").hasRole("ADMIN")
+                .requestMatchers("/api/roles/**").hasAuthority("ADMIN")
                 .requestMatchers("/api/usuarios/**").permitAll()
-                .requestMatchers("/api/rolLos/**").hasAnyRole("RESPONSABLE_DE_DEPOSITO", "RESPONSABLE_DE_PRODUCCION")
+                .requestMatchers("/api/rolLos/**").hasAnyAuthority("RESPONSABLE_DE_DEPOSITO", "RESPONSABLE_DE_PRODUCCION")
+                .requestMatchers("/api/controles-calidad/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
