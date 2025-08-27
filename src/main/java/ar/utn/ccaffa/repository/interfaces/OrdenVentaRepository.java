@@ -4,9 +4,16 @@ import ar.utn.ccaffa.model.entity.OrdenVenta;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-
+/**
+ * 
+ */
 @Repository
 public interface OrdenVentaRepository extends JpaRepository<OrdenVenta, Long>, JpaSpecificationExecutor<OrdenVenta> {
     OrdenVenta findByOrdenDeTrabajoId(Long ordenDeTrabajoId);
+
+    @Query("select ov from OrdenVenta ov left join fetch ov.cliente left join fetch ov.especificacion where ov.ordenDeTrabajo.id = :ordenDeTrabajoId")
+    OrdenVenta findByOrdenDeTrabajoIdFetchClienteEspecificacion(@Param("ordenDeTrabajoId") Long ordenDeTrabajoId);
 }

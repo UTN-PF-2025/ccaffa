@@ -12,6 +12,7 @@ import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoRepository;
 import ar.utn.ccaffa.repository.interfaces.OrdenVentaRepository;
 import ar.utn.ccaffa.repository.interfaces.ProveedorRepository;
 import ar.utn.ccaffa.repository.interfaces.UsuarioRepository;
+import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoMaquinaRepository;
 import ar.utn.ccaffa.services.interfaces.ControlDeCalidadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
     private final MedidaDeCalidadRepository medidaDeCalidadRepository;
     private final ProveedorRepository proveedorRepository;
     private final OrdenVentaRepository ordenDeVentaRepository;
+    private final OrdenDeTrabajoMaquinaRepository ordenDeTrabajoMaquinaRepository;
 
     @Override
     public ControlDeCalidad createControlDeCalidad(CreateControlDeCalidadRequest request) {
@@ -82,10 +84,10 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
 
     @Override
     public ControlDeProcesoDto getControlDeProceso(Long controlDeCalidadId) {
-        ControlDeCalidad control = controlDeCalidadRepository.findById(controlDeCalidadId)
+        ControlDeCalidad control = controlDeCalidadRepository.findByIdWithMedidas(controlDeCalidadId)
                 .orElseThrow(() -> new RuntimeException("Control de Calidad no encontrado con ID: " + controlDeCalidadId));
 
-        OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoRepository.findById(Long.parseLong(control.getOrdenDeTrabajoId()))
+        OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoRepository.findByIdFetchRollo(Long.parseLong(control.getOrdenDeTrabajoId()))
                 .orElseThrow(() -> new RuntimeException("Orden de Trabajo no encontrada con ID: " + control.getOrdenDeTrabajoId()));
 
         Rollo rollo = ordenDeTrabajo.getRollo();
@@ -94,14 +96,14 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
             proveedor = proveedorRepository.findById(rollo.getProveedorId()).orElse(null);
         }
 
-        OrdenVenta ordenDeVenta = ordenDeVentaRepository.findByOrdenDeTrabajoId(ordenDeTrabajo.getId());
+        OrdenVenta ordenDeVenta = ordenDeVentaRepository.findByOrdenDeTrabajoIdFetchClienteEspecificacion(ordenDeTrabajo.getId());
         Cliente cliente = null;
         Especificacion especificacion = null;
         if (ordenDeVenta != null) {
             cliente = ordenDeVenta.getCliente();
             especificacion = ordenDeVenta.getEspecificacion();
         }
-        OrdenDeTrabajoMaquina maquinaAsignada = (ordenDeTrabajo.getOrdenDeTrabajoMaquinas() != null && !ordenDeTrabajo.getOrdenDeTrabajoMaquinas().isEmpty()) ? ordenDeTrabajo.getOrdenDeTrabajoMaquinas().getLast() : null;
+        OrdenDeTrabajoMaquina maquinaAsignada = ordenDeTrabajoMaquinaRepository.findTopByOrdenDeTrabajo_IdOrderByFechaInicioDesc(ordenDeTrabajo.getId());
 
         return ControlDeProcesoDto.builder()
                 .idControl(control.getId())
