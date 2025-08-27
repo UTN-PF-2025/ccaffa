@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -39,7 +40,7 @@ public class ControlCalidadServiceImpl implements ControlCalidadService {
         }
 
         ControlDeCalidad controlDeCalidad = new ControlDeCalidad();
-        controlDeCalidad.setFechaControl(hoy);
+        controlDeCalidad.setFechaControl(LocalDateTime.now());
         controlDeCalidad.setEstado("INICIADO");
 
         if (medidasDeCalidad != null) {
@@ -53,7 +54,6 @@ public class ControlCalidadServiceImpl implements ControlCalidadService {
                         } else if ("rebaba".equals(dto.getTipo())) {
                             medida.setRebabaMedio(dto.getValor());
                         }
-                        medida.setControlDeCalidad(controlDeCalidad);
                         return medida;
                     })
                     .toList();
