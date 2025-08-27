@@ -20,6 +20,24 @@ public class DefectoServiceImpl implements DefectoService {
         return toDto(defecto);
     }
 
+    @Override
+    public DefectoDto actualizarEstadoRechazo(Long id, boolean esRechazado) {
+        Defecto defecto = defectoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Defecto no encontrado con ID: " + id));
+        defecto.setEsRechazado(esRechazado);
+        Defecto actualizado = defectoRepository.save(defecto);
+        return toDto(actualizado);
+    }
+
+    @Override
+    public DefectoDto actualizarEstadoRechazoPorImagen(String imageId, boolean esRechazado) {
+        Defecto defecto = defectoRepository.findByImagen(imageId)
+                .orElseThrow(() -> new RuntimeException("Defecto no encontrado con imageId: " + imageId));
+        defecto.setEsRechazado(esRechazado);
+        Defecto actualizado = defectoRepository.save(defecto);
+        return toDto(actualizado);
+    }
+
     private DefectoDto toDto(Defecto defecto) {
         DefectoDto dto = new DefectoDto();
         dto.setId(defecto.getId());
@@ -34,3 +52,4 @@ public class DefectoServiceImpl implements DefectoService {
         return dto;
     }
 }
+

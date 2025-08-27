@@ -9,11 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/defectos")
+@RequestMapping("/api/defectos")
 @RequiredArgsConstructor
 @Slf4j
 public class DefectoController {
@@ -35,4 +36,19 @@ public class DefectoController {
         return ResponseEntity.ok().header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION,
                 "inline; filename=\"" + file.getFilename() + "\"").body(file);
     }
+
+    @PutMapping("/{imageId:.+}/rechazar")
+    public ResponseEntity<DefectoDto> rechazarDefecto(@PathVariable("imageId") String imageId) {
+        log.info("Rechazando defecto con imageId: {}", imageId);
+        DefectoDto actualizado = defectoService.actualizarEstadoRechazoPorImagen(imageId, true);
+        return ResponseEntity.ok(actualizado);
+    }
+
+    @PutMapping("/{imageId:.+}/aceptar")
+    public ResponseEntity<DefectoDto> aceptarDefecto(@PathVariable("imageId") String imageId) {
+        log.info("Aceptando defecto con imageId: {}", imageId);
+        DefectoDto actualizado = defectoService.actualizarEstadoRechazoPorImagen(imageId, false);
+        return ResponseEntity.ok(actualizado);
+    }
 }
+

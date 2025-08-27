@@ -72,12 +72,6 @@ public class AnalysisServiceImpl implements AnalysisService {
                 String filePath = fileStorageService.save(fileBytes, originalFilename);
                 log.info("Imagen con defecto guardada en: {}", filePath);
 
-                // 7. Enviar notificación por WebSocket
-                AnalysisResponse analysis = new AnalysisResponse();
-                analysis.setDefect(true);
-                analysis.setDetails("Defecto detectado en " + originalFilename);
-                analysis.setImageId(filePath);
-
                 // Buscar el control de calidad y añadir el nuevo defecto
                 ControlDeCalidad controlDeCalidad = controlDeCalidadRepository.findById(Long.valueOf(id))
                         .orElseThrow(() -> new RuntimeException("Control de Calidad no encontrado con ID: " + id));
@@ -91,6 +85,13 @@ public class AnalysisServiceImpl implements AnalysisService {
                 defecto.setControlDeCalidad(controlDeCalidad); // Establecer la relación
 
                 controlDeCalidad.getDefectos().add(defecto);
+
+                // 7. Enviar notificación por WebSocket
+                AnalysisResponse analysis = new AnalysisResponse();
+                analysis.setDefect(true);
+                analysis.setDetails("Defecto detectado en " + originalFilename);
+                analysis.setImageId(filePath);
+                analysis.setId(defecto.getId());
 
                 // Guardar la entidad actualizada
                 controlDeCalidadRepository.save(controlDeCalidad);

@@ -37,8 +37,9 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**", "/api/camaras/**", "/ws/**").permitAll()
                 .requestMatchers("/api/roles/**").hasAuthority("ADMIN")
-                .requestMatchers("/api/usuarios/**").permitAll()
+                .requestMatchers("/api/usuarios/**").hasAuthority("ADMIN")
                 .requestMatchers("/api/rolLos/**").hasAnyAuthority("RESPONSABLE_DE_DEPOSITO", "RESPONSABLE_DE_PRODUCCION")
+                .requestMatchers("/api/defectos/**").permitAll()
                 .requestMatchers("/api/controles-calidad/**").permitAll()
                 .anyRequest().authenticated()
             )
