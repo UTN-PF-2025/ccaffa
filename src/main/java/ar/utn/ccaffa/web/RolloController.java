@@ -44,7 +44,7 @@ public class RolloController {
     @GetMapping("/{id}/arbolDeRollosHijos")
     public ResponseEntity<RolloDto> getRolloByIdConArbolDeRollosHijos(@PathVariable Long id) {
         log.info("Buscando rollo con ID: {}", id);
-        return ResponseEntity.ok(rolloService.obtenerArbolCompletoDeHijos(id));
+        return ResponseEntity.ok(rolloService.obtenerArbolCompletoDeRollosHijos(id));
     }
 
     @GetMapping("/{id}/rollosDisponibles")
@@ -71,6 +71,15 @@ public class RolloController {
     public ResponseEntity<Void> deleteRollo(@PathVariable Long id) {
         log.info("Eliminando rollo con ID: {}", id);
         if (rolloService.deleteById(id)) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/{id}/anular")
+    public ResponseEntity<Void> anularRollo(@PathVariable Long id) {
+        log.info("Anulando rollo con ID: {}", id);
+        if (rolloService.anularRollo(id)) {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.notFound().build();

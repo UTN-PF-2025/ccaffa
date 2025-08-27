@@ -51,6 +51,7 @@ public class OrdenDeTrabajoController {
             return ResponseEntity.ok(ordenDeTrabajoResponseMapper.toDto(guardada));
 
         } catch (IllegalArgumentException e) {
+            log.error("Error al crear orden de trabajo: {}", e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }
