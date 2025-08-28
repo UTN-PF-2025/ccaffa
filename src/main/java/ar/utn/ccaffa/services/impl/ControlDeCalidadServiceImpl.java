@@ -17,7 +17,6 @@ import ar.utn.ccaffa.services.interfaces.ControlDeCalidadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -143,7 +142,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
         if (!control.getDefectos().isEmpty()) {
             control.setEstado("Defectuoso");
         } else {
-            control.setEstado("Aprobado");
+            control.setEstado("Finalizado");
         }
         control.setFechaFinalizacion(LocalDateTime.now());
         return controlDeCalidadRepository.save(control);
@@ -154,6 +153,14 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
         ControlDeCalidad control = controlDeCalidadRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Control de Calidad no encontrado con ID: " + id));
         control.setFechaControl(LocalDateTime.now());
+        return controlDeCalidadRepository.save(control);
+    }
+
+    @Override
+    public ControlDeCalidad marcarComoACorregir(Long id) {
+        ControlDeCalidad control = controlDeCalidadRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Control de Calidad no encontrado con ID: " + id));
+        control.setEstado("A corregir");
         return controlDeCalidadRepository.save(control);
     }
 }

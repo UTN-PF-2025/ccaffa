@@ -26,6 +26,4 @@ public class Usuario {
     private String password;
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Rol> roles;
-    @Column(name = "nombre")
-    private String nombre;
 }

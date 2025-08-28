@@ -57,4 +57,10 @@ public class ControlDeCalidadController {
         ControlDeCalidad controlDeCalidad = controlDeCalidadService.iniciarControl(id);
         return ResponseEntity.ok(controlDeCalidad);
     }
+
+    @PutMapping("/{id}/a-corregir")
+    public ResponseEntity<ControlDeCalidad> marcarComoACorregir(@PathVariable Long id) {
+        ControlDeCalidad controlDeCalidad = controlDeCalidadService.marcarComoACorregir(id);
+        return ResponseEntity.ok(controlDeCalidad);
+    }
 }

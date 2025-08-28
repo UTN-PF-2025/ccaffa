@@ -19,4 +19,6 @@ public interface ControlDeCalidadService {
     List<ControlDeCalidad> getAllControlesCalidad();
 
     ControlDeCalidad iniciarControl(Long id);
+
+    ControlDeCalidad marcarComoACorregir(Long id);
 }
