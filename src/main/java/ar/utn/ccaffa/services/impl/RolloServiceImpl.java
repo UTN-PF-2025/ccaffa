@@ -202,4 +202,14 @@ public class RolloServiceImpl implements RolloService {
         
         return this.rolloMapper.toDtoListOnlyWithRolloPadreID(rollosDisponibles);
     }
+
+    @Override
+    public List<Rollo> findEntitiesByEstado(EstadoRollo estadoRollo){
+        return rolloRepository.findByEstado(estadoRollo);
+    }
+    @Override
+    public List<Rollo> findEntitiesByIdIn(List<Long> ids){
+        return rolloRepository.findByIdIn(ids);
+    }
+
 }

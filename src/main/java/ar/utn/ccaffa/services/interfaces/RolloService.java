@@ -1,5 +1,6 @@
 package ar.utn.ccaffa.services.interfaces;
 
+import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.model.dto.FiltroRolloDto;
 import ar.utn.ccaffa.model.dto.RolloDto;
 import ar.utn.ccaffa.model.entity.Rollo;
@@ -13,6 +14,10 @@ public interface RolloService {
     RolloDto findByIdConRollosPadres(Long id);
     RolloDto obtenerArbolCompletoDeHijos(Long rolloId);
     List<RolloDto> obtenerRollosDisponiblesParaOrdenVenta(Long ordenVentaId);
+
+    List<Rollo> findEntitiesByEstado(EstadoRollo estadoRollo);
+
+    List<Rollo> findEntitiesByIdIn(List<Long> ids);
     RolloDto save(RolloDto rollo);
     boolean deleteById(Long id);
 } 

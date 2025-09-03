@@ -30,7 +30,10 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/roles/**").hasRole("ADMIN")
                 .requestMatchers("/api/usuarios/**").permitAll()
-                .requestMatchers("/api/rolLos/**").hasAnyRole("RESPONSABLE_DE_DEPOSITO", "RESPONSABLE_DE_PRODUCCION")
+                .requestMatchers("/api/rolLos/**").hasAnyRole("RESPONSABLE_DE_DEPOSITO", "RESPONSABLE_DE_PRODUCCION","ADMIN")
+                .requestMatchers("/api/rollos_productos/**").hasAnyRole("OPERARIO", "RESPONSABLE_DE_PRODUCCION","ADMIN")
+                .requestMatchers("/api/ordenes-venta/**").hasAnyRole("vendedor", "RESPONSABLE_DE_PRODUCCION","ADMIN")
+                .requestMatchers("/api/ordenes-trabajo/**").hasAnyRole("OPERARIO", "SUPERVISOR", "RESPONSABLE_DE_PRODUCCION","ADMIN")
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session

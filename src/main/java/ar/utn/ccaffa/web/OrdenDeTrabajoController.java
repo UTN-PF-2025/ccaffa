@@ -377,12 +377,12 @@ public class OrdenDeTrabajoController {
     }
 
     // Métodos privados para gestión de rollos
-    private List<Rollo> crearRollosHijos(Rollo rollo, Especificacion especificacion) {
+    public List<Rollo> crearRollosHijos(Rollo rollo, Especificacion especificacion) {
         List<Rollo> rolloHijos = new ArrayList<>();
         List<Bloque> bloques = cortarBloque(
             new Bloque(0f, 0f, rollo.getAnchoMM(), rollo.getPesoKG()),
             especificacion.getAncho(),
-            especificacion.getPesoMaximoPorRollo()
+            Float.valueOf(especificacion.getCantidad())
         );
 
         for (Bloque bloque : bloques) {

@@ -72,6 +72,11 @@ public class OrdenVentaServiceImpl implements OrdenVentaService {
     }
 
     @Override
+    public List<OrdenVenta> findByIdIn(List<Long> ids){
+        return this.ordenVentaRepository.findByIdIn(ids);
+    }
+
+    @Override
     public List<OrdenVentaDto> searchByFiltros(FiltroOrdenVentaDTO filtros) {
         Specification<OrdenVenta> spec = Specification.where(null);
         if (filtros.getFechaCreacion() != null) {

@@ -49,4 +49,8 @@ public class Especificacion {
 
     @Column(name = "diametro_externo")
     private Float diametroExterno;
+
+    public float getLargo(){
+        return (float) (this.getCantidad() / (this.getAncho() * this.getEspesor() * 0.008));
+    }
 } 

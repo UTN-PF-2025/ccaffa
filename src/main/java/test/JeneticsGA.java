@@ -92,7 +92,6 @@ public class JeneticsGA {
         }
     }
 
-    static class ProcessedRoll { int roll; LocalDateTime end; ProcessedRoll(int roll, LocalDateTime end) { this.roll = roll; this.end = end; } }
 
     static class ChildRoll {
         int roll; int length, width; double thickness; String state; LocalDateTime available_from;

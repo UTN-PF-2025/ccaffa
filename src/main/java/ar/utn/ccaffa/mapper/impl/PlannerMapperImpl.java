@@ -1,0 +1,30 @@
+package ar.utn.ccaffa.mapper.impl;
+
+import ar.utn.ccaffa.mapper.interfaces.PlannerMapper;
+import ar.utn.ccaffa.planner.PlannerDTO;
+import ar.utn.ccaffa.planner.PlannerGA;
+import org.springframework.stereotype.Component;
+
+
+@Component
+public class PlannerMapperImpl implements PlannerMapper {
+
+    @Override
+    public PlannerGA toEntity(PlannerDTO plannerDTO) {
+        if (plannerDTO == null) {
+            return null;
+        }
+
+        return PlannerGA.builder()
+                .grace_hours(plannerDTO.getHorasDeGracia())
+                .maquinasIDs(plannerDTO.getMaquinasIDs())
+                .ordenesDeVentaIDs(plannerDTO.getOrdenesDeVentaIDs())
+                .rollosIDs(plannerDTO.getRolloIDs())
+                .MIN_WIDTH(plannerDTO.anchoDesperdicio)
+                .MIN_LENGTH(plannerDTO.largoDesperdicio)
+                .INVALIDATE_SCORE(plannerDTO.getINVALIDATE_SCORE())
+                .MULTIPLIER_OF_WASTE(plannerDTO.getMULTIPLIER_OF_WASTE())
+                .build();
+    }
+
+} 

@@ -23,7 +23,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Rollo {
+public class Rollo implements Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,11 +40,6 @@ public class Rollo {
     @Column(name = "peso", nullable = false)
     @NotNull(message = "El peso es obligatorio")
     private Float pesoKG;
-
-    @Column(name = "largo", nullable = false)
-    @NotNull(message = "El largo es obligatorio")
-    @Builder.Default
-    private Float largoM = 0.0f;
 
     @Column(name = "ancho", nullable = false)
     @NotNull(message = "El ancho es obligatorio")
@@ -79,5 +74,21 @@ public class Rollo {
     private List<Rollo> hijos = new ArrayList<>();
     // Método helper para obtener el rollo padre cuando se necesite
 
+    public float getLargo(){
+        return (float) (this.getPesoKG() / (this.getAnchoMM() * this.getEspesorMM() * 0.008));
+    }
+
+    public static float calcularPeso(Float ancho, Float espesorMM, Float largo){
+        return (float) (ancho * espesorMM * largo* 0.008);
+    }
+    @Override
+    public Object clone(){
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return this;
+    }
 
 }
