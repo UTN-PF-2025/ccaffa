@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 
 import java.time.LocalDateTime;
@@ -22,14 +23,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Slf4j
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class PlannerGA {
     // --- PARAMETERS ---
-    static final int POPULATION_SIZE = 3000;
-    static final int GENERATIONS = 10000;
+    static final int POPULATION_SIZE = 300;
+    static final int GENERATIONS = 1000;
     static final double MUTATION_RATE = 0.7;
     static final double CROSSOVER_RATE = 0.7;
     static final double FITNESS_TOLERANCE = 1e-6; // Minimum fitness improvement considered significant
@@ -60,7 +62,7 @@ public class PlannerGA {
     @Builder.Default
     private int MIN_LENGTH = 300;
     @Builder.Default
-    private int INVALIDATE_SCORE = 1000000;
+    private double INVALIDATE_SCORE = 0;
     @Builder.Default
     private int MULTIPLIER_OF_WASTE = 1;
 
@@ -245,7 +247,7 @@ public class PlannerGA {
 
     private double calcPenaltyForAvailableChildrenRolls(List<Rollo> rollosHijos){
         double p = 0;
-        for (Rollo c : rollosHijos) if (c.getEstado() == EstadoRollo.DISPONIBLE) p += (double) c.getPesoKG(); return p;
+        for (Rollo c : rollosHijos) if (c.getEstado() == EstadoRollo.DISPONIBLE) p += (double) c.getPesoKG()/100000000; return p;
     }
     private double calcScoreForDiffDates(List<OrdenDeTrabajo> jobs) {
         double score = 0;
@@ -406,11 +408,11 @@ public class PlannerGA {
         double fitness = 0.0;
         boolean shouldGenerateJobOrders = true;
 
-        if (checkRepeatedOrdenesVentasIDs(blocks)) { fitness -= this.INVALIDATE_SCORE; System.out.println("Repeated sales detected"); shouldGenerateJobOrders = false; }
-        if (checkRollTypeMismatch(blocks)) { fitness -= this.INVALIDATE_SCORE; System.out.println("Roll type mismatch detected"); shouldGenerateJobOrders = false; }
-        if (checkRollThicknessMismatch(blocks)) { fitness -= this.INVALIDATE_SCORE; System.out.println("Roll thickness mismatch detected"); shouldGenerateJobOrders = false; }
-        if (checkInvalidMachineCombination(blocks)) { fitness -= this.INVALIDATE_SCORE; System.out.println("Invalid machine combination detected"); shouldGenerateJobOrders = false; }
-        if (checkRepeatedTypeMachinesInOV(blocks)) { fitness -= this.INVALIDATE_SCORE; System.out.println("Repeated type of machines in a sale detected"); shouldGenerateJobOrders = false; }
+        if (checkRepeatedOrdenesVentasIDs(blocks)) { fitness -= this.INVALIDATE_SCORE; log.debug("Repeated sales detected"); shouldGenerateJobOrders = false; }
+        if (checkRollTypeMismatch(blocks)) { fitness -= this.INVALIDATE_SCORE; log.debug("Roll type mismatch detected"); shouldGenerateJobOrders = false; }
+        if (checkRollThicknessMismatch(blocks)) { fitness -= this.INVALIDATE_SCORE; log.debug("Roll thickness mismatch detected"); shouldGenerateJobOrders = false; }
+        if (checkInvalidMachineCombination(blocks)) { fitness -= this.INVALIDATE_SCORE; log.debug("Invalid machine combination detected"); shouldGenerateJobOrders = false; }
+        if (checkRepeatedTypeMachinesInOV(blocks)) { fitness -= this.INVALIDATE_SCORE; log.debug("Repeated type of machines in a sale detected"); shouldGenerateJobOrders = false; }
 
         if (!shouldGenerateJobOrders) return fitness;
 
@@ -461,13 +463,16 @@ public class PlannerGA {
             ordenDeTrabajo.setOrdenDeTrabajoMaquinas(new ArrayList<>());
 
             // CHECK IF MAIN ROLL CAN BE USED FOR SALE
-            if (!checkRollCharacteristics(sale, roll.getLargo(), roll.getAnchoMM(), roll.getEspesorMM()))
+            if (!checkRollCharacteristics(sale, roll.getLargo(), roll.getAnchoMM(), roll.getEspesorMM())) {
+                log.debug("Main roll cannot be used in sale");
                 return new Pair<>(List.of(), List.of());
+            }
 
             // USE A CHILD IF NECESSARY
             if (processedRolls.contains(rollId)) { // should use a child because the roll was already processed
                 List<Rollo> childrenCandidates = this.childrenCandidatesOfRoll(childrenMap, rollId, sale);
                 if (childrenCandidates.isEmpty()) { // no available children, then return as failed
+                    log.debug("No available children");
                     return new Pair<>(List.of(), List.of());
                 }
                 usingRoll = childrenCandidates.get(0); // grab the one with less area
@@ -482,6 +487,7 @@ public class PlannerGA {
             // No machines, then sale is and roll must match completely
             if (m1 == 0 && m2 == 0) {
                 if (!ordenDeTrabajo.rolloIgualQueEspecificacion()){
+                    log.debug("m1=0 | m2=0 | sale != rollo");
                     return new Pair<>(List.of(), List.of()); // THEN IT NEEDS A MACHINE, SO FAILED
                 }
                 ordenDeTrabajo.setFechaEstimadaDeInicio(possibleStart);
@@ -492,9 +498,10 @@ public class PlannerGA {
             }
 
 
-            if (this.isThereAInvalidCombinationOfMachinesForRollAndSale(m1, m2, usingRoll, sale))
-                    return new Pair<>(List.of(), List.of()); // BAD COMBINATION OF MACHINE FOR SALE AND ROLL, SO FAILED
-
+            if (this.isThereAInvalidCombinationOfMachinesForRollAndSale(m1, m2, usingRoll, sale)) {
+                log.debug("InvalidCombinationOfMachinesForRollAndSale");
+                return new Pair<>(List.of(), List.of()); // BAD COMBINATION OF MACHINE FOR SALE AND ROLL, SO FAILED
+            }
 
             if (m1 != 0) {
                 Maquina machine1 = this.getMaquinaByID((long) m1);

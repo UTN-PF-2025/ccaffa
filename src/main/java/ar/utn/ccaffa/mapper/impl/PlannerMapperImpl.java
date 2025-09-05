@@ -22,7 +22,6 @@ public class PlannerMapperImpl implements PlannerMapper {
                 .rollosIDs(plannerDTO.getRolloIDs())
                 .MIN_WIDTH(plannerDTO.anchoDesperdicio)
                 .MIN_LENGTH(plannerDTO.largoDesperdicio)
-                .INVALIDATE_SCORE(plannerDTO.getINVALIDATE_SCORE())
                 .MULTIPLIER_OF_WASTE(plannerDTO.getMULTIPLIER_OF_WASTE())
                 .build();
     }

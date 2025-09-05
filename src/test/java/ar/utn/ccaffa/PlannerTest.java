@@ -20,7 +20,7 @@ public class PlannerTest {
         void planner() {
             // Generate Especificacion
             List<Especificacion> especificaciones = new ArrayList<>();
-            for (long i = 1; i <= 2; i++) {
+            for (long i = 1; i <= 10; i++) {
                 Especificacion e = Especificacion.builder()
                         .id(i)
                         .ancho(10F + RANDOM.nextFloat() * 100) // 10–110
@@ -39,7 +39,7 @@ public class PlannerTest {
 
             // Generate OrdenVenta
             List<OrdenVenta> ordenesVenta = new ArrayList<>();
-            for (long i = 1; i <= 2; i++) {
+            for (long i = 1; i <= 10; i++) {
                 Especificacion randomEspecificacion = especificaciones.get(RANDOM.nextInt(especificaciones.size()));
                 OrdenVenta ov = OrdenVenta.builder()
                         .id(i)
@@ -61,12 +61,12 @@ public class PlannerTest {
 
             // Generate Rollo
             List<Rollo> rollos = new ArrayList<>();
-            for (long i = 1; i <= 2; i++) {
+            for (long i = 1; i <= 7; i++) {
                 Rollo r = Rollo.builder()
                         .id(i)
                         .proveedorId(1L)
                         .codigoProveedor("PROV" + i)
-                        .pesoKG(100000F + RANDOM.nextFloat() * 9000) // 1–10 t
+                        .pesoKG(1000000000F + RANDOM.nextFloat() * 9000) // 1–10 t
                         .anchoMM(200F + RANDOM.nextFloat() * 200)  // 200–800 mm
                         .espesorMM(1F + RANDOM.nextFloat() * 300)  // 1–21 mm
                         .tipoMaterial(TipoMaterial.LAMINADO_EN_FRIO)
@@ -79,7 +79,7 @@ public class PlannerTest {
 
             // Generate Maquina
             List<Maquina> maquinas = new ArrayList<>();
-            for (long i = 1; i <= 2; i++) {
+            for (long i = 1; i <= 5; i++) {
                 Maquina m = Maquina.builder()
                         .id(i)
                         .nombre((i % 2 == 0 ? "Laminadora " : "Cortadora ") + i)
@@ -97,7 +97,7 @@ public class PlannerTest {
             // Generate OrdenDeTrabajoMaquina
             OrdenDeTrabajo ordenDeTrabajo = new OrdenDeTrabajo();
             List<OrdenDeTrabajoMaquina> ordenesTrabajoMaquina = new ArrayList<>();
-            for (long i = 1; i <= 2; i++) {
+            for (long i = 1; i <= 7; i++) {
                 LocalDateTime start = LocalDateTime.now().minusDays(RANDOM.nextInt(20)).minusHours(RANDOM.nextInt(24));
                 OrdenDeTrabajoMaquina otm = OrdenDeTrabajoMaquina.builder()
                         .id(i)

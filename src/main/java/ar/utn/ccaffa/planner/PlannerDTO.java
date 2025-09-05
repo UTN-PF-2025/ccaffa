@@ -20,6 +20,5 @@ public class PlannerDTO {
     public int horasDeGracia;
     public int anchoDesperdicio;
     public int largoDesperdicio;
-    private int INVALIDATE_SCORE = 1000000;
     private int MULTIPLIER_OF_WASTE = 1000;
 }
