@@ -1,8 +1,10 @@
 package ar.utn.ccaffa.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -15,11 +17,14 @@ public class ControlDeCalidad {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "empleado_id")
-    private Empleado empleado;
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
 
     @Column(name = "fecha_control")
-    private LocalDate fechaControl;
+    private LocalDateTime fechaControl;
+
+    @Column(name = "fecha_finalizacion")
+    private LocalDateTime fechaFinalizacion;
 
     @Column(name = "espesor_medido")
     private Float espesorMedido;
@@ -33,13 +38,19 @@ public class ControlDeCalidad {
     @Column(length = 50)
     private String estado;
 
-    @OneToMany(mappedBy = "controlDeCalidad")
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "control_de_calidad_id")
+    @JsonManagedReference("control-medida")
     private List<MedidaDeCalidad> medidasDeCalidad;
 
     @OneToOne
     @JoinColumn(name = "certificado_de_calidad_id")
     private CertificadoDeCalidad certificadoDeCalidad;
 
-    @Transient
+    @OneToMany(mappedBy = "controlDeCalidad", cascade = CascadeType.ALL)
+    @JsonManagedReference("control-defecto")
     private List<Defecto> defectos;
+
+    @Column(name = "orden_de_trabajo_id")
+    private String ordenDeTrabajoId;
 } 

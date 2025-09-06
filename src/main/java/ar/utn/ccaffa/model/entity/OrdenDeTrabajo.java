@@ -45,6 +45,7 @@ public class OrdenDeTrabajo {
     @Column(name = "activa")
     private Boolean activa = true;
 
+    
     @OneToOne(mappedBy = "ordenDeTrabajo")
     private OrdenVenta ordenDeVenta;
 

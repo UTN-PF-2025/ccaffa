@@ -18,8 +18,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+import ar.utn.ccaffa.model.dto.ModificarRolloRequestDto;
+import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoService;
+import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 
 @Service
 @Slf4j
@@ -29,11 +32,13 @@ public class RolloServiceImpl implements RolloService {
     private final RolloRepository rolloRepository;
     private final RolloMapper rolloMapper;
     private final OrdenVentaRepository ordenVentaRepository;
+    private final OrdenDeTrabajoService ordenDeTrabajoService;
 
-    public RolloServiceImpl(RolloRepository rolloRepository, RolloMapper rolloMapper, OrdenVentaRepository ordenVentaRepository) {
+    public RolloServiceImpl(RolloRepository rolloRepository, RolloMapper rolloMapper, OrdenVentaRepository ordenVentaRepository, OrdenDeTrabajoService ordenDeTrabajoService) {
         this.rolloRepository = rolloRepository;
         this.rolloMapper = rolloMapper;
         this.ordenVentaRepository = ordenVentaRepository;
+        this.ordenDeTrabajoService = ordenDeTrabajoService;
     }
 
     @Override
@@ -86,7 +91,7 @@ public class RolloServiceImpl implements RolloService {
     }
 
     @Override
-    public RolloDto obtenerArbolCompletoDeHijos(Long rolloId) {
+    public RolloDto obtenerArbolCompletoDeRollosHijos(Long rolloId) {
 
         Rollo root = rolloRepository.findById(rolloId).orElse(Rollo.builder().build());
 
@@ -212,4 +217,97 @@ public class RolloServiceImpl implements RolloService {
         return rolloRepository.findByIdIn(ids);
     }
 
+    public RolloDto modificarRollo(ModificarRolloRequestDto request) {
+        log.info("Modificando rollo con ID: {}", request.getId());
+        
+        Rollo rollo = rolloRepository.findById(request.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Rollo", "id", request.getId()));
+        
+        Float pesoOriginal = rollo.getPesoKG();
+        Float anchoOriginal = rollo.getAnchoMM();
+        
+        if (request.getPesoKG() != null) {
+            rollo.setPesoKG(request.getPesoKG());
+            log.info("Peso del rollo {} actualizado a: {} kg", request.getId(), request.getPesoKG());
+        }
+        
+        if (request.getAnchoMM() != null) {
+            rollo.setAnchoMM(request.getAnchoMM());
+            log.info("Ancho del rollo {} actualizado a: {} mm", request.getId(), request.getAnchoMM());
+        }
+        
+        // Verificar si se redujo el peso o ancho
+        boolean pesoReducido = request.getPesoKG() != null && request.getPesoKG() < pesoOriginal;
+        boolean anchoReducido = request.getAnchoMM() != null && request.getAnchoMM() < anchoOriginal;
+        
+        if (pesoReducido || anchoReducido) {
+            log.info("Se detectó reducción en el rollo {}. Peso reducido: {}, Ancho reducido: {}", 
+                    request.getId(), pesoReducido, anchoReducido);
+            
+            procesarCancelacionOrdenesTrabajo(rollo);
+        }
+        
+        Rollo rolloModificado = rolloRepository.save(rollo);
+        log.info("Rollo {} modificado exitosamente", request.getId());
+        
+        return this.rolloMapper.toDtoOnlyWithRolloPadreID(rolloModificado);
+    }
+    
+    /**
+     * Procesa la cancelación de órdenes de trabajo y replanificación de órdenes de venta
+     * cuando se reduce el peso o ancho de un rollo
+     */
+    private void procesarCancelacionOrdenesTrabajo(Rollo rollo) {
+        log.info("Procesando cancelación de órdenes de trabajo para rollo {}", rollo.getId());
+        
+        // Buscar todas las órdenes de trabajo asociadas al rollo
+        List<OrdenDeTrabajo> ordenesTrabajo = ordenDeTrabajoService.findByRolloId(rollo.getId());
+        
+        if (ordenesTrabajo.isEmpty()) {
+            log.info("No se encontraron órdenes de trabajo para el rollo {}", rollo.getId());
+            return;
+        }
+        
+        log.info("Encontradas {} órdenes de trabajo para cancelar", ordenesTrabajo.size());
+        
+        for (OrdenDeTrabajo ordenTrabajo : ordenesTrabajo) {
+            // Solo cancelar si no está ya cancelada
+            if (!"Cancelada".equals(ordenTrabajo.getEstado())) {
+                log.info("Cancelando orden de trabajo ID: {}", ordenTrabajo.getId());
+                
+                // Cancelar la orden de trabajo
+                ordenTrabajo.setEstado("Cancelada");
+                ordenTrabajo.setActiva(false);
+                ordenTrabajo.setObservaciones("Cancelada - Rollo modificado (peso/ancho reducido)");
+                ordenTrabajo.setFechaFin(LocalDateTime.now());
+                
+                // Guardar la orden de trabajo cancelada
+                ordenDeTrabajoService.save(ordenTrabajo);
+                
+
+                log.info("Replanificando orden de venta ID: {}", ordenTrabajo.getOrdenDeVenta().getId());
+                ordenTrabajo.getOrdenDeVenta().setEstado("REPLANIFICADO");
+                ordenVentaRepository.save(ordenTrabajo.getOrdenDeVenta());
+            
+            }
+        }
+        
+        log.info("Proceso de cancelación completado para el rollo {}", rollo.getId());
+    }
+    
+    @Override
+    public boolean anularRollo(Long id) {
+        log.info("Anulando rollo con ID: {}", id);
+        
+        Rollo rollo = rolloRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Rollo", "id", id));
+        
+        procesarCancelacionOrdenesTrabajo(rollo);
+        
+        rollo.setEstado(EstadoRollo.CANCELADO);
+        rolloRepository.save(rollo);
+        
+        log.info("Rollo {} anulado exitosamente", id);
+        return true;
+    }
 }

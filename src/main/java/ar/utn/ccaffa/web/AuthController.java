@@ -39,6 +39,6 @@ public class AuthController {
             .map(authority -> authority.getAuthority())
             .toArray(String[]::new);
 
-        return ResponseEntity.ok(new LoginResponseDto(token, userDetails.getUsername(), roles));
+        return ResponseEntity.ok(new LoginResponseDto(token, userDetails.getUsername(), roles, usuario.getNombre()));
     }
 } 

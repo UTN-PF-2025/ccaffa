@@ -120,11 +120,12 @@ public class OrdenDeTrabajoResponseMapperImpl implements OrdenDeTrabajoResponseM
         
         return ControlDeCalidadDto.builder()
                 .id(controlDeCalidad.getId())
-                .empleado(controlDeCalidad.getEmpleado() != null ? 
+                .empleado(controlDeCalidad.getUsuario() != null ? 
                     ControlDeCalidadDto.EmpleadoDto.builder()
-                        .id(controlDeCalidad.getEmpleado().getId())
+                        .id(controlDeCalidad.getUsuario().getId())
+                        .nombre(controlDeCalidad.getUsuario().getNombre())
                         .build() : null)
-                .fechaControl(controlDeCalidad.getFechaControl())
+                .fechaControl(controlDeCalidad.getFechaControl().toLocalDate())
                 .espesorMedido(controlDeCalidad.getEspesorMedido())
                 .anchoMedido(controlDeCalidad.getAnchoMedido())
                 .rebabaMedio(controlDeCalidad.getRebabaMedio())
