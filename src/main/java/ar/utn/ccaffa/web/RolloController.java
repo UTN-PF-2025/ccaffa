@@ -1,9 +1,9 @@
 package ar.utn.ccaffa.web;
 
 import ar.utn.ccaffa.enums.EstadoRollo;
+import ar.utn.ccaffa.enums.TipoMaterial;
 import ar.utn.ccaffa.model.dto.FiltroRolloDto;
 import ar.utn.ccaffa.model.dto.RolloDto;
-import ar.utn.ccaffa.model.entity.Rollo;
 import ar.utn.ccaffa.services.interfaces.RolloService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.EnumSet;
 import java.util.List;
 
 @RestController
@@ -31,12 +32,17 @@ public class RolloController {
         return ResponseEntity.ok(rollos);
     }
 
+
     @GetMapping("/{id}")
     public ResponseEntity<RolloDto> getRollosById(@PathVariable Long id) {
         log.info("Buscando rollo con ID: {}", id);
         return ResponseEntity.ok(rolloService.findById(id));
     }
 
+    @GetMapping("/tipoMateriales")
+    public ResponseEntity<EnumSet<TipoMaterial>> getRollosById() {
+        return ResponseEntity.ok(EnumSet.allOf(TipoMaterial.class));
+    }
     @GetMapping("/{id}/conRollosPadres")
     public ResponseEntity<RolloDto> getRolloByIdConRollosPadres(@PathVariable Long id) {
         log.info("Buscando rollo con ID: {}", id);
