@@ -1,5 +1,6 @@
 package ar.utn.ccaffa.web;
 
+import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.model.dto.FiltroRolloDto;
 import ar.utn.ccaffa.model.dto.RolloDto;
 import ar.utn.ccaffa.model.entity.Rollo;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -56,6 +58,8 @@ public class RolloController {
     @PostMapping
     public ResponseEntity<RolloDto> createRollo(@RequestBody RolloDto rollo) {
         log.info("Creando nuevo rollo: {}", rollo);
+        rollo.setEstado(EstadoRollo.DISPONIBLE);
+        rollo.setFechaIngreso(LocalDateTime.now());
         RolloDto savedRollo = rolloService.save(rollo);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedRollo);
     }
