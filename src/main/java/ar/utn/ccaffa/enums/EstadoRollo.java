@@ -4,5 +4,6 @@ public enum EstadoRollo {
     DISPONIBLE,
     AGOTADO,
     DIVIDO,
-    CANCELADO
+    CANCELADO,
+    DESPERDICIO
 }

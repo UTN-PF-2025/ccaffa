@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -14,4 +15,9 @@ public interface MaquinaRepository extends JpaRepository<Maquina, Long> {
     
     @Query("SELECT m FROM Maquina m WHERE m.id = :id")
     @NonNull Optional<Maquina> findById(@NonNull @Param("id") Long id);
+    List<Maquina> findByActivoIsTrue();
+
+    List<Maquina> findByIdIn(List<Long> ids);
+
+
 } 

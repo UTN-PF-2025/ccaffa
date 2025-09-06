@@ -23,4 +23,6 @@ public interface OrdenVentaService {
     void anular(Long ordenVentaId) throws BadRequestException;
 
     void finalizar(Long ordenVentaId);
+
+    List<OrdenVenta> findByIdIn(List<Long> ids);
 }
