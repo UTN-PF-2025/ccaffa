@@ -325,11 +325,9 @@ public class OrdenDeTrabajoController {
 
         Rollo rollo = rolloOpt.get();
         orden.setRollo(rollo);
-        rollo.setEstado(EstadoRollo.DIVIDO);
 
         if (ordenVenta != null && ordenVenta.getEspecificacion() != null) {
-            List<Rollo> rolloHijos = crearRollosHijos(rollo, ordenVenta.getEspecificacion());
-            asignarFechasRollosHijos(rolloHijos, orden.getOrdenDeTrabajoMaquinas());
+            List<Rollo> rolloHijos = orden.procesarRollo();
             rolloRepository.saveAll(rolloHijos);
         }
     }
@@ -378,60 +376,8 @@ public class OrdenDeTrabajoController {
         return orden;
     }
 
-    // Métodos privados para gestión de rollos
-    public List<Rollo> crearRollosHijos(Rollo rollo, Especificacion especificacion) {
-        List<Rollo> rolloHijos = new ArrayList<>();
-        List<Bloque> bloques = cortarBloque(
-            new Bloque(0f, 0f, rollo.getAnchoMM(), rollo.getPesoKG()),
-            especificacion.getAncho(),
-            Float.valueOf(especificacion.getCantidad())
-        );
 
-        for (Bloque bloque : bloques) {
-            Rollo rolloHijo = crearRolloHijo(rollo, bloque);
-            rolloHijos.add(rolloHijo);
-        }
 
-        return rolloHijos;
-    }
-
-    private Rollo crearRolloHijo(Rollo rolloPadre, Bloque bloque) {
-        return Rollo.builder()
-                .proveedorId(rolloPadre.getProveedorId())
-                .codigoProveedor(rolloPadre.getCodigoProveedor() + "_HIJO")
-                .anchoMM(bloque.getAncho())
-                .pesoKG(bloque.getLargo())
-                .espesorMM(rolloPadre.getEspesorMM())
-                .tipoMaterial(rolloPadre.getTipoMaterial())
-                .estado(EstadoRollo.DISPONIBLE)
-                .fechaIngreso(LocalDateTime.now())
-                .rolloPadre(rolloPadre)
-                .build();
-    }
-
-    private void asignarFechasRollosHijos(List<Rollo> rolloHijos, List<OrdenDeTrabajoMaquina> maquinas) {
-        if (maquinas == null || maquinas.isEmpty() || rolloHijos == null) {
-            return;
-        }
-
-        LocalDateTime fechaIngreso = calcularFechaIngreso(maquinas);
-        rolloHijos.forEach(rollo -> {
-            rollo.setFechaIngreso(fechaIngreso);
-            rolloRepository.save(rollo);
-        });
-    }
-
-    private LocalDateTime calcularFechaIngreso(List<OrdenDeTrabajoMaquina> maquinas) {
-        if (maquinas == null || maquinas.isEmpty()) {
-            throw new IllegalArgumentException("La lista de máquinas no puede estar vacía");
-        }
-
-        return maquinas.stream()
-                .filter(m -> m.getMaquina() != null && MaquinaTipoEnum.CORTADORA.equals(m.getMaquina().getTipo()))
-                .findFirst()
-                .map(OrdenDeTrabajoMaquina::getFechaFin)
-                .orElseGet(() -> maquinas.get(0).getFechaFin());
-    }
 
     // Métodos privados para liberación de recursos
     private void liberarRecursos(OrdenDeTrabajo orden) {
