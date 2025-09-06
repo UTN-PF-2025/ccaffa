@@ -54,19 +54,9 @@ public class Maquina {
     @OneToMany(mappedBy = "maquina", cascade = CascadeType.ALL)
     private List<OrdenDeTrabajoMaquina> ordenDeTrabajoMaquinas;
 
-    public Long minutosParaProcesar(Rollo rollo) {
-        return (long) (rollo.getLargo()/velocidadTrabajoMetrosPorMinuto);
+    public Long minutosParaProcesarEspecifiacion(Especificacion especificacion, Rollo rollo) {
+        return (long) ( especificacion.neededLengthOfRoll(rollo)/velocidadTrabajoMetrosPorMinuto);
     }
 
-    public Long minutosParaProcesarEspecifiacion(Especificacion especificacion) {
-        return (long) ( especificacion.getLargo()/velocidadTrabajoMetrosPorMinuto);
-    }
-
-    public boolean puedeProcesarRollo(Rollo rollo){
-        return rollo.getEspesorMM() >= this.getEspesorMinimoMilimetros()
-                && rollo.getEspesorMM() <= this.getEspesorMaximoMilimetros()
-                && rollo.getAnchoMM() >= this.getAnchoMinimoMilimetros()
-                && rollo.getAnchoMM() <= this.getAnchoMaximoMilimetros();
-    }
 }
 

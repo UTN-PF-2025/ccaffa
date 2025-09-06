@@ -23,6 +23,10 @@ public class PlannerMapperImpl implements PlannerMapper {
                 .MIN_WIDTH(plannerDTO.anchoDesperdicio)
                 .MIN_LENGTH(plannerDTO.largoDesperdicio)
                 .MULTIPLIER_OF_WASTE(plannerDTO.getMULTIPLIER_OF_WASTE())
+                .TOP_DAYS_IN_ADVANCE(plannerDTO.getTOP_DAYS_IN_ADVANCE())
+                .POPULATION_SIZE_PER_SALE(plannerDTO.getPOPULATION_SIZE_PER_SALE())
+                .horaDeInicioLaboral(plannerDTO.getHoraDeInicioLaboral())
+                .horaDeFinLaboral(plannerDTO.getHoraDeFinLaboral())
                 .build();
     }
 

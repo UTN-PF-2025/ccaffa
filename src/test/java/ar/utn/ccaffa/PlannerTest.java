@@ -8,6 +8,7 @@ import ar.utn.ccaffa.planner.PlannerGA;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -20,7 +21,7 @@ public class PlannerTest {
         void planner() {
             // Generate Especificacion
             List<Especificacion> especificaciones = new ArrayList<>();
-            for (long i = 1; i <= 10; i++) {
+            for (long i = 1; i <= 15; i++) {
                 Especificacion e = Especificacion.builder()
                         .id(i)
                         .ancho(10F + RANDOM.nextFloat() * 100) // 10–110
@@ -39,7 +40,7 @@ public class PlannerTest {
 
             // Generate OrdenVenta
             List<OrdenVenta> ordenesVenta = new ArrayList<>();
-            for (long i = 1; i <= 10; i++) {
+            for (long i = 1; i <= 15; i++) {
                 Especificacion randomEspecificacion = especificaciones.get(RANDOM.nextInt(especificaciones.size()));
                 OrdenVenta ov = OrdenVenta.builder()
                         .id(i)
@@ -97,8 +98,8 @@ public class PlannerTest {
             // Generate OrdenDeTrabajoMaquina
             OrdenDeTrabajo ordenDeTrabajo = new OrdenDeTrabajo();
             List<OrdenDeTrabajoMaquina> ordenesTrabajoMaquina = new ArrayList<>();
-            for (long i = 1; i <= 7; i++) {
-                LocalDateTime start = LocalDateTime.now().minusDays(RANDOM.nextInt(20)).minusHours(RANDOM.nextInt(24));
+            for (long i = 1; i <= 10; i++) {
+                LocalDateTime start = LocalDateTime.now().minusDays(RANDOM.nextInt(1)).minusHours(RANDOM.nextInt(24));
                 OrdenDeTrabajoMaquina otm = OrdenDeTrabajoMaquina.builder()
                         .id(i)
                         .ordenDeTrabajo(ordenDeTrabajo)
@@ -136,18 +137,76 @@ public class PlannerTest {
             Pair<List<OrdenDeTrabajo>, List<Rollo>> result = plannerGA.execute();
 
             List<OrdenDeTrabajo> ordenDeTrabajoList = result.first;
+            List<Rollo> rolloList = result.second;
 
             for (OrdenDeTrabajo job : ordenDeTrabajoList) {
                 for (OrdenDeTrabajoMaquina ordenDeTrabajoMaquina : job.getOrdenDeTrabajoMaquinas()){
-                    System.out.printf("Sale %d on Roll %d using Machine %d from %s to %s%n",
+                    int parentRollHash;
+                    if (job.getRollo().getRolloPadre() == null){
+                        parentRollHash = 0;
+                    } else {
+                        parentRollHash = job.getRollo().getRolloPadre().hashCode();
+                    }
+                    System.out.printf("Sale %d | Roll %d | Parent Roll %d  | Machine %d - %s | From: %s | %s%n",
                             job.getOrdenDeVenta().getId(),
-                            job.getRollo().getId(),
+                            job.getRollo().hashCode(),
+                            parentRollHash,
                             ordenDeTrabajoMaquina.getMaquina().getId(),
+                            ordenDeTrabajoMaquina.getMaquina().getTipo(),
                             ordenDeTrabajoMaquina.getFechaInicio(),
                             ordenDeTrabajoMaquina.getFechaFin());
                 }
 
             }
+
+            for (OrdenDeTrabajo job : ordenDeTrabajoList) {
+                System.out.printf("Sale %d | Ended %s | Due date %s  | Days in advance %d %n",
+                        job.getOrdenDeVenta().getId(),
+                        job.getFechaEstimadaDeFin(),
+                        job.getOrdenDeVenta().getFechaEntregaEstimada(),
+                        ChronoUnit.DAYS.between(job.getFechaEstimadaDeFin(), job.getOrdenDeVenta().getFechaEntregaEstimada()));
+            }
+
+            int totalDesperdicio = 0;
+            float pesoDesperdicio = 0;
+            int totalDisponible = 0;
+            float pesoDisponible = 0;
+            int totalDividido = 0;
+            float pesoDividido = 0;
+            for (Rollo roll : rolloList){
+                int parentRollHash;
+                if (roll.getRolloPadre() == null){
+                    parentRollHash = 0;
+                } else {
+                    parentRollHash = roll.getRolloPadre().hashCode();
+                }
+                System.out.printf("Child Roll %d | Parent Roll %d | State %s | Weight %f.2 %n",
+                        roll.hashCode(),
+                        parentRollHash,
+                        roll.getEstado(),
+                        roll.getPesoKG());
+                if (roll.getEstado() == EstadoRollo.DESPERDICIO){
+                    totalDesperdicio++;
+                    pesoDesperdicio += roll.getPesoKG();
+                }
+                if (roll.getEstado() == EstadoRollo.DISPONIBLE){
+                    totalDisponible++;
+                    pesoDisponible += roll.getPesoKG();
+                }
+                if (roll.getEstado() == EstadoRollo.DIVIDO){
+                    totalDividido++;
+                    pesoDividido += roll.getPesoKG();
+                }
+            }
+
+            System.out.printf("DESPERDICIO - Total %d | Weight %f.2 %n",
+                    totalDesperdicio, pesoDesperdicio);
+
+            System.out.printf("DISPONIBLE - Total %d | Weight %f.2 %n",
+                    totalDisponible, pesoDisponible);
+
+            System.out.printf("DIVIDIDO - Total %d | Weight %f.2 %n",
+                    totalDividido, pesoDividido);
 
         }
 

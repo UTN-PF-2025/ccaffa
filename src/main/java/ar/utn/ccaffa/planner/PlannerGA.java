@@ -30,16 +30,13 @@ import java.util.stream.Stream;
 @AllArgsConstructor
 public class PlannerGA {
     // --- PARAMETERS ---
-    static final int POPULATION_SIZE = 300;
-    static final int GENERATIONS = 1000;
-    static final double MUTATION_RATE = 0.7;
-    static final double CROSSOVER_RATE = 0.7;
-    static final double FITNESS_TOLERANCE = 1e-6; // Minimum fitness improvement considered significant
-    static final int PATIENCE = 300;               // Steady generations limit
+    static final double INVALIDATE_SCORE = Double.POSITIVE_INFINITY;
+    static final int GENERATIONS = 10000;
+    static final double MUTATION_RATE = 0.2;
+    static final double CROSSOVER_RATE = 0.5;
+    static final int PATIENCE = 50;               // Steady generations limit
     static final int GENES_PER_OV = 4; // sale, roll, m1, m2
-
-    private int grace_hours;
-
+    
     private List<Long> ordenesDeVentaIDs;
     private List<Long> maquinasIDs;
     private List<Long> rollosIDs;
@@ -52,53 +49,51 @@ public class PlannerGA {
     @Builder.Default
     private LocalDateTime CURRENT_DATE = LocalDateTime.now();
 
+    @Builder.Default
+    private int  COUNT = 0;
+    
     private int horaDeInicioLaboral;
     private int horaDeFinLaboral;
+    private int grace_hours;
 
-    private int  COUNT = 0;
-
+    @Builder.Default
+    private int POPULATION_SIZE_PER_SALE = 60;
     @Builder.Default
     private int MIN_WIDTH = 100;
     @Builder.Default
     private int MIN_LENGTH = 300;
     @Builder.Default
-    private double INVALIDATE_SCORE = 0;
-    @Builder.Default
     private int MULTIPLIER_OF_WASTE = 1;
-
+    @Builder.Default
+    private int TOP_DAYS_IN_ADVANCE = 3;
 
     public int num_sales(){return ordenesDeVentaIDs.size();}
     public Pair<List<OrdenDeTrabajo>, List<Rollo>> execute() {
         Engine<IntegerGene, Double> engine = Engine
                 .builder(this::evaluate, genotypeFactory())
-                .offspringFraction(1.0) // we'll control rates via alterers
-                .selector(new TournamentSelector<>(2))
+                .offspringFraction(0.6) // we'll control rates via alterers
+                .selector(new LinearRankSelector<>(0.9))
+                .offspringSelector(new TournamentSelector<>(3))
                 .alterers(
                         new PlannerGA.BlockCrossover(CROSSOVER_RATE),
                         new PlannerGA.BlockMutation(MUTATION_RATE)
                 )
-                .populationSize(POPULATION_SIZE)
+                .populationSize(POPULATION_SIZE_PER_SALE*this.ordenesDeVenta.size())
                 .maximizing()
                 .build();
 
-        double bestFitness = Double.NEGATIVE_INFINITY;
-        int stagnant = 0;
 
-        Phenotype<IntegerGene, Double> best = null;
-        int generation = 0;
 
         EvolutionResult<IntegerGene, Double> finalResult = engine.stream()
-                .limit(Limits.bySteadyFitness(PATIENCE))
+                .limit(Limits.bySteadyFitness(PATIENCE*this.ordenesDeVenta.size()))
                 .limit(GENERATIONS)
                 .collect(EvolutionResult.toBestEvolutionResult());
 
 
-        best = engine.stream().limit(1).collect(EvolutionResult.toBestPhenotype());
+        System.out.println("\nBest solution: " + toChromosomeList(finalResult.bestPhenotype().genotype()));
+        System.out.println("Best fitness: " + finalResult.bestFitness());
 
-        System.out.println("\nBest solution: " + toChromosomeList(best.genotype()));
-        System.out.println("Best fitness: " + best.fitness());
-
-        List<int[]> blocks = toBlocks(best.genotype());
+        List<int[]> blocks = toBlocks(finalResult.bestPhenotype().genotype());
 
         return generateJobOrders(blocks);
 
@@ -163,7 +158,7 @@ public class PlannerGA {
                 .filter(r -> r.getTipoMaterial().equals(s.getEspecificacion().getTipoMaterial())
                         && r.getEspesorMM() >= s.getEspecificacion().getEspesor()
                         && r.getAnchoMM() >= s.getEspecificacion().getAncho()
-                        && r.getLargo() >= s.getEspecificacion().getLargo())
+                        && r.getLargo() >= s.getEspecificacion().neededLengthOfRoll(r))
                 .map(Rollo::getId).collect(Collectors.toList());
         return comp.isEmpty() ? rollosIDs : comp;
     }
@@ -252,12 +247,13 @@ public class PlannerGA {
     private double calcScoreForDiffDates(List<OrdenDeTrabajo> jobs) {
         double score = 0;
         for (OrdenDeTrabajo j : jobs) score += Duration.between(j.getFechaEstimadaDeInicio(), j.getFechaEstimadaDeFin()).toSeconds();
+        score = Math.min(score, TOP_DAYS_IN_ADVANCE*24*60*60);
         return score;
     }
 
-    static boolean checkRollCharacteristics(OrdenVenta s, Float length, Float width, Float thickness) {
-        if (s.getEspecificacion().getAncho() > width) return false;
-        if (s.getEspecificacion().getLargo() > length) return false;
+    static boolean checkRollCharacteristics(OrdenVenta s, Rollo rollo) {
+        if (s.getEspecificacion().getAncho() > rollo.getAnchoMM()) return false;
+        if (s.getEspecificacion().neededLengthOfRoll(rollo) > rollo.getLargo()) return false;
         return true;
     }
 
@@ -408,17 +404,17 @@ public class PlannerGA {
         double fitness = 0.0;
         boolean shouldGenerateJobOrders = true;
 
-        if (checkRepeatedOrdenesVentasIDs(blocks)) { fitness -= this.INVALIDATE_SCORE; log.debug("Repeated sales detected"); shouldGenerateJobOrders = false; }
-        if (checkRollTypeMismatch(blocks)) { fitness -= this.INVALIDATE_SCORE; log.debug("Roll type mismatch detected"); shouldGenerateJobOrders = false; }
-        if (checkRollThicknessMismatch(blocks)) { fitness -= this.INVALIDATE_SCORE; log.debug("Roll thickness mismatch detected"); shouldGenerateJobOrders = false; }
-        if (checkInvalidMachineCombination(blocks)) { fitness -= this.INVALIDATE_SCORE; log.debug("Invalid machine combination detected"); shouldGenerateJobOrders = false; }
-        if (checkRepeatedTypeMachinesInOV(blocks)) { fitness -= this.INVALIDATE_SCORE; log.debug("Repeated type of machines in a sale detected"); shouldGenerateJobOrders = false; }
+        if (checkRepeatedOrdenesVentasIDs(blocks)) { fitness -= INVALIDATE_SCORE; log.debug("Repeated sales detected"); shouldGenerateJobOrders = false; }
+        if (checkRollTypeMismatch(blocks)) { fitness -= INVALIDATE_SCORE; log.debug("Roll type mismatch detected"); shouldGenerateJobOrders = false; }
+        if (checkRollThicknessMismatch(blocks)) { fitness -= INVALIDATE_SCORE; log.debug("Roll thickness mismatch detected"); shouldGenerateJobOrders = false; }
+        if (checkInvalidMachineCombination(blocks)) { fitness -= INVALIDATE_SCORE; log.debug("Invalid machine combination detected"); shouldGenerateJobOrders = false; }
+        if (checkRepeatedTypeMachinesInOV(blocks)) { fitness -= INVALIDATE_SCORE; log.debug("Repeated type of machines in a sale detected"); shouldGenerateJobOrders = false; }
 
         if (!shouldGenerateJobOrders) return fitness;
 
         Pair<List<OrdenDeTrabajo>, List<Rollo>> res = generateJobOrders(blocks);
         List<OrdenDeTrabajo> jobOrders = res.first; List<Rollo> children = res.second;
-        if (jobOrders.isEmpty()) { fitness -= this.INVALIDATE_SCORE; return fitness; }
+        if (jobOrders.isEmpty()) { fitness -= INVALIDATE_SCORE; return fitness; }
 
         double penaltyForWaste = calcPenaltyForWastedRolls(children);
         fitness -= penaltyForWaste;
@@ -432,7 +428,12 @@ public class PlannerGA {
         COUNT++;
 
         if (penaltyForChildren > 0 || penaltyForWaste > 0 || score > 0) {
-            System.out.printf("%d - Fitness score: %.3f, Penalty Waste: %.3f, Penalty Child: %.3f, Score: %.3f%n", COUNT, fitness, penaltyForWaste, penaltyForChildren, score);
+            log.debug("{} - Fitness score: {}, Penalty Waste: {}, Penalty Child: {}, Score: {}",
+                    COUNT,
+                    String.format("%.3f", fitness),
+                    String.format("%.3f", penaltyForWaste),
+                    String.format("%.3f", penaltyForChildren),
+                    String.format("%.3f", score));
         }
         return fitness;
     }
@@ -463,7 +464,7 @@ public class PlannerGA {
             ordenDeTrabajo.setOrdenDeTrabajoMaquinas(new ArrayList<>());
 
             // CHECK IF MAIN ROLL CAN BE USED FOR SALE
-            if (!checkRollCharacteristics(sale, roll.getLargo(), roll.getAnchoMM(), roll.getEspesorMM())) {
+            if (!checkRollCharacteristics(sale, roll)) {
                 log.debug("Main roll cannot be used in sale");
                 return new Pair<>(List.of(), List.of());
             }
@@ -508,7 +509,7 @@ public class PlannerGA {
 
                 List<OrdenDeTrabajoMaquina> ordenesDeTrabajoConMaquina = ordenesMaquina.stream().filter(u -> u.getMaquina() == machine1).toList();
 
-                long minutosDeProcesamiento = machine1.minutosParaProcesarEspecifiacion(sale.getEspecificacion());
+                long minutosDeProcesamiento = machine1.minutosParaProcesarEspecifiacion(sale.getEspecificacion(),usingRoll);
                 possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
 
                 if (possibleEnd.getHour() >= this.horaDeFinLaboral){
@@ -540,6 +541,7 @@ public class PlannerGA {
                 ordenMaquina.setFechaFin(possibleEnd);
 
                 ordenDeTrabajo.getOrdenDeTrabajoMaquinas().add(ordenMaquina);
+                ordenesMaquina.add(ordenMaquina);
 
                 possibleStart = ordenMaquina.getFechaFin();
 
@@ -562,7 +564,7 @@ public class PlannerGA {
 
                 List<OrdenDeTrabajoMaquina> ordenesDeTrabajoConMaquina = ordenesMaquina.stream().filter(u -> u.getMaquina() == machine2).toList();
 
-                long minutosDeProcesamiento = machine2.minutosParaProcesarEspecifiacion(sale.getEspecificacion());
+                long minutosDeProcesamiento = machine2.minutosParaProcesarEspecifiacion(sale.getEspecificacion(),usingRoll);
                 possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
 
                 if (possibleEnd.getHour() >= this.horaDeFinLaboral){
@@ -595,6 +597,7 @@ public class PlannerGA {
                 ordenMaquina.setFechaFin(possibleEnd);
 
                 ordenDeTrabajo.getOrdenDeTrabajoMaquinas().add(ordenMaquina);
+                ordenesMaquina.add(ordenMaquina);
             }
 
             // ALL OKAY, ADD ORDEN DE TRABAJO
@@ -615,7 +618,7 @@ public class PlannerGA {
     private List<Rollo> childrenCandidatesOfRoll(Map<Integer, List<Rollo>> childrenMap, int rollId, OrdenVenta sale){
         // returns the children of a roll in the map and orders them by volume
        return childrenMap.get(rollId).stream()
-                .filter(c -> EstadoRollo.DISPONIBLE.equals(c.getEstado()) && checkRollCharacteristics(sale, c.getLargo(), c.getAnchoMM(), c.getEspesorMM()))
+                .filter(c -> EstadoRollo.DISPONIBLE.equals(c.getEstado()) && checkRollCharacteristics(sale, c ))
                 .sorted(Comparator.comparingDouble(c -> c.getAnchoMM() * c.getLargo()))
                 .toList();
 

@@ -2,12 +2,7 @@ package ar.utn.ccaffa.web;
 
 import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.mapper.interfaces.PlannerMapper;
-import ar.utn.ccaffa.model.dto.FiltroRolloDto;
-import ar.utn.ccaffa.model.dto.RolloDto;
-import ar.utn.ccaffa.model.entity.Maquina;
-import ar.utn.ccaffa.model.entity.OrdenDeTrabajoMaquina;
-import ar.utn.ccaffa.model.entity.OrdenVenta;
-import ar.utn.ccaffa.model.entity.Rollo;
+import ar.utn.ccaffa.model.entity.*;
 import ar.utn.ccaffa.planner.Pair;
 import ar.utn.ccaffa.planner.PlannerDTO;
 import ar.utn.ccaffa.planner.PlannerGA;
@@ -57,7 +52,6 @@ public class PlannerController {
         List<Long> rollosIDs = new ArrayList<>();
         List<Maquina> maquinas;
         List<Rollo> rollos;
-        // TODO: FALTA ORDEN DE TRABAJO MAQUINA
 
         List<OrdenVenta> ordenVentas = this.ordenVentaService.findByIdIn(plannerInfo.ordenesDeVentaIDs);
 
@@ -94,7 +88,7 @@ public class PlannerController {
 
         plannerGA.setOrdenesDeTrabajoMaquina(ordenDeTrabajoMaquinas);
 
-        Pair result = plannerGA.execute();
+        Pair<List<OrdenDeTrabajo>, List<Rollo>> result = plannerGA.execute();
 
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }

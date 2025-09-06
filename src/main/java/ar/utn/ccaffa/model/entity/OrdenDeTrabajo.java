@@ -118,11 +118,8 @@ public class OrdenDeTrabajo {
         return this.getOrdenDeVenta().getEspecificacion().getAncho();
     }
     public Float neededLengthFromOriginalRoll(){
-        //TODO: VALIDAR BIEN EL LARGO (DEBO USAR EL ESPESOR DE LA 1)
-        //return this.getOrdenDeVenta().getEspecificacion().getLargo();
         Especificacion especificacion = this.getOrdenDeVenta().getEspecificacion();
-        return ( especificacion.getEspesor() * especificacion.getLargo())
-                / (this.getRollo().getEspesorMM());
+        return especificacion.neededLengthOfRoll(this.getRollo());
     }
 
     private void crearHijoPorAncho(List<Rollo> rolloHijos){

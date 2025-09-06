@@ -18,7 +18,11 @@ public class PlannerDTO {
     public boolean usarTodosLosRollosDisponibles;
     public List<Long> rolloIDs;
     public int horasDeGracia;
+    public int horaDeInicioLaboral;
+    public int horaDeFinLaboral;
     public int anchoDesperdicio;
     public int largoDesperdicio;
-    private int MULTIPLIER_OF_WASTE = 1000;
+    private int MULTIPLIER_OF_WASTE;
+    private int TOP_DAYS_IN_ADVANCE;
+    private int POPULATION_SIZE_PER_SALE;
 }

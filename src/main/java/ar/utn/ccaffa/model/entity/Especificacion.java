@@ -50,7 +50,8 @@ public class Especificacion {
     @Column(name = "diametro_externo")
     private Float diametroExterno;
 
-    public float getLargo(){
-        return (float) (this.getCantidad() / (this.getAncho() * this.getEspesor() * 0.008));
+    public float neededLengthOfRoll(Rollo rollo){
+        return (float) (this.getCantidad() /(0.008 * this.getAncho() * rollo.getEspesorMM()));
     }
+
 } 
