@@ -2,6 +2,7 @@ package ar.utn.ccaffa.web;
 
 import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.enums.TipoMaterial;
+import ar.utn.ccaffa.exceptions.ErrorResponse;
 import ar.utn.ccaffa.model.dto.FiltroRolloDto;
 import ar.utn.ccaffa.model.dto.RolloDto;
 import ar.utn.ccaffa.services.interfaces.RolloService;
@@ -62,10 +63,18 @@ public class RolloController {
     }
 
     @PostMapping
-    public ResponseEntity<RolloDto> createRollo(@RequestBody RolloDto rollo) {
+    public ResponseEntity<?> createRollo(@RequestBody RolloDto rollo) {
         log.info("Creando nuevo rollo: {}", rollo);
         rollo.setEstado(EstadoRollo.DISPONIBLE);
         rollo.setFechaIngreso(LocalDateTime.now());
+        if (rolloService.existsRolloByProveedorIdAndCodigoProveedor(rollo.getProveedorId(), rollo.getCodigoProveedor())){
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("REPEATED_PROVIDER_CODE_AND_PROVIDER")
+                    .message("Ya existe un rollo con el mismo codigo y proveedor")
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+
         RolloDto savedRollo = rolloService.save(rollo);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedRollo);
     }

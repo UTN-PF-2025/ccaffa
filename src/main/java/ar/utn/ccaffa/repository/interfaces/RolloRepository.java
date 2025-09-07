@@ -12,4 +12,5 @@ public interface RolloRepository extends JpaRepository<Rollo, Long>, JpaSpecific
     List<Rollo> findByRolloPadreId(Long rolloPadreId);
     List<Rollo> findByEstado(EstadoRollo estadoRollo);
     List<Rollo> findByIdIn(List<Long> ids);
+    boolean existsRolloByProveedorIdAndCodigoProveedor(Long proovedorId, String codigoProveedor);
 }

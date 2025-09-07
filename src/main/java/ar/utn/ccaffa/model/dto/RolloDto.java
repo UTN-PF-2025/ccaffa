@@ -26,7 +26,6 @@ public class RolloDto {
     private Float espesorMM;
     private TipoMaterial tipoMaterial;
     private EstadoRollo estado;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "DEFAULT_TIMEZONE")
     private LocalDateTime fechaIngreso;
     private RolloDto rolloPadre;
     private Long rolloPadreId;

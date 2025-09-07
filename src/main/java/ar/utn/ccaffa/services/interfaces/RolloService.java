@@ -19,6 +19,8 @@ public interface RolloService {
     List<Rollo> findEntitiesByEstado(EstadoRollo estadoRollo);
 
     List<Rollo> findEntitiesByIdIn(List<Long> ids);
+
+    boolean existsRolloByProveedorIdAndCodigoProveedor(Long proovedorId, String codigoProveedor);
     RolloDto save(RolloDto rollo);
     boolean deleteById(Long id);
     RolloDto modificarRollo(ModificarRolloRequestDto request);

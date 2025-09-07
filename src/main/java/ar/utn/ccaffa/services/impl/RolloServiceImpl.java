@@ -217,6 +217,11 @@ public class RolloServiceImpl implements RolloService {
         return rolloRepository.findByIdIn(ids);
     }
 
+    @Override
+    public boolean existsRolloByProveedorIdAndCodigoProveedor(Long proovedorId, String codigoProveedor){
+        return rolloRepository.existsRolloByProveedorIdAndCodigoProveedor(proovedorId, codigoProveedor);
+    }
+
     public RolloDto modificarRollo(ModificarRolloRequestDto request) {
         log.info("Modificando rollo con ID: {}", request.getId());
         
