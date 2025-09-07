@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "Orden_Venta")
@@ -31,7 +32,7 @@ public class OrdenVenta {
 
     @Column(name = "fecha_creacion", nullable = false)
     @NotNull(message = "La fecha de creación es obligatoria")
-    private LocalDate fechaCreacion;
+    private LocalDateTime fechaCreacion;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id", nullable = false)
@@ -39,7 +40,7 @@ public class OrdenVenta {
     private Cliente cliente;
 
     @Column(name = "fecha_entrega_estimada")
-    private LocalDate fechaEntregaEstimada;
+    private LocalDateTime fechaEntregaEstimada;
 
     @Column(name = "estado", nullable = false)
     @NotNull(message = "El estado es obligatorio")

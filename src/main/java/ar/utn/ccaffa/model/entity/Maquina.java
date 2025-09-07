@@ -53,4 +53,10 @@ public class Maquina {
 
     @OneToMany(mappedBy = "maquina", cascade = CascadeType.ALL)
     private List<OrdenDeTrabajoMaquina> ordenDeTrabajoMaquinas;
-} 
+
+    public Long minutosParaProcesarEspecifiacion(Especificacion especificacion, Rollo rollo) {
+        return (long) ( especificacion.neededLengthOfRoll(rollo)/velocidadTrabajoMetrosPorMinuto);
+    }
+
+}
+

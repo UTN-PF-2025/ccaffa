@@ -56,4 +56,14 @@ public class MaquinaServiceImpl implements MaquinaService {
         maquinaRepository.deleteById(id);
         return true;
     }
+
+    @Override
+    public List<Maquina> findAllIDsOfAvailableMachinesEntity(){
+        return  maquinaRepository.findByActivoIsTrue();
+    }
+
+    @Override
+    public List<Maquina> findByIdIn(List<Long> ids){
+        return  maquinaRepository.findByIdIn(ids);
+    }
 }
