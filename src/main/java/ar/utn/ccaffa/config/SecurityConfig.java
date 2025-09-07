@@ -1,5 +1,6 @@
 package ar.utn.ccaffa.config;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -35,10 +36,10 @@ public class SecurityConfig {
             .cors(withDefaults())
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/auth/**", "/ws/**").permitAll()
                 .requestMatchers("/api/roles/**").hasRole("ADMIN")
                 .requestMatchers("/api/usuarios/**").permitAll()
-                    .requestMatchers("/api/rollos/**").permitAll()
+                .requestMatchers("/api/rollos/**").permitAll()
                 .requestMatchers("/api/rollos_productos/**").permitAll()
                 .requestMatchers("/api/ordenes-venta/**").permitAll()
                 .requestMatchers("/api/ordenes-trabajo/**").permitAll()
