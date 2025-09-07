@@ -1982,6 +1982,71 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Ordenes de Trabajo Maquina",
+			"item": [
+				{
+					"name": "Get Ordenes de Trabajo by Maquina ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "https://ccaffa.art/api/ordenes-trabajo-maquina/por-maquina/1",
+							"protocol": "https",
+							"host": [
+								"ccaffa",
+								"art"
+							],
+							"path": [
+								"api",
+								"ordenes-trabajo-maquina",
+								"por-maquina",
+								"1"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Sample Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://ccaffa.art/api/ordenes-trabajo-maquina/por-maquina/1",
+									"protocol": "https",
+									"host": [
+										"ccaffa",
+										"art"
+									],
+									"path": [
+										"api",
+										"ordenes-trabajo-maquina",
+										"por-maquina",
+										"1"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 1,\n        \"ordenDeTrabajoId\": 100,\n        \"maquinaId\": 1,\n        \"fechaInicio\": \"2025-09-07T18:30:00\",\n        \"fechaFin\": \"2025-09-07T19:30:00\",\n        \"estado\": \"Completada\",\n        \"observaciones\": \"Corte realizado sin problemas.\"\n    }\n]"
+						}
+					]
+				}
+			]
 		}
 	],
 	"auth": {

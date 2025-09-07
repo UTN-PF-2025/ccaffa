@@ -15,4 +15,6 @@ public interface OrdenDeTrabajoMaquinaRepository extends JpaRepository<OrdenDeTr
     
     @EntityGraph(attributePaths = {"maquina"})
     OrdenDeTrabajoMaquina findTopByOrdenDeTrabajo_IdOrderByFechaInicioDesc(Long ordenDeTrabajoId);
+
+    List<OrdenDeTrabajoMaquina> findByMaquinaId(Long maquinaId);
 }
