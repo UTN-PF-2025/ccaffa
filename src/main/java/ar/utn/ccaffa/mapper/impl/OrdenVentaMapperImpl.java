@@ -1,5 +1,6 @@
 package ar.utn.ccaffa.mapper.impl;
 
+import ar.utn.ccaffa.enums.EstadoOrdenVentaEnum;
 import ar.utn.ccaffa.mapper.interfaces.ClienteMapper;
 import ar.utn.ccaffa.mapper.interfaces.EspecificacionMapper;
 import ar.utn.ccaffa.mapper.interfaces.OrdenVentaMapper;
@@ -32,7 +33,7 @@ public class OrdenVentaMapperImpl implements OrdenVentaMapper {
                 .fechaCreacion(ordenVenta.getFechaCreacion())
                 .fechaEntregaEstimada(ordenVenta.getFechaEntregaEstimada() != null ?
                         ordenVenta.getFechaEntregaEstimada() : null)
-                .estado(ordenVenta.getEstado())
+                .estado(EstadoOrdenVentaEnum.valueOf(ordenVenta.getEstado()))
                 .observaciones(ordenVenta.getObservaciones())
                 .cliente(clienteMapper.toDto(ordenVenta.getCliente()))
                 .especificacion(especificacionMapper.toDto(ordenVenta.getEspecificacion()))
@@ -51,7 +52,7 @@ public class OrdenVentaMapperImpl implements OrdenVentaMapper {
                 .fechaCreacion(ordenVentaDto.getFechaCreacion())
                 .fechaEntregaEstimada(ordenVentaDto.getFechaEntregaEstimada() != null ?
                         ordenVentaDto.getFechaEntregaEstimada() : null)
-                .estado(ordenVentaDto.getEstado())
+                .estado(ordenVentaDto.getEstado().name())
                 .observaciones(ordenVentaDto.getObservaciones())
                 .cliente(clienteMapper.toEntity(ordenVentaDto.getCliente()))
                 .especificacion(especificacionMapper.toEntity(ordenVentaDto.getEspecificacion()))

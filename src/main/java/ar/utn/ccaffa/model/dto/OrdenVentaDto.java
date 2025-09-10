@@ -1,5 +1,6 @@
 package ar.utn.ccaffa.model.dto;
 
+import ar.utn.ccaffa.enums.EstadoOrdenVentaEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +17,7 @@ public class OrdenVentaDto {
     private Long orderId;
     private LocalDate fechaCreacion;
     private LocalDate fechaEntregaEstimada;
-    private String estado;
+    private EstadoOrdenVentaEnum estado;
     private String observaciones;
     private ClienteDto cliente;
     private EspecificacionDto especificacion;

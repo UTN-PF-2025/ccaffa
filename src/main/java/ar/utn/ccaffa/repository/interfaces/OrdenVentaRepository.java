@@ -3,9 +3,11 @@ package ar.utn.ccaffa.repository.interfaces;
 import ar.utn.ccaffa.model.entity.OrdenVenta;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 
@@ -16,4 +18,10 @@ public interface OrdenVentaRepository extends JpaRepository<OrdenVenta, Long>, J
 
     @Query("select ov from OrdenVenta ov left join fetch ov.cliente left join fetch ov.especificacion where ov.ordenDeTrabajo.id = :ordenDeTrabajoId")
     OrdenVenta findByOrdenDeTrabajoIdFetchClienteEspecificacion(@Param("ordenDeTrabajoId") Long ordenDeTrabajoId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Transactional
+    @Query("update OrdenVenta ov set ov.estado = :estado where ov.id = :ordenVentaId")
+    void updateOrdenDeVentaEstado(@Param("ordenVentaId") Long ordenVentaId, @Param("estado") String estado);
+
 }

@@ -45,7 +45,7 @@ public class OrdenDeTrabajoResponseMapperImpl implements OrdenDeTrabajoResponseM
                 .nombre(ordenDeTrabajo.getNombre())
                 .fechaInicio(ordenDeTrabajo.getFechaInicio())
                 .fechaFin(ordenDeTrabajo.getFechaFin())
-                .estado(ordenDeTrabajo.getEstado())
+                .estado(ordenDeTrabajo.getEstado().name())
                 .observaciones(ordenDeTrabajo.getObservaciones())
                 .fechaEstimadaDeInicio(ordenDeTrabajo.getFechaEstimadaDeInicio())
                 .fechaEstimadaDeFin(ordenDeTrabajo.getFechaEstimadaDeFin())
@@ -108,7 +108,7 @@ public class OrdenDeTrabajoResponseMapperImpl implements OrdenDeTrabajoResponseM
                 .maquina(maquinaMapper.toDto(otm.getMaquina()))
                 .fechaInicio(otm.getFechaInicio())
                 .fechaFin(otm.getFechaFin())
-                .estado(otm.getEstado())
+                .estado(otm.getEstado().name())
                 .observaciones(otm.getObservaciones())
                 .build();
     }
