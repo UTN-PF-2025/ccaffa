@@ -1,21 +1,34 @@
 package ar.utn.ccaffa.services.impl;
 
 import ar.utn.ccaffa.model.dto.FiltroOrdenDeTrabajoDto;
+import ar.utn.ccaffa.model.entity.Maquina;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
+import ar.utn.ccaffa.model.entity.OrdenDeTrabajoMaquina;
+import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoMaquinaRepository;
 import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoRepository;
 import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoService;
 import lombok.RequiredArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
+@Slf4j
+@Transactional
 public class OrdenDeTrabajoServiceImpl implements OrdenDeTrabajoService {
     private final OrdenDeTrabajoRepository repository;
+    private final OrdenDeTrabajoMaquinaRepository ordenDeTrabajoMaquinaRepository;
 
+    public OrdenDeTrabajoServiceImpl (OrdenDeTrabajoRepository repository, OrdenDeTrabajoMaquinaRepository ordenDeTrabajoMaquinaRepository){
+        this.repository = repository;
+        this.ordenDeTrabajoMaquinaRepository = ordenDeTrabajoMaquinaRepository;
+    }
     @Override
     public OrdenDeTrabajo save(OrdenDeTrabajo orden) {
         return repository.save(orden);
@@ -93,5 +106,10 @@ public class OrdenDeTrabajoServiceImpl implements OrdenDeTrabajoService {
         }
 
         return repository.findAll(spec);
+    }
+
+    @Override
+    public List<OrdenDeTrabajoMaquina> findOrdenDeTrabajoMaquinaByEstadoAndFechaFinAfterAndFechaFinBeforeAndMaquinaIn(String estado, LocalDateTime fechaFinDesde, LocalDateTime fecaFinHasta, List<Maquina> maquinas){
+        return this.ordenDeTrabajoMaquinaRepository.findOrdenDeTrabajoMaquinaByEstadoAndFechaFinAfterAndFechaFinBeforeAndMaquinaIn(estado, fechaFinDesde, fecaFinHasta, maquinas);
     }
 }

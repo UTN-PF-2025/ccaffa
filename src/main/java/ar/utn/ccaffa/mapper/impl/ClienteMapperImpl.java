@@ -19,9 +19,9 @@ public class ClienteMapperImpl implements ClienteMapper {
 
         return ClienteDto.builder()
                 .id(cliente.getId())
-                .nombre(cliente.getName())
+                .name(cliente.getName())
                 .email(cliente.getEmail())
-                .activo(cliente.isActivo())
+                .active(cliente.isActive())
                 .build();
     }
 
@@ -33,9 +33,9 @@ public class ClienteMapperImpl implements ClienteMapper {
 
         return Cliente.builder()
                 .id(clienteDto.getId())
-                .name(clienteDto.getNombre())
+                .name(clienteDto.getName())
                 .email(clienteDto.getEmail())
-                .activo(clienteDto.isActivo())
+                .active(clienteDto.isActive())
                 .build();
     }
 

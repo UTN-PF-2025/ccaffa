@@ -211,6 +211,19 @@ public class RolloServiceImpl implements RolloService {
     }
 
     @Override
+    public List<Rollo> findEntitiesByEstado(EstadoRollo estadoRollo){
+        return rolloRepository.findByEstado(estadoRollo);
+    }
+    @Override
+    public List<Rollo> findEntitiesByIdIn(List<Long> ids){
+        return rolloRepository.findByIdIn(ids);
+    }
+
+    @Override
+    public boolean existsRolloByProveedorIdAndCodigoProveedor(Long proovedorId, String codigoProveedor){
+        return rolloRepository.existsRolloByProveedorIdAndCodigoProveedor(proovedorId, codigoProveedor);
+    }
+
     public RolloDto modificarRollo(ModificarRolloRequestDto request) {
         log.info("Modificando rollo con ID: {}", request.getId());
         

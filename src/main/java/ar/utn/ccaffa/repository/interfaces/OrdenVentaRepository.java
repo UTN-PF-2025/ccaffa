@@ -9,11 +9,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * 
- */
+import java.util.List;
+
+
 @Repository
 public interface OrdenVentaRepository extends JpaRepository<OrdenVenta, Long>, JpaSpecificationExecutor<OrdenVenta> {
+    List<OrdenVenta> findByIdIn(List<Long> ids);
+
     OrdenVenta findByOrdenDeTrabajoId(Long ordenDeTrabajoId);
 
     @Query("select ov from OrdenVenta ov left join fetch ov.cliente left join fetch ov.especificacion where ov.ordenDeTrabajo.id = :ordenDeTrabajoId")

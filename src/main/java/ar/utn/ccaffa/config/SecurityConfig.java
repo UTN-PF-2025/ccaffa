@@ -35,10 +35,14 @@ public class SecurityConfig {
             .cors(withDefaults())
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/api/camaras/**", "/ws/**").permitAll()
-                .requestMatchers("/api/roles/**").hasAuthority("ADMIN")
-                .requestMatchers("/api/usuarios/**").hasAuthority("ADMIN")
-                .requestMatchers("/api/rolLos/**").hasAnyAuthority("RESPONSABLE_DE_DEPOSITO", "RESPONSABLE_DE_PRODUCCION")
+                .requestMatchers("/api/auth/login", "/api/ws/**").permitAll() 
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/roles/**").hasRole("ADMIN")
+                .requestMatchers("/api/usuarios/**").permitAll()
+                .requestMatchers("/api/rollos/**").permitAll()
+                .requestMatchers("/api/rollos_productos/**").permitAll()
+                .requestMatchers("/api/ordenes-venta/**").permitAll()
+                .requestMatchers("/api/ordenes-trabajo/**").permitAll()
                 .requestMatchers("/api/defectos/**").permitAll()
                 .requestMatchers("/api/controles-calidad/**").permitAll()
                 .anyRequest().authenticated()
@@ -64,7 +68,7 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:8080", "http://localhost:5174"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:8080", "http://localhost:5174", "http://18.189.28.38", "https://ccaffa.art"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
         configuration.setAllowCredentials(true);

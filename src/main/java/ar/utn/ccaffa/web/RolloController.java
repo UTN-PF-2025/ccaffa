@@ -1,14 +1,18 @@
 package ar.utn.ccaffa.web;
 
+import ar.utn.ccaffa.enums.EstadoRollo;
+import ar.utn.ccaffa.enums.TipoMaterial;
+import ar.utn.ccaffa.exceptions.ErrorResponse;
 import ar.utn.ccaffa.model.dto.FiltroRolloDto;
 import ar.utn.ccaffa.model.dto.RolloDto;
-import ar.utn.ccaffa.model.entity.Rollo;
 import ar.utn.ccaffa.services.interfaces.RolloService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.EnumSet;
 import java.util.List;
 
 @RestController
@@ -29,12 +33,17 @@ public class RolloController {
         return ResponseEntity.ok(rollos);
     }
 
+
     @GetMapping("/{id}")
     public ResponseEntity<RolloDto> getRollosById(@PathVariable Long id) {
         log.info("Buscando rollo con ID: {}", id);
         return ResponseEntity.ok(rolloService.findById(id));
     }
 
+    @GetMapping("/tipoMateriales")
+    public ResponseEntity<EnumSet<TipoMaterial>> getRollosById() {
+        return ResponseEntity.ok(EnumSet.allOf(TipoMaterial.class));
+    }
     @GetMapping("/{id}/conRollosPadres")
     public ResponseEntity<RolloDto> getRolloByIdConRollosPadres(@PathVariable Long id) {
         log.info("Buscando rollo con ID: {}", id);
@@ -54,8 +63,18 @@ public class RolloController {
     }
 
     @PostMapping
-    public ResponseEntity<RolloDto> createRollo(@RequestBody RolloDto rollo) {
+    public ResponseEntity<?> createRollo(@RequestBody RolloDto rollo) {
         log.info("Creando nuevo rollo: {}", rollo);
+        rollo.setEstado(EstadoRollo.DISPONIBLE);
+        rollo.setFechaIngreso(LocalDateTime.now());
+        if (rolloService.existsRolloByProveedorIdAndCodigoProveedor(rollo.getProveedorId(), rollo.getCodigoProveedor())){
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("REPEATED_PROVIDER_CODE_AND_PROVIDER")
+                    .message("Ya existe un rollo con el mismo codigo y proveedor")
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+
         RolloDto savedRollo = rolloService.save(rollo);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedRollo);
     }

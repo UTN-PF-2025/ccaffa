@@ -13,4 +13,8 @@ public interface MaquinaService {
     Maquina save(MaquinaDto entidad);
 
     boolean deleteById(Long id);
+
+    List<Maquina> findAllIDsOfAvailableMachinesEntity();
+
+    List<Maquina> findByIdIn(List<Long> ids);
 }
