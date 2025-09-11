@@ -139,12 +139,21 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
     public ControlDeCalidad finalizarControl(Long id) {
         ControlDeCalidad control = controlDeCalidadRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Control de Calidad no encontrado con ID: " + id));
-        if (!control.getDefectos().isEmpty()) {
+        OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoRepository.findById(Long.parseLong(control.getOrdenDeTrabajoId())).orElseThrow(
+            () -> new RuntimeException("Orden de Trabajo no encontrada con ID: " + control.getOrdenDeTrabajoId()));
+        
+        if (!control.getDefectos().isEmpty() || control.getEstado().equals("Defectuoso")) {
             control.setEstado("Defectuoso");
+            ordenDeTrabajo.setEstado("Defectuoso");
+           //TODO mandar a cancelar orden de trabajo
+    
         } else {
             control.setEstado("Finalizado");
+            ordenDeTrabajo.setEstado("Finalizado");
         }
         control.setFechaFinalizacion(LocalDateTime.now());
+        ordenDeTrabajo.setFechaFin(LocalDateTime.now());
+        ordenDeTrabajoRepository.save(ordenDeTrabajo);
         return controlDeCalidadRepository.save(control);
     }
 

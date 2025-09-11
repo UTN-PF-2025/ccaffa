@@ -30,7 +30,7 @@ public class DefectoController {
     }
 
     @GetMapping("/imagenes/{filename:.+}")
-    public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
+    public ResponseEntity<Resource> serveFile(@PathVariable("filename") String filename) {
         log.info("Buscando imagen: {}", filename);
         Resource file = fileStorageService.loadAsResource(filename);
         return ResponseEntity.ok().header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION,

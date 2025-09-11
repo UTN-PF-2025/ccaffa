@@ -60,14 +60,21 @@ public class CamaraController {
     }
 
     @PostMapping("/{id}/upload")
-    public ResponseEntity<String> uploadImage(@PathVariable String id, @RequestParam("file") MultipartFile file) {
-        log.info("Recibiendo archivo: {} para enviar a análisis", file.getOriginalFilename());
+    public ResponseEntity<String> uploadImage(
+            @PathVariable String id,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "cameraId", required = false) String cameraId,
+            @RequestHeader(value = "X-Camera-Id", required = false) String cameraIdHeader
+    ) {
+        String effectiveCameraId = (cameraId != null && !cameraId.isBlank()) ? cameraId
+                : (cameraIdHeader != null && !cameraIdHeader.isBlank()) ? cameraIdHeader : "cam-1";
+        log.info("Recibiendo archivo: {} para enviar a análisis (cameraId={})", file.getOriginalFilename(), effectiveCameraId);
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body("Por favor seleccione un archivo para subir.");
         }
 
         try {
-            analysisService.analyzeAndNotify(file, id);
+            analysisService.analyzeAndNotify(file, id, effectiveCameraId);
             return ResponseEntity.ok("Archivo enviado a análisis exitosamente.");
         } catch (IOException e) {
             log.error("Error al leer el archivo para el análisis", e);
@@ -77,4 +84,5 @@ public class CamaraController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al procesar el archivo: " + e.getMessage());
         }
     }
-} 
+}
+ 
