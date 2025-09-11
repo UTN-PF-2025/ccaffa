@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ClienteDto {
     private Long id;
-    private String nombre;
+    private String name;
     private String email;
-    private boolean activo;
+    private boolean active;
 }
