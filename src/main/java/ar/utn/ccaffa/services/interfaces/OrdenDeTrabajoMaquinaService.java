@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface OrdenDeTrabajoMaquinaService {
     List<OrdenDeTrabajoMaquina> findByMaquinaId(Long maquinaId);
+    OrdenDeTrabajoMaquina findFirstByMaquinaId(Long maquinaId);
 }

@@ -11,6 +11,7 @@ import java.util.Optional;
 
 public interface OrdenDeTrabajoRepository extends JpaRepository<OrdenDeTrabajo, Long>, JpaSpecificationExecutor<OrdenDeTrabajo> {
     List<OrdenDeTrabajo> findByRolloId(Long rolloId);
+    OrdenDeTrabajo findByOrdenDeTrabajoMaquinas_Id(Long ordenDeTrabajoMaquinaId);
     List<OrdenDeTrabajo> findByOrdenDeVenta_Id(Long ordenDeVentaId);
 
     @Query("select ot from OrdenDeTrabajo ot left join fetch ot.rollo where ot.id = :id")
