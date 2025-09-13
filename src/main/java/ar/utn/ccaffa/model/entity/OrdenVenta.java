@@ -19,6 +19,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(exclude = {"ordenDeTrabajo"})
+@NamedEntityGraph(
+    name = "OrdenVenta.withEspecificacion",
+    attributeNodes = @NamedAttributeNode("especificacion")
+)
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class OrdenVenta {
 

@@ -51,7 +51,6 @@ public class PlannerTest {
                         .observaciones("Generada automáticamente")
                         .cliente(Cliente.builder()
                                 .id(1L)
-                                .activo(true)
                                 .email("test@example.com")
                                 .name("Cliente " + i)
                                 .build())

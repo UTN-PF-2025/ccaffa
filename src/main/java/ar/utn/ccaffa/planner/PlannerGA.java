@@ -210,7 +210,9 @@ public class PlannerGA {
             Rollo r = getRolloById(b[1]);
             if (s == null || r == null) return true;
             if (s.getEspecificacion().getEspesor() > r.getEspesorMM()) {
-                System.out.printf("ESPE: %.3f | R: %.3f%n", s.getEspecificacion().getEspesor(), r.getEspesorMM() );
+                log.debug("ESPE: {} | R: {}",
+                        String.format("%.3f", s.getEspecificacion().getEspesor()),
+                        String.format("%.3f", r.getEspesorMM()));
                 return true;
             }
         }
