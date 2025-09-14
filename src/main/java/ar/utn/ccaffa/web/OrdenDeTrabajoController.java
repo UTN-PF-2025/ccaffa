@@ -100,7 +100,7 @@ public class OrdenDeTrabajoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PatchMapping("/{id}/cancelar")
+    @PostMapping("/{id}/cancelar")
     public ResponseEntity<OrdenDeTrabajoResponseDto> cancelarOrdenDeTrabajo(@PathVariable Long id) {
         return ordenDeTrabajoService.findById(id)
                 .map(ordenACancelar -> {
@@ -302,7 +302,6 @@ public class OrdenDeTrabajoController {
         }
 
         OrdenVenta ordenVenta = ordenVentaOpt.get();
-        ordenVenta.setOrdenDeTrabajo(orden);
         orden.setOrdenDeVenta(ordenVenta);
         return ordenVenta;
     }

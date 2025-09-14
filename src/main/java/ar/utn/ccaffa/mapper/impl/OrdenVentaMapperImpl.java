@@ -27,8 +27,7 @@ public class OrdenVentaMapperImpl implements OrdenVentaMapper {
         }
 
         return OrdenVentaDto.builder()
-                .id(ordenVenta.getId())
-                .orderId(ordenVenta.getOrderId())
+                .orderId(ordenVenta.getId())
                 .fechaCreacion(ordenVenta.getFechaCreacion())
                 .fechaEntregaEstimada(ordenVenta.getFechaEntregaEstimada() != null ?
                         ordenVenta.getFechaEntregaEstimada() : null)
@@ -46,8 +45,7 @@ public class OrdenVentaMapperImpl implements OrdenVentaMapper {
         }
 
         return OrdenVenta.builder()
-                .id(ordenVentaDto.getId())
-                .orderId(ordenVentaDto.getOrderId())
+                .id(ordenVentaDto.getOrderId())
                 .fechaCreacion(ordenVentaDto.getFechaCreacion())
                 .fechaEntregaEstimada(ordenVentaDto.getFechaEntregaEstimada() != null ?
                         ordenVentaDto.getFechaEntregaEstimada() : null)

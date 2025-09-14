@@ -95,7 +95,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
             proveedor = proveedorRepository.findById(rollo.getProveedorId()).orElse(null);
         }
 
-        OrdenVenta ordenDeVenta = ordenDeVentaRepository.findByOrdenDeTrabajoIdFetchClienteEspecificacion(ordenDeTrabajo.getId());
+        OrdenVenta ordenDeVenta = ordenDeTrabajo.getOrdenDeVenta();
         Cliente cliente = null;
         Especificacion especificacion = null;
         if (ordenDeVenta != null) {

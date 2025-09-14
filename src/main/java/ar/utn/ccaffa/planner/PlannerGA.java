@@ -173,7 +173,7 @@ public class PlannerGA {
     }
 
     private OrdenVenta getOrdenVentaById(long id) { return ordenesDeVenta.stream().filter(s -> s.getId() == id).findFirst().orElse(null); }
-    private Rollo getRolloById(long id) { return rollos.stream().filter(s -> s.getId() == id).findFirst().orElse(null); }
+    private Rollo getRolloById(long id) { return rollos.stream().filter(r -> r.getId() == id).findFirst().orElse(null); }
 
     static List<Integer> toChromosomeList(Genotype<IntegerGene> gt) {
         return gt.chromosome().stream().map(IntegerGene::intValue).collect(Collectors.toList());

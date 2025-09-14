@@ -75,8 +75,7 @@ public class OrdenDeTrabajoResponseMapperImpl implements OrdenDeTrabajoResponseM
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         
         return OrdenVentaSimpleDto.builder()
-                .id(ordenVenta.getId())
-                .orderId(ordenVenta.getOrderId())
+                .orderId(ordenVenta.getId())
                 .fechaCreacion(ordenVenta.getFechaCreacion() != null ? 
                         ordenVenta.getFechaCreacion().format(formatter) : null)
                 .fechaEntregaEstimada(ordenVenta.getFechaEntregaEstimada() != null ? 

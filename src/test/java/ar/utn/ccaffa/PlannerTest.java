@@ -44,7 +44,6 @@ public class PlannerTest {
                 Especificacion randomEspecificacion = especificaciones.get(RANDOM.nextInt(especificaciones.size()));
                 OrdenVenta ov = OrdenVenta.builder()
                         .id(i)
-                        .orderId(i)
                         .fechaCreacion(LocalDateTime.now().minusDays(RANDOM.nextInt(1)))
                         .fechaEntregaEstimada(LocalDateTime.now().plusDays(RANDOM.nextInt(30)))
                         .estado("Creada")
