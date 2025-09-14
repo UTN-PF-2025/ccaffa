@@ -22,7 +22,7 @@ import java.util.List;
 public class CamaraController {
 
     // private final CamaraService camaraService;
-    // private final AnalysisService analysisService;
+    private final AnalysisService analysisService;
 
     // @PostMapping
     // public ResponseEntity<CamaraDto> createCamara(@RequestBody CamaraDto camaraDto) {
@@ -59,22 +59,22 @@ public class CamaraController {
     //     return ResponseEntity.noContent().build();
     // }
 
-    // @PostMapping("/{id}/upload")
-    // public ResponseEntity<String> uploadImage(@PathVariable String id, @RequestParam("file") MultipartFile file) {
-    //     log.info("Recibiendo archivo: {} para enviar a análisis", file.getOriginalFilename());
-    //     if (file.isEmpty()) {
-    //         return ResponseEntity.badRequest().body("Por favor seleccione un archivo para subir.");
-    //     }
+    @PostMapping("/{id}/upload")
+    public ResponseEntity<String> uploadImage(@PathVariable String id, @RequestParam("file") MultipartFile file) {
+        log.info("Recibiendo archivo: {} para enviar a análisis", file.getOriginalFilename());
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("Por favor seleccione un archivo para subir.");
+        }
 
-    //     try {
-    //         analysisService.analyzeAndNotify(file, id);
-    //         return ResponseEntity.ok("Archivo enviado a análisis exitosamente.");
-    //     } catch (IOException e) {
-    //         log.error("Error al leer el archivo para el análisis", e);
-    //         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al leer el archivo.");
-    //     } catch (Exception e) {
-    //         log.error("Error al procesar el archivo y enviarlo a análisis", e);
-    //         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al procesar el archivo: " + e.getMessage());
-    //     }
-    // }
+        try {
+            analysisService.analyzeAndNotify(file, id);
+            return ResponseEntity.ok("Archivo enviado a análisis exitosamente.");
+        } catch (IOException e) {
+            log.error("Error al leer el archivo para el análisis", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al leer el archivo.");
+        } catch (Exception e) {
+            log.error("Error al procesar el archivo y enviarlo a análisis", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al procesar el archivo: " + e.getMessage());
+        }
+    }
 } 
