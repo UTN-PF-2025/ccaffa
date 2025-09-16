@@ -43,8 +43,8 @@ public class OrdenVentaServiceImpl implements OrdenVentaService {
 
 
     @Override
-    public OrdenVenta save(OrdenVentaDto ordenVenta) {
-        return this.ordenVentaRepository.save(this.ordenVentaMapper.toEntity(ordenVenta));
+    public OrdenVentaDto save(OrdenVentaDto ordenVenta) {
+        return ordenVentaMapper.toDto(this.ordenVentaRepository.save(this.ordenVentaMapper.toEntity(ordenVenta)));
     }
 
     @Override
@@ -55,7 +55,7 @@ public class OrdenVentaServiceImpl implements OrdenVentaService {
     @Override
     public void anular(Long ordenVentaId) {
         OrdenVentaDto ordenVentaAAnular = this.findById(ordenVentaId);
-        List<OrdenDeTrabajo> ordenesDeTrabajo = this.ordenDeTrabajoRepository.findByOrdenDeVenta_Id(ordenVentaAAnular.getId());
+        List<OrdenDeTrabajo> ordenesDeTrabajo = this.ordenDeTrabajoRepository.findByOrdenDeVenta_Id(ordenVentaAAnular.getOrderId());
         if(ordenesDeTrabajo.isEmpty()){
             ordenVentaAAnular.setEstado("Cancelada");
             this.save(ordenVentaAAnular);
@@ -97,8 +97,9 @@ public class OrdenVentaServiceImpl implements OrdenVentaService {
         if (filtros.getObservaciones() != null) {
             spec = spec.and((root, query, cb) -> cb.like(root.get("observaciones"), "%" + filtros.getObservaciones() + "%"));
         }
+
         if (filtros.getOrderId() != null) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("orderId"), filtros.getOrderId()));
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("id"), filtros.getOrderId()));
         }
         if(filtros.getClienteId() != null){
             spec = spec.and((root, query, cb) -> cb.equal(root.get("cliente").get("id"), filtros.getClienteId()));

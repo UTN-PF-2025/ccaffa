@@ -1,24 +1,24 @@
-package ar.utn.ccaffa.config;
+// package ar.utn.ccaffa.config;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.MongoDatabaseFactory;
-import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
-import org.springframework.data.mongodb.gridfs.GridFsTemplate;
-import org.springframework.web.client.RestTemplate;
+// import org.springframework.context.annotation.Bean;
+// import org.springframework.context.annotation.Configuration;
+// import org.springframework.data.mongodb.MongoDatabaseFactory;
+// import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
+// import org.springframework.data.mongodb.gridfs.GridFsTemplate;
+// import org.springframework.web.client.RestTemplate;
 
-@Configuration
-public class MongoConfig {
+// @Configuration
+// public class MongoConfig {
 
-    @Bean
-    public GridFsTemplate gridFsTemplate(
-            MongoDatabaseFactory dbFactory,
-            MappingMongoConverter converter) {
-        return new GridFsTemplate(dbFactory, converter);
-    }
+//     @Bean
+//     public GridFsTemplate gridFsTemplate(
+//             MongoDatabaseFactory dbFactory,
+//             MappingMongoConverter converter) {
+//         return new GridFsTemplate(dbFactory, converter);
+//     }
 
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
-}
+//     @Bean
+//     public RestTemplate restTemplate() {
+//         return new RestTemplate();
+//     }
+// }

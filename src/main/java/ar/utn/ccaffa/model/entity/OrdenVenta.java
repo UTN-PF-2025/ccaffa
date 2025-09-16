@@ -19,16 +19,16 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(exclude = {"ordenDeTrabajo"})
+@NamedEntityGraph(
+    name = "OrdenVenta.withEspecificacion",
+    attributeNodes = @NamedAttributeNode("especificacion")
+)
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class OrdenVenta {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(name = "order_id", nullable = false)
-    @NotNull(message = "El número de orden es obligatorio")
-    private Long orderId;
 
     @Column(name = "fecha_creacion", nullable = false)
     @NotNull(message = "La fecha de creación es obligatoria")
@@ -53,7 +53,4 @@ public class OrdenVenta {
     @JoinColumn(name = "especificacion_id")
     private Especificacion especificacion;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "orden_trabajo_id")
-    private OrdenDeTrabajo ordenDeTrabajo;
 }

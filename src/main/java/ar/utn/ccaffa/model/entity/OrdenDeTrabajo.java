@@ -45,8 +45,8 @@ public class OrdenDeTrabajo {
     @Column(name = "activa")
     private Boolean activa = true;
 
-    
-    @OneToOne(mappedBy = "ordenDeTrabajo")
+    @JoinColumn(name = "orden_venta_id")
+    @ManyToOne()
     private OrdenVenta ordenDeVenta;
 
     @OneToMany(mappedBy = "ordenDeTrabajo", cascade = CascadeType.ALL)

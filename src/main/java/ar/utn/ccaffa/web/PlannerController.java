@@ -48,8 +48,8 @@ public class PlannerController {
     @PostMapping
     public ResponseEntity<Pair> generatePlan(@RequestBody PlannerDTO plannerInfo) {
         PlannerGA plannerGA = plannerMapper.toEntity(plannerInfo);
-        List<Long> maquinasIDs = new ArrayList<>();
-        List<Long> rollosIDs = new ArrayList<>();
+        List<Long> maquinasIDs = new ArrayList<>(plannerGA.getMaquinasIDs());
+        List<Long> rollosIDs = new ArrayList<>(plannerGA.getRollosIDs());
         List<Maquina> maquinas;
         List<Rollo> rollos;
 

@@ -7,7 +7,6 @@ import ar.utn.ccaffa.model.entity.OrdenDeTrabajoMaquina;
 import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoMaquinaRepository;
 import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoRepository;
 import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoService;
-import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
@@ -63,6 +62,11 @@ public class OrdenDeTrabajoServiceImpl implements OrdenDeTrabajoService {
     @Override
     public List<OrdenDeTrabajo> findByRolloId(Long rolloId) {
         return repository.findByRolloId(rolloId);
+    }
+
+    @Override
+    public OrdenDeTrabajo findByProcesoId(Long procesoId) {
+      return repository.findByOrdenDeTrabajoMaquinas_Id(procesoId);
     }
 
     @Override

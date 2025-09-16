@@ -30,6 +30,6 @@ public class Cliente {
     private String email;
 
     @Column(name = "activo")
-    private boolean activo;
+    private boolean active;
 
 }

@@ -22,7 +22,7 @@ public class PlannerDTO {
     public int horaDeFinLaboral;
     public int anchoDesperdicio;
     public int largoDesperdicio;
-    private int MULTIPLIER_OF_WASTE;
-    private int TOP_DAYS_IN_ADVANCE;
-    private int POPULATION_SIZE_PER_SALE;
+    public int MULTIPLIER_OF_WASTE;
+    public int TOP_DAYS_IN_ADVANCE;
+    public int POPULATION_SIZE_PER_SALE;
 }

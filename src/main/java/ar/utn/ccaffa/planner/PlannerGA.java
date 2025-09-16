@@ -173,7 +173,7 @@ public class PlannerGA {
     }
 
     private OrdenVenta getOrdenVentaById(long id) { return ordenesDeVenta.stream().filter(s -> s.getId() == id).findFirst().orElse(null); }
-    private Rollo getRolloById(long id) { return rollos.stream().filter(s -> s.getId() == id).findFirst().orElse(null); }
+    private Rollo getRolloById(long id) { return rollos.stream().filter(r -> r.getId() == id).findFirst().orElse(null); }
 
     static List<Integer> toChromosomeList(Genotype<IntegerGene> gt) {
         return gt.chromosome().stream().map(IntegerGene::intValue).collect(Collectors.toList());
@@ -210,7 +210,9 @@ public class PlannerGA {
             Rollo r = getRolloById(b[1]);
             if (s == null || r == null) return true;
             if (s.getEspecificacion().getEspesor() > r.getEspesorMM()) {
-                System.out.printf("ESPE: %.3f | R: %.3f%n", s.getEspecificacion().getEspesor(), r.getEspesorMM() );
+                log.debug("ESPE: {} | R: {}",
+                        String.format("%.3f", s.getEspecificacion().getEspesor()),
+                        String.format("%.3f", r.getEspesorMM()));
                 return true;
             }
         }

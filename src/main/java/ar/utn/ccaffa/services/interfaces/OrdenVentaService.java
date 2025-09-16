@@ -16,7 +16,7 @@ public interface OrdenVentaService {
 
     List<OrdenVentaDto> searchByFiltros(FiltroOrdenVentaDTO filtros);
 
-    OrdenVenta save(OrdenVentaDto ordenVenta);
+    OrdenVentaDto save(OrdenVentaDto ordenVenta);
     
     void deleteById(Long id);
 

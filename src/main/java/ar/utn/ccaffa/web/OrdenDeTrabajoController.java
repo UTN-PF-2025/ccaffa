@@ -2,7 +2,10 @@ package ar.utn.ccaffa.web;
 
 import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.enums.MaquinaTipoEnum;
+import ar.utn.ccaffa.mapper.interfaces.OrdenDeTrabajoMaquinaMapper;
 import ar.utn.ccaffa.mapper.interfaces.OrdenDeTrabajoResponseMapper;
+import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoMaquinaService;
+import ar.utn.ccaffa.model.dto.OrdenDeTrabajoMaquinaDto;
 import ar.utn.ccaffa.model.dto.OrdenDeTrabajoResponseDto;
 import ar.utn.ccaffa.model.entity.*;
 import ar.utn.ccaffa.repository.interfaces.*;
@@ -10,6 +13,7 @@ import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoService;
 import ar.utn.ccaffa.model.dto.Bloque;
 import ar.utn.ccaffa.model.dto.FiltroOrdenDeTrabajoDto;
 import ar.utn.ccaffa.model.dto.OrdenDeTrabajoDto;
+import java.util.Comparator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +37,8 @@ public class OrdenDeTrabajoController {
     private final RolloRepository rolloRepository;
     private final OrdenVentaRepository ordenDeVentaRepository;
     private final OrdenDeTrabajoResponseMapper ordenDeTrabajoResponseMapper;
+    private final OrdenDeTrabajoMaquinaService ordenDeTrabajoMaquinaService;
+    private final OrdenDeTrabajoMaquinaMapper ordenDeTrabajoMaquinaMapper;
 
     @PostMapping
     public ResponseEntity<OrdenDeTrabajoResponseDto> crearOrdenDeTrabajo(@RequestBody OrdenDeTrabajoDto request) {
@@ -94,7 +100,7 @@ public class OrdenDeTrabajoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PatchMapping("/{id}/cancelar")
+    @PostMapping("/{id}/cancelar")
     public ResponseEntity<OrdenDeTrabajoResponseDto> cancelarOrdenDeTrabajo(@PathVariable Long id) {
         return ordenDeTrabajoService.findById(id)
                 .map(ordenACancelar -> {
@@ -200,6 +206,25 @@ public class OrdenDeTrabajoController {
     }
 
 
+    @GetMapping("/obtenerOrdenesConMaquina/{id}")
+    public ResponseEntity<List<OrdenDeTrabajoResponseDto>> obtenerOrdenesDeTrabajoConMaquina(@PathVariable Long id) {
+
+      List<OrdenDeTrabajoMaquina> ordenesDeTrabajoMaquinas = ordenDeTrabajoMaquinaService.findByMaquinaId(id);
+      List<OrdenDeTrabajo> ordenes = ordenesDeTrabajoMaquinas.stream().map(otm -> ordenDeTrabajoService.findByProcesoId(otm.getId())).toList();
+      List<OrdenDeTrabajoResponseDto> ordenesDto = ordenDeTrabajoResponseMapper.toDtoList(ordenes);
+      return ResponseEntity.ok(ordenesDto);
+    }
+
+    @GetMapping("/obtenerProximaOrdenPendienteConMaquina/{id}")
+    public ResponseEntity<OrdenDeTrabajoResponseDto> obtenerProximaOrdenPendienteConMaquina(@PathVariable Long id) {
+
+      OrdenDeTrabajoMaquina ordenDeTrabajoMaquina = ordenDeTrabajoMaquinaService.findFirstByMaquinaId(id);
+      OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoService.findByProcesoId(ordenDeTrabajoMaquina.getId());
+      OrdenDeTrabajoResponseDto ordenDto = ordenDeTrabajoResponseMapper.toDto(ordenDeTrabajo);
+      return ResponseEntity.ok(ordenDto);
+    }
+
+
     /**
      * Procesa recursivamente los ancestros de un rollo (padre, abuelo, etc.)
      * para recolectar órdenes de venta y trabajo
@@ -277,7 +302,6 @@ public class OrdenDeTrabajoController {
         }
 
         OrdenVenta ordenVenta = ordenVentaOpt.get();
-        ordenVenta.setOrdenDeTrabajo(orden);
         orden.setOrdenDeVenta(ordenVenta);
         return ordenVenta;
     }
