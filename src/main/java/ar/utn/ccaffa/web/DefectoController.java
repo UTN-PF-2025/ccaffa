@@ -30,24 +30,25 @@ public class DefectoController {
     }
 
     @GetMapping("/imagenes/{filename:.+}")
-    public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
+    public ResponseEntity<Resource> serveFile(@PathVariable("filename") String filename) {
         log.info("Buscando imagen: {}", filename);
         Resource file = fileStorageService.loadAsResource(filename);
         return ResponseEntity.ok().header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION,
                 "inline; filename=\"" + file.getFilename() + "\"").body(file);
     }
 
-    @PutMapping("/{imageId:.+}/rechazar")
-    public ResponseEntity<DefectoDto> rechazarDefecto(@PathVariable("imageId") String imageId) {
+    @PutMapping("{camaraId:.+}/{imageId:.+}/rechazar")
+    public ResponseEntity<DefectoDto> rechazarDefecto(@PathVariable("imageId") String imageId, @PathVariable("camaraId") String camaraId) {
         log.info("Rechazando defecto con imageId: {}", imageId);
-        DefectoDto actualizado = defectoService.actualizarEstadoRechazoPorImagen(imageId, true);
+        DefectoDto actualizado = defectoService.actualizarEstadoRechazoPorImagen(imageId, true, camaraId);
         return ResponseEntity.ok(actualizado);
     }
 
-    @PutMapping("/{imageId:.+}/aceptar")
-    public ResponseEntity<DefectoDto> aceptarDefecto(@PathVariable("imageId") String imageId) {
+    @PutMapping("{camaraId:.+}/{imageId:.+}/aceptar")
+
+    public ResponseEntity<DefectoDto> aceptarDefecto(@PathVariable("imageId") String imageId, @PathVariable("camaraId") String camaraId) {
         log.info("Aceptando defecto con imageId: {}", imageId);
-        DefectoDto actualizado = defectoService.actualizarEstadoRechazoPorImagen(imageId, false);
+        DefectoDto actualizado = defectoService.actualizarEstadoRechazoPorImagen(imageId, false, camaraId);
         return ResponseEntity.ok(actualizado);
     }
 }

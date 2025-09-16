@@ -59,6 +59,38 @@ public class FileStorageServiceImpl implements FileStorageService {
     }
 
     @Override
+    public String save(byte[] fileBytes, String originalFilename, String cameraId) throws IOException {
+        String cleanFilename = StringUtils.cleanPath(originalFilename);
+        if (cleanFilename.contains("..")) {
+            throw new IOException("No se puede guardar un archivo con una ruta relativa fuera del directorio actual: " + cleanFilename);
+        }
+
+        String uniqueFilename = UUID.randomUUID().toString() + "_" + cleanFilename;
+
+        Path baseDir = this.rootLocation;
+        Path destinationDir = baseDir;
+        if (cameraId != null && !cameraId.isBlank()) {
+            String sanitizedCamera = cameraId.replaceAll("[^a-zA-Z0-9_-]", "_");
+            destinationDir = baseDir.resolve(sanitizedCamera);
+            if (Files.notExists(destinationDir)) {
+                Files.createDirectories(destinationDir);
+                log.info("Directorio de cámara creado: {}", destinationDir);
+            }
+        }
+
+        Path destinationFile = destinationDir.resolve(uniqueFilename);
+        if (!destinationFile.normalize().startsWith(this.rootLocation)) {
+            throw new IOException("No se puede guardar el archivo fuera del directorio raíz: " + cleanFilename);
+        }
+
+        Files.write(destinationFile, fileBytes);
+        log.info("Archivo guardado en: {}", destinationFile);
+
+        // Devolver la ruta relativa al root (p. ej. "cam-1/uuid_nombre.jpg" o solo el nombre si no hay cámara)
+        return this.rootLocation.relativize(destinationFile).toString();
+    }
+
+    @Override
     public Resource loadAsResource(String filename) {
         try {
             Path file = rootLocation.resolve(filename);
@@ -73,3 +105,4 @@ public class FileStorageServiceImpl implements FileStorageService {
         }
     }
 }
+

@@ -2,10 +2,12 @@ package ar.utn.ccaffa.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,8 +35,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .cors(withDefaults())
-            .csrf(csrf -> csrf.disable())
+            .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() 
                 .requestMatchers("/api/auth/login", "/api/ws/**").permitAll() 
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/roles/**").hasRole("ADMIN")
@@ -43,8 +46,13 @@ public class SecurityConfig {
                 .requestMatchers("/api/rollos_productos/**").permitAll()
                 .requestMatchers("/api/ordenes-venta/**").permitAll()
                 .requestMatchers("/api/ordenes-trabajo/**").permitAll()
-                .requestMatchers("/api/defectos/**").permitAll()
-                .requestMatchers("/api/controles-calidad/**").permitAll()
+                .requestMatchers("/api/defectos/{camaraId}/{imageId}/aceptar").permitAll()
+                .requestMatchers("/api/defectos/{camaraId}/{imageId}/rechazar").permitAll()
+                .requestMatchers("/api/defectos/**").hasRole("ADMIN")
+                .requestMatchers("/api/images/**").permitAll() 
+                .requestMatchers("/api/camaras/{id}/upload").permitAll()
+                .requestMatchers("/api/images/{id}/{filename}").permitAll()
+                .requestMatchers("/api/camaras/**").hasAnyRole("OPERADOR", "ADMIN")
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
@@ -70,7 +78,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:8080", "http://localhost:5174", "http://18.189.28.38", "https://ccaffa.art"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "X-Camera-Id"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
