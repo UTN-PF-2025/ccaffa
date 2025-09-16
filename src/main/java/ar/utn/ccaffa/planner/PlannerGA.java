@@ -1,5 +1,7 @@
 package ar.utn.ccaffa.planner;
 
+import ar.utn.ccaffa.enums.EstadoOrdenTrabajoEnum;
+import ar.utn.ccaffa.enums.EstadoOrdenTrabajoMaquinaEnum;
 import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.enums.MaquinaTipoEnum;
 import ar.utn.ccaffa.model.entity.*;
@@ -493,7 +495,7 @@ public class PlannerGA {
                 }
                 ordenDeTrabajo.setFechaEstimadaDeInicio(possibleStart);
                 ordenDeTrabajo.setFechaEstimadaDeFin(possibleStart.plusHours(grace_hours));
-                ordenDeTrabajo.setEstado("En Proceso");
+                ordenDeTrabajo.setEstado(EstadoOrdenTrabajoEnum.EN_CURSO);
                 jobs.add(ordenDeTrabajo);
                 continue;
             }
@@ -535,7 +537,7 @@ public class PlannerGA {
                 possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
                 OrdenDeTrabajoMaquina ordenMaquina = new OrdenDeTrabajoMaquina();
                 ordenMaquina.setMaquina(machine1);
-                ordenMaquina.setEstado("Programada");
+                ordenMaquina.setEstado(EstadoOrdenTrabajoMaquinaEnum.PROGRAMADA);
                 ordenMaquina.setOrdenDeTrabajo(ordenDeTrabajo);
                 ordenMaquina.setFechaInicio(possibleStart);
                 ordenMaquina.setFechaFin(possibleEnd);
@@ -591,7 +593,7 @@ public class PlannerGA {
                 possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
                 OrdenDeTrabajoMaquina ordenMaquina = new OrdenDeTrabajoMaquina();
                 ordenMaquina.setMaquina(machine2);
-                ordenMaquina.setEstado("Programada");
+                ordenMaquina.setEstado(EstadoOrdenTrabajoMaquinaEnum.PROGRAMADA);
                 ordenMaquina.setOrdenDeTrabajo(ordenDeTrabajo);
                 ordenMaquina.setFechaInicio(possibleStart);
                 ordenMaquina.setFechaFin(possibleEnd);
@@ -603,7 +605,7 @@ public class PlannerGA {
             // ALL OKAY, ADD ORDEN DE TRABAJO
             ordenDeTrabajo.setFechaEstimadaDeInicio(ordenDeTrabajo.fechaInicioPrimeraMaquina());
             ordenDeTrabajo.setFechaEstimadaDeFin(possibleEnd);
-            ordenDeTrabajo.setEstado("Programada");
+            ordenDeTrabajo.setEstado(EstadoOrdenTrabajoEnum.PROGRAMADA);
             jobs.add(ordenDeTrabajo);
 
 
