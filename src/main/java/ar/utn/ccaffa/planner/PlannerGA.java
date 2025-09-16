@@ -556,6 +556,7 @@ public class PlannerGA {
                 List<Rollo> childrenRolls = ordenDeTrabajo.procesarRollo();
                 for (Rollo cr : childrenRolls) {
                     cr.setId(generateUniqueRandomId());
+                    cr.setRolloPadreId(usingRoll.getId());
                     if (cr.getAnchoMM() < this.MIN_WIDTH || cr.getLargo() < this.MIN_LENGTH){
                         cr.setEstado(EstadoRollo.DESPERDICIO);
                     }

@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrdenVentaSimpleDto {
-    private Long id;
     private Long orderId;
     private String fechaCreacion;
     private String fechaEntregaEstimada;
