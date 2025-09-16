@@ -18,9 +18,12 @@ public class ImageController {
 
     private final FileStorageService fileStorageService;
 
-    @GetMapping("/{filename:.+}")
-    public ResponseEntity<Resource> serveFile(@PathVariable String filename, HttpServletRequest request) {
-        Resource resource = fileStorageService.loadAsResource(filename);
+    @GetMapping("/{cameraId}/{filename:.+}")
+    public ResponseEntity<Resource> serveFile(@PathVariable String cameraId,
+                                              @PathVariable String filename,
+                                              HttpServletRequest request) {
+        String relativePath = cameraId + "/" + filename;
+        Resource resource = fileStorageService.loadAsResource(relativePath);
 
         String contentType = null;
         try {

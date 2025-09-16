@@ -2047,6 +2047,57 @@
 					]
 				}
 			]
+		},
+		{
+			"name": "Defectos",
+			"item": [
+				{
+					"name": "Aceptar Defecto",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/defectos/cam-1/your-image-filename.jpg/aceptar",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"defectos",
+								"cam-1",
+								"your-image-filename.jpg",
+								"aceptar"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Rechazar Defecto",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/defectos/cam-1/your-image-filename.jpg/rechazar",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"defectos",
+								"cam-1",
+								"your-image-filename.jpg",
+								"rechazar"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"auth": {

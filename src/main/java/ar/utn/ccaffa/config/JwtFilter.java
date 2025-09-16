@@ -32,8 +32,11 @@ public class JwtFilter extends OncePerRequestFilter {
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             return true;
         }
+        boolean isCameraUpload = path.startsWith("/api/camaras/") && path.endsWith("/upload");
         return path.startsWith("/api/auth/")
-                || path.startsWith("api/ws")
+                || path.startsWith("/api/ws")
+                || path.startsWith("/api/images/")
+                || isCameraUpload
                 || path.startsWith("/actuator")
                 || path.startsWith("/error")
                 || path.startsWith("/v3/api-docs")
@@ -45,36 +48,38 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, 
                                   HttpServletResponse response, 
                                   FilterChain filterChain) throws ServletException, IOException {
+
+        final String authHeader = request.getHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         try {
-            String jwt = getJwtFromRequest(request);
-            if (jwt != null && !jwt.isBlank()) {
-                try {
-                    String username = jwtUtil.extractUsername(jwt);
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                    if (jwtUtil.validateToken(jwt, userDetails)) {
-                        UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-                    }
-                } catch (ExpiredJwtException ex) {
-                    logger.debug("JWT expirado para la ruta " + request.getRequestURI() + ". Se omite autenticación.");
-                } catch (JwtException ex) {
-                    logger.debug("JWT inválido: " + ex.getMessage());
+            final String jwt = authHeader.substring(7);
+            final String username = jwtUtil.extractUsername(jwt);
+
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+                if (jwtUtil.validateToken(jwt, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        userDetails, 
+                        null, 
+                        userDetails.getAuthorities()
+                    );
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
+        } catch (ExpiredJwtException e) {
+            logger.warn("JWT token has expired.", e);
+        } catch (JwtException e) {
+            logger.error("JWT token validation error.", e);
         } catch (Exception e) {
-            logger.error("No se pudo establecer la autenticación del usuario en el contexto de seguridad", e);
+            logger.error("Could not set user authentication in security context", e);
         }
 
         filterChain.doFilter(request, response);
-    }
-
-    private String getJwtFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
     }
 }

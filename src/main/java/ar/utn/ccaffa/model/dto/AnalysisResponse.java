@@ -8,4 +8,5 @@ public class AnalysisResponse {
     private String details;
     private String imageId; // Opcional, para asociar la respuesta a una imagen guardada
     private Long id;
+    private String cameraId; // Identificador de la cámara para segmentar notificaciones
 }
