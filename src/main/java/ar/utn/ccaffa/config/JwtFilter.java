@@ -32,9 +32,11 @@ public class JwtFilter extends OncePerRequestFilter {
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             return true;
         }
+        boolean isCameraUpload = path.startsWith("/api/camaras/") && path.endsWith("/upload");
         return path.startsWith("/api/auth/")
-                || path.startsWith("/api/ws") // Corrected typo
-                || path.startsWith("/api/camaras/") // Exclude camera uploads
+                || path.startsWith("/api/ws")
+                || path.startsWith("/api/images/")
+                || isCameraUpload
                 || path.startsWith("/actuator")
                 || path.startsWith("/error")
                 || path.startsWith("/v3/api-docs")

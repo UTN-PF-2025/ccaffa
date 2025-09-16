@@ -2,6 +2,7 @@ package ar.utn.ccaffa.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -36,6 +37,7 @@ public class SecurityConfig {
             .cors(withDefaults())
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() 
                 .requestMatchers("/api/auth/login", "/api/ws/**").permitAll() 
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/roles/**").hasRole("ADMIN")
@@ -44,9 +46,12 @@ public class SecurityConfig {
                 .requestMatchers("/api/rollos_productos/**").permitAll()
                 .requestMatchers("/api/ordenes-venta/**").permitAll()
                 .requestMatchers("/api/ordenes-trabajo/**").permitAll()
-                .requestMatchers("/api/defectos/**").permitAll()
-                .requestMatchers("/api/images/**").permitAll()
+                .requestMatchers("/api/defectos/{camaraId}/{imageId}/aceptar").permitAll()
+                .requestMatchers("/api/defectos/{camaraId}/{imageId}/rechazar").permitAll()
+                .requestMatchers("/api/defectos/**").hasRole("ADMIN")
+                .requestMatchers("/api/images/**").permitAll() 
                 .requestMatchers("/api/camaras/{id}/upload").permitAll()
+                .requestMatchers("/api/images/{id}/{filename}").permitAll()
                 .requestMatchers("/api/camaras/**").hasAnyRole("OPERADOR", "ADMIN")
                 .anyRequest().authenticated()
             )

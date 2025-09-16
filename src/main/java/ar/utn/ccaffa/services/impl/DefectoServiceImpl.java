@@ -30,8 +30,9 @@ public class DefectoServiceImpl implements DefectoService {
     }
 
     @Override
-    public DefectoDto actualizarEstadoRechazoPorImagen(String imageId, boolean esRechazado) {
-        Defecto defecto = defectoRepository.findByImagen(imageId)
+    public DefectoDto actualizarEstadoRechazoPorImagen(String imageId, boolean esRechazado, String camaraId) {
+        String imagen = camaraId + "/" + imageId;
+        Defecto defecto = defectoRepository.findByImagen(imagen)
                 .orElseThrow(() -> new RuntimeException("Defecto no encontrado con imageId: " + imageId));
         defecto.setEsRechazado(esRechazado);
         Defecto actualizado = defectoRepository.save(defecto);
