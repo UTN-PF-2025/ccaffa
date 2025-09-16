@@ -1,7 +1,12 @@
 package ar.utn.ccaffa.web;
 
 import ar.utn.ccaffa.enums.EstadoRollo;
+import ar.utn.ccaffa.mapper.interfaces.OrdenDeTrabajoResponseMapper;
 import ar.utn.ccaffa.mapper.interfaces.PlannerMapper;
+import ar.utn.ccaffa.mapper.interfaces.RolloMapper;
+import ar.utn.ccaffa.model.dto.OrdenDeTrabajoDto;
+import ar.utn.ccaffa.model.dto.OrdenDeTrabajoResponseDto;
+import ar.utn.ccaffa.model.dto.RolloDto;
 import ar.utn.ccaffa.model.entity.*;
 import ar.utn.ccaffa.planner.Pair;
 import ar.utn.ccaffa.planner.PlannerDTO;
@@ -32,21 +37,27 @@ public class PlannerController {
     private final OrdenDeTrabajoService ordenDeTrabajoService;
     private final PlannerMapper plannerMapper;
 
+    private final OrdenDeTrabajoResponseMapper ordenDeTrabajoResponseMapper;
+
+    private final RolloMapper rolloMapper;
 
 
-    public PlannerController(RolloService rolloService, OrdenVentaService ordenVentaService, MaquinaService maquinaService, OrdenDeTrabajoService ordenDeTrabajoService, PlannerMapper plannerMapper) {
+
+    public PlannerController(RolloService rolloService, OrdenVentaService ordenVentaService, MaquinaService maquinaService, OrdenDeTrabajoService ordenDeTrabajoService, PlannerMapper plannerMapper, OrdenDeTrabajoResponseMapper ordenDeTrabajoResponseMapper, RolloMapper rolloMapper) {
         this.rolloService = rolloService;
         this.ordenVentaService = ordenVentaService;
         this.maquinaService = maquinaService;
         this.ordenDeTrabajoService = ordenDeTrabajoService;
         this.plannerMapper = plannerMapper;
+        this.ordenDeTrabajoResponseMapper = ordenDeTrabajoResponseMapper;
+        this.rolloMapper = rolloMapper;
     }
 
 
 
 
     @PostMapping
-    public ResponseEntity<Pair> generatePlan(@RequestBody PlannerDTO plannerInfo) {
+    public ResponseEntity<Pair<List<OrdenDeTrabajoResponseDto>, List<RolloDto>>> generatePlan(@RequestBody PlannerDTO plannerInfo) {
         PlannerGA plannerGA = plannerMapper.toEntity(plannerInfo);
         List<Long> maquinasIDs = new ArrayList<>(plannerGA.getMaquinasIDs());
         List<Long> rollosIDs = new ArrayList<>(plannerGA.getRollosIDs());
@@ -89,8 +100,13 @@ public class PlannerController {
         plannerGA.setOrdenesDeTrabajoMaquina(ordenDeTrabajoMaquinas);
 
         Pair<List<OrdenDeTrabajo>, List<Rollo>> result = plannerGA.execute();
+        
+        List<OrdenDeTrabajoResponseDto> ordenesDeTrabajoDto = ordenDeTrabajoResponseMapper.toDtoList(result.first);
+        List<RolloDto> rollosDto = rolloMapper.toDtoListOnlyWithRolloPadreID(result.second);
 
-        return ResponseEntity.status(HttpStatus.OK).body(result);
+        Pair<List<OrdenDeTrabajoResponseDto>, List<RolloDto>> dtoResult = new Pair<>(ordenesDeTrabajoDto, rollosDto);
+
+        return ResponseEntity.status(HttpStatus.OK).body(dtoResult);
     }
 
 }

@@ -447,6 +447,8 @@ public class PlannerGA {
         Set<Integer> processedRolls = new HashSet<>();
         List<Rollo> children = new ArrayList<>();
         Map<Integer, List<Rollo>> childrenMap =  new HashMap<>();
+        Long id_count_orden_trabajo = 0L;
+        Long id_count_orden_trabajo_maquina = 0L;
 
 
         for (int[] b : blocks) {
@@ -464,6 +466,8 @@ public class PlannerGA {
             ordenDeTrabajo.setOrdenDeVenta(sale);
             ordenDeTrabajo.setRollo(usingRoll);
             ordenDeTrabajo.setOrdenDeTrabajoMaquinas(new ArrayList<>());
+            ordenDeTrabajo.setId(id_count_orden_trabajo);
+            id_count_orden_trabajo ++;
 
             // CHECK IF MAIN ROLL CAN BE USED FOR SALE
             if (!checkRollCharacteristics(sale, roll)) {
@@ -541,6 +545,8 @@ public class PlannerGA {
                 ordenMaquina.setOrdenDeTrabajo(ordenDeTrabajo);
                 ordenMaquina.setFechaInicio(possibleStart);
                 ordenMaquina.setFechaFin(possibleEnd);
+                ordenMaquina.setId(id_count_orden_trabajo_maquina);
+                id_count_orden_trabajo_maquina ++;
 
                 ordenDeTrabajo.getOrdenDeTrabajoMaquinas().add(ordenMaquina);
                 ordenesMaquina.add(ordenMaquina);
@@ -548,7 +554,8 @@ public class PlannerGA {
                 possibleStart = ordenMaquina.getFechaFin();
 
                 List<Rollo> childrenRolls = ordenDeTrabajo.procesarRollo();
-                for (Rollo cr :childrenRolls){
+                for (Rollo cr : childrenRolls) {
+                    cr.setId(generateUniqueRandomId());
                     if (cr.getAnchoMM() < this.MIN_WIDTH || cr.getLargo() < this.MIN_LENGTH){
                         cr.setEstado(EstadoRollo.DESPERDICIO);
                     }
@@ -597,6 +604,8 @@ public class PlannerGA {
                 ordenMaquina.setOrdenDeTrabajo(ordenDeTrabajo);
                 ordenMaquina.setFechaInicio(possibleStart);
                 ordenMaquina.setFechaFin(possibleEnd);
+                ordenMaquina.setId(id_count_orden_trabajo_maquina);
+                id_count_orden_trabajo_maquina ++;
 
                 ordenDeTrabajo.getOrdenDeTrabajoMaquinas().add(ordenMaquina);
                 ordenesMaquina.add(ordenMaquina);
@@ -616,6 +625,17 @@ public class PlannerGA {
         return new Pair<>(jobs, children);
     }
 
+    private Long generateUniqueRandomId() {
+        Random random = new Random();
+        long newId;
+        Set<Long> existingIds = this.rollos.stream().map(Rollo::getId).collect(Collectors.toSet());
+        
+        do {
+            newId = 100000 + random.nextInt(900000); // Generates a 6-digit random number
+        } while (existingIds.contains(newId));
+        
+        return newId;
+    }
 
     private List<Rollo> childrenCandidatesOfRoll(Map<Integer, List<Rollo>> childrenMap, int rollId, OrdenVenta sale){
         // returns the children of a roll in the map and orders them by volume
