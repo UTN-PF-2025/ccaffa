@@ -3,7 +3,7 @@
 *.iws
 *.iml
 *.ipr
-
+*.pdf
 # IDE - VS Code
 .vscode/
 *.code-workspace
