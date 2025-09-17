@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = {"ordenDeTrabajo"})
+//@EqualsAndHashCode(exclude = {"ordenDeTrabajo"})
 @NamedEntityGraph(
     name = "OrdenVenta.withEspecificacion",
     attributeNodes = @NamedAttributeNode("especificacion")

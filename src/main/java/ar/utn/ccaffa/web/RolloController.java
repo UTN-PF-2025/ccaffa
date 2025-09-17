@@ -65,6 +65,7 @@ public class RolloController {
     @PostMapping
     public ResponseEntity<?> createRollo(@RequestBody RolloDto rollo) {
         log.info("Creando nuevo rollo: {}", rollo);
+        rollo.setId(null);
         rollo.setEstado(EstadoRollo.DISPONIBLE);
         rollo.setFechaIngreso(LocalDateTime.now());
         if (rolloService.existsRolloByProveedorIdAndCodigoProveedor(rollo.getProveedorId(), rollo.getCodigoProveedor())){

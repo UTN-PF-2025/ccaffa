@@ -415,7 +415,7 @@ public class PlannerGA {
         if (!shouldGenerateJobOrders) return fitness;
 
         Pair<List<OrdenDeTrabajo>, List<Rollo>> res = generateJobOrders(blocks);
-        List<OrdenDeTrabajo> jobOrders = res.first; List<Rollo> children = res.second;
+        List<OrdenDeTrabajo> jobOrders = res.ordenesDeTrabajo; List<Rollo> children = res.rollosHijos;
         if (jobOrders.isEmpty()) { fitness -= INVALIDATE_SCORE; return fitness; }
 
         double penaltyForWaste = calcPenaltyForWastedRolls(children);
