@@ -9,4 +9,7 @@ public interface OrdenDeTrabajoResponseMapper {
     OrdenDeTrabajoResponseDto toDto(OrdenDeTrabajo ordenDeTrabajo);
     
     List<OrdenDeTrabajoResponseDto> toDtoList(List<OrdenDeTrabajo> ordenesDeTrabajo);
+
+    OrdenDeTrabajo toEntity(OrdenDeTrabajoResponseDto ordenDeTrabajo);
+    List<OrdenDeTrabajo> toEntityList(List<OrdenDeTrabajoResponseDto> ordenesDeTrabajo);
 } 

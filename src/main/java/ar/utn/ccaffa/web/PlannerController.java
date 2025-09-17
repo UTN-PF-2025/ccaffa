@@ -4,7 +4,6 @@ import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.mapper.interfaces.OrdenDeTrabajoResponseMapper;
 import ar.utn.ccaffa.mapper.interfaces.PlannerMapper;
 import ar.utn.ccaffa.mapper.interfaces.RolloMapper;
-import ar.utn.ccaffa.model.dto.OrdenDeTrabajoDto;
 import ar.utn.ccaffa.model.dto.OrdenDeTrabajoResponseDto;
 import ar.utn.ccaffa.model.dto.RolloDto;
 import ar.utn.ccaffa.model.entity.*;
@@ -43,6 +42,7 @@ public class PlannerController {
 
 
 
+
     public PlannerController(RolloService rolloService, OrdenVentaService ordenVentaService, MaquinaService maquinaService, OrdenDeTrabajoService ordenDeTrabajoService, PlannerMapper plannerMapper, OrdenDeTrabajoResponseMapper ordenDeTrabajoResponseMapper, RolloMapper rolloMapper) {
         this.rolloService = rolloService;
         this.ordenVentaService = ordenVentaService;
@@ -56,7 +56,7 @@ public class PlannerController {
 
 
 
-    @PostMapping
+    @PostMapping("/simulate/")
     public ResponseEntity<Pair<List<OrdenDeTrabajoResponseDto>, List<RolloDto>>> generatePlan(@RequestBody PlannerDTO plannerInfo) {
         PlannerGA plannerGA = plannerMapper.toEntity(plannerInfo);
         List<Long> maquinasIDs = new ArrayList<>(plannerGA.getMaquinasIDs());
@@ -101,10 +101,50 @@ public class PlannerController {
 
         Pair<List<OrdenDeTrabajo>, List<Rollo>> result = plannerGA.execute();
         
-        List<OrdenDeTrabajoResponseDto> ordenesDeTrabajoDto = ordenDeTrabajoResponseMapper.toDtoList(result.first);
-        List<RolloDto> rollosDto = rolloMapper.toDtoListOnlyWithRolloPadreID(result.second);
+        List<OrdenDeTrabajoResponseDto> ordenesDeTrabajoDto = ordenDeTrabajoResponseMapper.toDtoList(result.ordenesDeTrabajo);
+        List<RolloDto> rollosDto = rolloMapper.toDtoListOnlyWithRolloPadreID(result.rollosHijos);
 
         Pair<List<OrdenDeTrabajoResponseDto>, List<RolloDto>> dtoResult = new Pair<>(ordenesDeTrabajoDto, rollosDto);
+
+        return ResponseEntity.status(HttpStatus.OK).body(dtoResult);
+    }
+
+    @PostMapping("/create/")
+    public  ResponseEntity<Pair<List<OrdenDeTrabajoResponseDto>, List<RolloDto>>> generatePlan(@RequestBody Pair<List<OrdenDeTrabajoResponseDto>, List<RolloDto>> structuresToCreate) {
+
+        List<OrdenDeTrabajoResponseDto> ordenesDeTrabajo = structuresToCreate.ordenesDeTrabajo;
+        List<RolloDto> rollosHijos = structuresToCreate.rollosHijos;
+
+
+
+        for (RolloDto rolloHijo : rollosHijos){
+            Long temporalID = rolloHijo.getId();
+            rolloHijo.setId(null);
+            RolloDto rolloCreado = this.rolloService.save(rolloHijo);
+
+            rolloHijo.setId(rolloCreado.getId());
+
+            rollosHijos.stream()
+                    .filter(obj -> obj.getRolloPadreId().equals(temporalID))
+                    .forEach(obj -> obj.setRolloPadreId(rolloCreado.getId()));
+
+            ordenesDeTrabajo.stream()
+                    .filter(obj -> obj.getRollo().getId().equals(temporalID))
+                    .forEach(obj -> obj.getRollo().setId(rolloCreado.getId()));
+
+        }
+
+        for (OrdenDeTrabajoResponseDto ordenTrabajo : ordenesDeTrabajo){
+            ordenTrabajo.setId(null);
+            ordenTrabajo.getOrdenDeTrabajoMaquinas().stream().forEach(obj -> obj.setId(null));
+        }
+
+        List<OrdenDeTrabajo> ordenesDeTrabajoCreadas = this.ordenDeTrabajoService.saveAllDtos(ordenesDeTrabajo);
+
+        List<OrdenDeTrabajoResponseDto> ordenesDeTrabajoDto = ordenDeTrabajoResponseMapper.toDtoList(ordenesDeTrabajoCreadas);
+
+        Pair<List<OrdenDeTrabajoResponseDto>, List<RolloDto>> dtoResult = new Pair<>(ordenesDeTrabajoDto, rollosHijos);
+
 
         return ResponseEntity.status(HttpStatus.OK).body(dtoResult);
     }

@@ -134,8 +134,8 @@ public class PlannerTest {
 
             Pair<List<OrdenDeTrabajo>, List<Rollo>> result = plannerGA.execute();
 
-            List<OrdenDeTrabajo> ordenDeTrabajoList = result.first;
-            List<Rollo> rolloList = result.second;
+            List<OrdenDeTrabajo> ordenDeTrabajoList = result.ordenesDeTrabajo;
+            List<Rollo> rolloList = result.rollosHijos;
 
             for (OrdenDeTrabajo job : ordenDeTrabajoList) {
                 for (OrdenDeTrabajoMaquina ordenDeTrabajoMaquina : job.getOrdenDeTrabajoMaquinas()){

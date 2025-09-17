@@ -8,12 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 @Entity
 @Table(name = "ordenes_de_trabajo")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(exclude = {"ordenDeVenta", "ordenDeTrabajoMaquinas"})
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class OrdenDeTrabajo {
