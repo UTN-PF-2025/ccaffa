@@ -219,6 +219,9 @@ public class OrdenDeTrabajoController {
     public ResponseEntity<OrdenDeTrabajoResponseDto> obtenerProximaOrdenPendienteConMaquina(@PathVariable Long id) {
 
       OrdenDeTrabajoMaquina ordenDeTrabajoMaquina = ordenDeTrabajoMaquinaService.findFirstByMaquinaId(id);
+      if (ordenDeTrabajoMaquina == null) {
+        return ResponseEntity.noContent().build();
+      }
       OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoService.findByProcesoId(ordenDeTrabajoMaquina.getId());
       OrdenDeTrabajoResponseDto ordenDto = ordenDeTrabajoResponseMapper.toDto(ordenDeTrabajo);
       return ResponseEntity.ok(ordenDto);
