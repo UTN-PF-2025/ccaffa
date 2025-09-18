@@ -1,59 +1,118 @@
 package ar.utn.ccaffa.services.impl;
 
+import ar.utn.ccaffa.mapper.interfaces.OrdenVentaMapper;
 import ar.utn.ccaffa.model.dto.CertificadoRequestDTO;
+import ar.utn.ccaffa.model.dto.EspecificacionDto;
+import ar.utn.ccaffa.model.dto.OrdenVentaDto;
+import ar.utn.ccaffa.model.entity.CertificadoDeCalidad;
+import ar.utn.ccaffa.model.entity.ControlDeCalidad;
+import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
+import ar.utn.ccaffa.repository.interfaces.CertificadoDeCalidadRepository;
+import ar.utn.ccaffa.repository.interfaces.ControlDeCalidadRepository;
 import ar.utn.ccaffa.services.interfaces.CertificadoCalidadService;
+import ar.utn.ccaffa.services.interfaces.ControlDeCalidadService;
+import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoService;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.time.LocalDate;
 import java.util.stream.Stream;
 
 @Slf4j
 @Service
 public class CertificadoCalidadServiceImpl implements CertificadoCalidadService {
 
+    public static final String ANCHO_MM = "ANCHO(mm): ";
+    public static final String ESPESOR_MM = "ESPESOR(mm): ";
+    public static final String DUREZA_RB = "DUREZA(Rb): ";
+    public static final String MAS_MENOS = "+/- ";
+    public static final String NUMERO_CERTIFICADO = "NUMERO_CERTIFICADO";
+    public static final String CERTIFICADO_DE_CALIDAD = "CERTIFICADO DE CALIDAD";
+
+    private final ControlDeCalidadService controlDeCalidadService;
+    private final CertificadoDeCalidadRepository certificadoDeCalidadRepository;
+    private final ControlDeCalidadRepository controlDeCalidadRepository;
+    private final OrdenDeTrabajoService ordenDeTrabajoService;
+    private final OrdenVentaMapper ordenVentaMapper;
+
     Document documentParagraph;
+
+    public CertificadoCalidadServiceImpl(ControlDeCalidadService controlDeCalidadService,
+                                         CertificadoDeCalidadRepository certificadoDeCalidadRepository,
+                                         ControlDeCalidadRepository controlDeCalidadRepository, OrdenDeTrabajoService ordenDeTrabajoService, OrdenVentaMapper ordenVentaMapper) {
+        this.controlDeCalidadService = controlDeCalidadService;
+        this.certificadoDeCalidadRepository = certificadoDeCalidadRepository;
+        this.controlDeCalidadRepository = controlDeCalidadRepository;
+        this.ordenDeTrabajoService = ordenDeTrabajoService;
+        this.ordenVentaMapper = ordenVentaMapper;
+    }
+
     @Override
+    @Transactional
     public void generarCertificado(CertificadoRequestDTO certificadoRequestDTO) {
         try {
-            documentParagraph = new Document();
-            PdfWriter.getInstance(documentParagraph, new FileOutputStream("CertificadoDeCalidad.pdf"));
-            documentParagraph.open();
-            definirTitulo(Element.ALIGN_CENTER, certificadoRequestDTO.getTitulo());
-            agregarCampo(documentParagraph,Element.ALIGN_LEFT, "FECHA: "+certificadoRequestDTO.getFecha());
-            agregarCampo(documentParagraph,Element.ALIGN_LEFT, "CLIENTE:\t"+certificadoRequestDTO.getCliente());
+            OrdenDeTrabajo ot = this.ordenDeTrabajoService.findById(certificadoRequestDTO.getOrdenDeTrabajoId()).get();
+            ControlDeCalidad controlDeCalidad = ot.getControlDeCalidad();
+            OrdenVentaDto ordenVentaDto = this.ordenVentaMapper.toDto(ot.getOrdenDeVenta());
+            LocalDate fechaEmision = LocalDate.now();
 
-            documentParagraph.add(crearTablaPartidas(certificadoRequestDTO));
+            String nombreArchivo = construirNombreArchivo(certificadoRequestDTO);
+            inicializarDocumento(nombreArchivo);
 
-            documentParagraph.add(new Paragraph(" "));
-            documentParagraph.add(new Paragraph(" "));
-            agregarCampo(documentParagraph, Element.ALIGN_LEFT, "CANTIDAD(mm): "+certificadoRequestDTO.getCantidadOriginal());
-            agregarCampo(documentParagraph, Element.ALIGN_LEFT, "ANCHO(mm): "+ certificadoRequestDTO.getAnchoOriginal());
-            agregarCampo(documentParagraph, Element.ALIGN_LEFT, "ESPESOR(mm): "+ certificadoRequestDTO.getEspesorOriginal());
-            agregarCampo(documentParagraph, Element.ALIGN_LEFT, "DUREZA(Rb): " + certificadoRequestDTO.getDurezaOriginal());
+            agregarEncabezado(certificadoRequestDTO, fechaEmision);
+            agregarEspacio();
+            agregarSeccionPartidas(certificadoRequestDTO);
+            agregarEspacio();
 
-            documentParagraph.add(new Paragraph(" "));
+            agregarSeccionSolicitado(certificadoRequestDTO, ordenVentaDto);
+            agregarEspacio();
 
-            Chapter datosMedidos = new Chapter(new Paragraph("CONTROLADO"), 1);
+            agregarSeccionControlado(certificadoRequestDTO);
+            agregarEspacio();
 
-            agregarCampo(documentParagraph, Element.ALIGN_LEFT, "ANCHO(mm): "+ certificadoRequestDTO.getAnchoReal());
-            agregarCampo(documentParagraph, Element.ALIGN_LEFT, "ESPESOR(mm): "+ certificadoRequestDTO.getEspesorReal());
-            agregarCampo(documentParagraph, Element.ALIGN_LEFT, "DUREZA(Rb): " + certificadoRequestDTO.getDurezaReal());
-            
+            armarTablaComposicion(certificadoRequestDTO);
 
-            PdfPTable table = new PdfPTable(6);
-            agregarHeaderComposicion(table);
-            agregarDatoComposicion(table, certificadoRequestDTO);
-            documentParagraph.add(table);
-            documentParagraph.close();
+            cerrarDocumento();
+
+            CertificadoDeCalidad certificado = new CertificadoDeCalidad();
+            certificado.setNumeroDeCertificado(construirNumeroCertificado(certificadoRequestDTO));
+            certificado.setFechaDeEmision(fechaEmision);
+
+            try {
+                if (controlDeCalidad != null) {
+                    certificado.setControlDeCalidad(controlDeCalidad);
+                    // mantener relación bidireccional si corresponde
+                    controlDeCalidad.setCertificadoDeCalidad(certificado);
+                } else {
+                    log.warn("No se encontró ControlDeCalidad con id {}", ot.getControlDeCalidad());
+                }
+            } catch (Exception ex) {
+                log.warn("Error obteniendo ControlDeCalidad para asociar al certificado: {}", ex.getMessage());
+            }
+
+            certificadoDeCalidadRepository.save(certificado);
+
         } catch (FileNotFoundException | DocumentException e) {
             log.error("No se pudo crear el certificado PDF");
         }
+    }
+
+    private String construirNumeroCertificado(CertificadoRequestDTO certificadoRequestDTO) {
+        return NUMERO_CERTIFICADO;
+    }
+
+    private void armarTablaComposicion(CertificadoRequestDTO certificadoRequestDTO) throws DocumentException {
+        PdfPTable table = new PdfPTable(6);
+        agregarHeaderComposicion(table);
+        agregarDatoComposicion(table, certificadoRequestDTO);
+        documentParagraph.add(table);
     }
 
     private void agregarDatoComposicion(PdfPTable table, CertificadoRequestDTO certificadoRequestDTO) {
@@ -125,4 +184,123 @@ public class CertificadoCalidadServiceImpl implements CertificadoCalidadService 
                     table.addCell(header);
                 });
     }
+
+    private void inicializarDocumento(String nombreArchivo) throws FileNotFoundException, DocumentException {
+        documentParagraph = new Document();
+        PdfWriter.getInstance(documentParagraph, new FileOutputStream(nombreArchivo));
+        documentParagraph.open();
+    }
+
+    private String construirNombreArchivo(CertificadoRequestDTO dto) {
+        String cliente = dto.getCliente();
+        String nroOrden = dto.getNroOrdenTrabajo();
+
+        String base = "CertificadoDeCalidad";
+        if (cliente != null && !cliente.isBlank() && nroOrden != null && !nroOrden.isBlank()) {
+            return base + "_" + cliente + "_OT-" + nroOrden + ".pdf";
+        }
+        if (cliente != null && !cliente.isBlank()) {
+            return base + "_" + cliente + ".pdf";
+        }
+        if (nroOrden != null && !nroOrden.isBlank()) {
+            return base + "_OT-" + nroOrden + ".pdf";
+        }
+        return base + ".pdf";
+    }
+
+
+    private void cerrarDocumento() {
+        if (documentParagraph != null) {
+            documentParagraph.close();
+        }
+    }
+
+    private void agregarEncabezado(CertificadoRequestDTO dto, LocalDate fechaEmision) throws DocumentException {
+        definirTitulo(Element.ALIGN_CENTER, CERTIFICADO_DE_CALIDAD);
+        agregarCampo(documentParagraph, Element.ALIGN_LEFT, "FECHA: " + fechaEmision);
+        agregarCampo(documentParagraph, Element.ALIGN_LEFT, "CLIENTE:\t" + dto.getCliente());
+        agregarCampo(documentParagraph, Element.ALIGN_RIGHT, "O.T.: " + dto.getNroOrdenTrabajo());
+    }
+
+    private void agregarSeccionPartidas(CertificadoRequestDTO dto) throws DocumentException {
+        documentParagraph.add(crearTablaPartidas(dto));
+    }
+
+    private void agregarSeccionSolicitado(CertificadoRequestDTO dto, OrdenVentaDto ordenVentaOriginal) throws DocumentException {
+        documentParagraph.add(new Paragraph("SOLICITADO"));
+        agregarEspacio();
+        documentParagraph.add(crearTablaDatosSolicitados(dto, ordenVentaOriginal));
+    }
+
+    private void agregarSeccionControlado(CertificadoRequestDTO dto) throws DocumentException {
+        documentParagraph.add(new Paragraph("CONTROLADO"));
+        agregarEspacio();
+        documentParagraph.add(crearTablaDatosControlados(dto));
+    }
+
+    private PdfPTable crearTablaDatosSolicitados(CertificadoRequestDTO dto, OrdenVentaDto ordenVentaOriginal) {
+
+        PdfPTable izquierda3 = new PdfPTable(3);
+        EspecificacionDto especificacion = ordenVentaOriginal.getEspecificacion();
+        izquierda3.addCell(new Phrase("CANTIDAD(Kg): "));
+        izquierda3.addCell(new Phrase(especificacion.getCantidad()));
+        izquierda3.addCell(new Phrase(" "));
+
+        izquierda3.addCell(new Phrase(ANCHO_MM));
+        izquierda3.addCell(new Phrase(especificacion.getAncho()));
+        izquierda3.addCell(new Phrase(MAS_MENOS + especificacion.getToleranciaAncho()));
+
+        izquierda3.addCell(new Phrase(ESPESOR_MM));
+        izquierda3.addCell(new Phrase(especificacion.getEspesor()));
+        izquierda3.addCell(new Phrase(MAS_MENOS + especificacion.getToleranciaEspesor()));
+
+        izquierda3.addCell(new Phrase(DUREZA_RB));
+        izquierda3.addCell(new Phrase(dto.getDurezaOriginal()));
+        izquierda3.addCell(new Phrase(MAS_MENOS + dto.getErrorDurezaOriginal()));
+
+
+        PdfPTable derecha2 = new PdfPTable(2);
+
+        derecha2.addCell(new Phrase("CALIDAD "));
+        derecha2.addCell(new Phrase("Valor Calidad"));
+
+        derecha2.addCell(new Phrase("DIAMETRO INTERNO"));
+        derecha2.addCell(new Phrase(especificacion.getDiametroInterno()));
+
+        derecha2.addCell(new Phrase("DIAMETRO EXTERNO"));
+        derecha2.addCell(new Phrase(especificacion.getDiametroExterno()));
+
+        derecha2.addCell(new Phrase("Cant Rollos"));
+        derecha2.addCell(new Phrase(dto.getCantidadOriginal()));
+
+
+        PdfPTable contenedora = new PdfPTable(2);
+        PdfPCell cellIzq = new PdfPCell(izquierda3);
+        PdfPCell cellDer = new PdfPCell(derecha2);
+        contenedora.addCell(cellIzq);
+        contenedora.addCell(cellDer);
+        return contenedora;
+
+    }
+
+    private PdfPTable crearTablaDatosControlados(CertificadoRequestDTO dto) {
+        PdfPTable table = new PdfPTable(3);
+        table.addCell(new Phrase(ANCHO_MM));
+        table.addCell(new Phrase(dto.getAnchoReal()));
+        table.addCell(new Phrase(MAS_MENOS + dto.getErrorAnchoReal()));
+
+        table.addCell(new Phrase(ESPESOR_MM));
+        table.addCell(new Phrase(dto.getEspesorReal()));
+        table.addCell(new Phrase(MAS_MENOS + dto.getErrorEspesorReal()));
+
+        table.addCell(new Phrase(DUREZA_RB));
+        table.addCell(new Phrase(dto.getDurezaReal()));
+        table.addCell(new Phrase(MAS_MENOS + dto.getErrorDurezaReal()));
+        return table;
+    }
+
+    private void agregarEspacio() throws DocumentException {
+        documentParagraph.add(new Paragraph(" "));
+    }
+
 }
