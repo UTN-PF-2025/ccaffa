@@ -89,6 +89,10 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
         OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoRepository.findByIdFetchRollo(Long.parseLong(control.getOrdenDeTrabajoId()))
                 .orElseThrow(() -> new RuntimeException("Orden de Trabajo no encontrada con ID: " + control.getOrdenDeTrabajoId()));
 
+        return createControlDeProcesoDto(ordenDeTrabajo, control);
+    }
+
+    private ControlDeProcesoDto createControlDeProcesoDto(OrdenDeTrabajo ordenDeTrabajo, ControlDeCalidad control) {
         Rollo rollo = ordenDeTrabajo.getRollo();
         Proveedor proveedor = null;
         if (rollo != null && rollo.getProveedorId() != null) {
@@ -128,6 +132,16 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
                 .codigoEtiquetaMp(rollo != null ? rollo.getCodigoProveedor() : null)
                 .medidas(control.getMedidasDeCalidad())
                 .build();
+    }
+
+    @Override
+    public ControlDeProcesoDto getControlDeProcesoByOrdenTrabajo(Long ordenTrabajoId) {
+        OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoRepository.findByIdFetchRollo(ordenTrabajoId)
+                .orElseThrow(() -> new RuntimeException("Orden de Trabajo no encontrada con ID: " + ordenTrabajoId));
+        List<ControlDeCalidad> controlCalidad = this.controlDeCalidadRepository.findByOrdenDeTrabajoId(ordenTrabajoId);
+        ControlDeCalidad control = controlCalidad.isEmpty() ? null : controlCalidad.getFirst();
+
+        return createControlDeProcesoDto(ordenDeTrabajo, control);
     }
 
     @Override

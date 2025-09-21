@@ -3,11 +3,17 @@ package ar.utn.ccaffa.model.entity;
 import java.time.LocalDate;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "certificados_calidad")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CertificadoDeCalidad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,10 +24,11 @@ public class CertificadoDeCalidad {
     
     @Column(name = "fecha_de_emision")
     private LocalDate fechaDeEmision;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "aprobador_id")
     private Empleado aprobador;
+
     
     @OneToOne
     @JoinColumn(name = "control_de_calidad_id")
