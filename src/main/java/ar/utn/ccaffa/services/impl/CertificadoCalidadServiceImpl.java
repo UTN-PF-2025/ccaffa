@@ -31,6 +31,12 @@ public class CertificadoCalidadServiceImpl implements CertificadoCalidadService 
     public static final String MAS_MENOS = "+/- ";
     public static final String NUMERO_CERTIFICADO = "NUMERO_CERTIFICADO";
     public static final String CERTIFICADO_DE_CALIDAD = "CERTIFICADO DE CALIDAD";
+    public static final String COMPOSICION_CARBONO = "0,06";
+    public static final String COMPOSICION_MANGANESO = "0,20";
+    public static final String COMPOSICION_FOSFORO = "0,011";
+    public static final String COMPOSICION_AZUFRE = "0,014";
+    public static final String COMPOSICION_ALUMINIO = "0,029";
+    public static final String COMPOSICION_SILICIO = "0,02";
 
     private final ControlDeCalidadService controlDeCalidadService;
     private final CertificadoDeCalidadRepository certificadoDeCalidadRepository;
@@ -111,12 +117,12 @@ public class CertificadoCalidadServiceImpl implements CertificadoCalidadService 
     }
 
     private void agregarDatoComposicion(PdfPTable table, CertificadoRequestDTO certificadoRequestDTO) {
-        table.addCell(new Phrase(certificadoRequestDTO.getComposicionCarbono()));
-        table.addCell(new Phrase(certificadoRequestDTO.getComposicionManganeso()));
-        table.addCell(new Phrase(certificadoRequestDTO.getComposicionFosforo()));
-        table.addCell(new Phrase(certificadoRequestDTO.getComposicionAzufre()));
-        table.addCell(new Phrase(certificadoRequestDTO.getComposicionAluminio()));
-        table.addCell(new Phrase(certificadoRequestDTO.getComposicionSilicio()));
+        table.addCell(new Phrase(COMPOSICION_CARBONO));
+        table.addCell(new Phrase(COMPOSICION_MANGANESO));
+        table.addCell(new Phrase(COMPOSICION_FOSFORO));
+        table.addCell(new Phrase(COMPOSICION_AZUFRE));
+        table.addCell(new Phrase(COMPOSICION_ALUMINIO));
+        table.addCell(new Phrase(COMPOSICION_SILICIO));
     }
 
     private PdfPTable crearTablaPartidas(CertificadoRequestDTO certificadoRequestDTO) {
