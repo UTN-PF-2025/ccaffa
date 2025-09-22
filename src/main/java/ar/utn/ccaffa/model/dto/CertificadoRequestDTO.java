@@ -11,9 +11,6 @@ public class CertificadoRequestDTO {
     private String partida4;
     private String cantidadOriginal;
     private String durezaOriginal;
-    private String resistencia;
     private String errorDurezaOriginal;
-    private String errorDurezaReal;
-
 
 }

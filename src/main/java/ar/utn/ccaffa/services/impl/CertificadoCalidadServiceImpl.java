@@ -295,8 +295,8 @@ public class CertificadoCalidadServiceImpl implements CertificadoCalidadService 
         table.addCell(new Phrase(MAS_MENOS + controlProceso.getToleranciaEspesor()));
 
         table.addCell(new Phrase(DUREZA_RB));
-        table.addCell(new Phrase(controlProceso.getDureza()));
-        table.addCell(new Phrase(MAS_MENOS + dto.getErrorDurezaReal()));
+        table.addCell(new Phrase(" "));
+        table.addCell(new Phrase(MAS_MENOS + " "));
         return table;
     }
 
