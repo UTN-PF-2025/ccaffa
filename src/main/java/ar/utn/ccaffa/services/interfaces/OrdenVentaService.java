@@ -19,7 +19,7 @@ public interface OrdenVentaService {
 
     OrdenVentaDto save(OrdenVentaDto ordenVenta);
 
-    List<OrdenVenta> setToProgamada(List<Long> ids);
+    List<OrdenVentaDto> setToProgamada(List<Long> ids);
     
     void deleteById(Long id);
 

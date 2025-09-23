@@ -49,10 +49,10 @@ public class OrdenVentaServiceImpl implements OrdenVentaService {
     }
 
     @Override
-    public List<OrdenVenta> setToProgamada(List<Long> ids){
+    public List<OrdenVentaDto> setToProgamada(List<Long> ids){
         List<OrdenVenta> ordenVentas = this.ordenVentaRepository.findByIdIn(ids);
         ordenVentas.forEach(ov -> ov.setEstado("Programada"));
-        return this.ordenVentaRepository.saveAll(ordenVentas);
+        return ordenVentaMapper.toDtoList(this.ordenVentaRepository.saveAll(ordenVentas));
     }
     @Override
     public void deleteById(Long id) {

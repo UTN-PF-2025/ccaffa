@@ -63,6 +63,11 @@ public class MaquinaServiceImpl implements MaquinaService {
     }
 
     @Override
+    public List<MaquinaDto> findAllIDsOfAvailableMachinesDto(){
+        return this.maquinaMapper.toDtoList(this.findAllIDsOfAvailableMachinesEntity());
+    }
+
+    @Override
     public List<Maquina> findByIdIn(List<Long> ids){
         return  maquinaRepository.findByIdIn(ids);
     }
