@@ -16,6 +16,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class OrdenVentaServiceImpl implements OrdenVentaService {
@@ -47,6 +48,12 @@ public class OrdenVentaServiceImpl implements OrdenVentaService {
         return ordenVentaMapper.toDto(this.ordenVentaRepository.save(this.ordenVentaMapper.toEntity(ordenVenta)));
     }
 
+    @Override
+    public List<OrdenVenta> setToProgamada(List<Long> ids){
+        List<OrdenVenta> ordenVentas = this.ordenVentaRepository.findByIdIn(ids);
+        ordenVentas.forEach(ov -> ov.setEstado("Programada"));
+        return this.ordenVentaRepository.saveAll(ordenVentas);
+    }
     @Override
     public void deleteById(Long id) {
         this.ordenVentaRepository.deleteById(id);

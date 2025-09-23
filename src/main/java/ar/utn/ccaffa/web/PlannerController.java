@@ -23,6 +23,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/planner")
@@ -140,6 +142,10 @@ public class PlannerController {
         }
 
         List<OrdenDeTrabajo> ordenesDeTrabajoCreadas = this.ordenDeTrabajoService.saveAllDtos(ordenesDeTrabajo);
+
+        List<Long> ordenesDeVentaIDs = ordenesDeTrabajo.stream().map(ot -> ot.getOrdenDeVenta().getOrderId()).distinct().toList();
+
+        this.ordenVentaService.setToProgamada(ordenesDeVentaIDs);
 
         List<OrdenDeTrabajoResponseDto> ordenesDeTrabajoDto = ordenDeTrabajoResponseMapper.toDtoList(ordenesDeTrabajoCreadas);
 
