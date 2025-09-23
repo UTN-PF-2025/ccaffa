@@ -68,7 +68,7 @@ public class PlannerGA {
     private int TOP_DAYS_IN_ADVANCE = 3;
 
     public int num_sales(){return ordenesDeVentaIDs.size();}
-    public Pair<List<OrdenDeTrabajo>, List<Rollo>> execute() {
+    public Plan<List<OrdenDeTrabajo>, List<Rollo>> execute() {
         Engine<IntegerGene, Double> engine = Engine
                 .builder(this::evaluate, genotypeFactory())
                 .offspringFraction(0.6) // we'll control rates via alterers
@@ -414,7 +414,7 @@ public class PlannerGA {
 
         if (!shouldGenerateJobOrders) return fitness;
 
-        Pair<List<OrdenDeTrabajo>, List<Rollo>> res = generateJobOrders(blocks);
+        Plan<List<OrdenDeTrabajo>, List<Rollo>> res = generateJobOrders(blocks);
         List<OrdenDeTrabajo> jobOrders = res.ordenesDeTrabajo; List<Rollo> children = res.rollosHijos;
         if (jobOrders.isEmpty()) { fitness -= INVALIDATE_SCORE; return fitness; }
 
@@ -441,7 +441,7 @@ public class PlannerGA {
     }
 
 
-    public Pair<List<OrdenDeTrabajo>, List<Rollo>> generateJobOrders(List<int[]> blocks)  {
+    public Plan<List<OrdenDeTrabajo>, List<Rollo>> generateJobOrders(List<int[]> blocks)  {
         List<OrdenDeTrabajo> jobs = new ArrayList<>();
         List<OrdenDeTrabajoMaquina> ordenesMaquina = new ArrayList<>(this.getOrdenesDeTrabajoMaquina());
         Set<Integer> processedRolls = new HashSet<>();
@@ -472,7 +472,7 @@ public class PlannerGA {
             // CHECK IF MAIN ROLL CAN BE USED FOR SALE
             if (!checkRollCharacteristics(sale, roll)) {
                 log.debug("Main roll cannot be used in sale");
-                return new Pair<>(List.of(), List.of());
+                return new Plan<>(List.of(), List.of());
             }
 
             // USE A CHILD IF NECESSARY
@@ -480,7 +480,7 @@ public class PlannerGA {
                 List<Rollo> childrenCandidates = this.childrenCandidatesOfRoll(childrenMap, rollId, sale);
                 if (childrenCandidates.isEmpty()) { // no available children, then return as failed
                     log.debug("No available children");
-                    return new Pair<>(List.of(), List.of());
+                    return new Plan<>(List.of(), List.of());
                 }
                 usingRoll = childrenCandidates.get(0); // grab the one with less area
                 ordenDeTrabajo.setRollo(usingRoll);
@@ -495,7 +495,7 @@ public class PlannerGA {
             if (m1 == 0 && m2 == 0) {
                 if (!ordenDeTrabajo.rolloIgualQueEspecificacion()){
                     log.debug("m1=0 | m2=0 | sale != rollo");
-                    return new Pair<>(List.of(), List.of()); // THEN IT NEEDS A MACHINE, SO FAILED
+                    return new Plan<>(List.of(), List.of()); // THEN IT NEEDS A MACHINE, SO FAILED
                 }
                 ordenDeTrabajo.setFechaEstimadaDeInicio(possibleStart);
                 ordenDeTrabajo.setFechaEstimadaDeFin(possibleStart.plusHours(grace_hours));
@@ -507,7 +507,7 @@ public class PlannerGA {
 
             if (this.isThereAInvalidCombinationOfMachinesForRollAndSale(m1, m2, usingRoll, sale)) {
                 log.debug("InvalidCombinationOfMachinesForRollAndSale");
-                return new Pair<>(List.of(), List.of()); // BAD COMBINATION OF MACHINE FOR SALE AND ROLL, SO FAILED
+                return new Plan<>(List.of(), List.of()); // BAD COMBINATION OF MACHINE FOR SALE AND ROLL, SO FAILED
             }
 
             if (m1 != 0) {
@@ -623,7 +623,7 @@ public class PlannerGA {
         }
 
 
-        return new Pair<>(jobs, children);
+        return new Plan<>(jobs, children);
     }
 
     private Long generateUniqueRandomId() {

@@ -7,7 +7,7 @@ import ar.utn.ccaffa.mapper.interfaces.RolloMapper;
 import ar.utn.ccaffa.model.dto.OrdenDeTrabajoResponseDto;
 import ar.utn.ccaffa.model.dto.RolloDto;
 import ar.utn.ccaffa.model.entity.*;
-import ar.utn.ccaffa.planner.Pair;
+import ar.utn.ccaffa.planner.Plan;
 import ar.utn.ccaffa.planner.PlannerDTO;
 import ar.utn.ccaffa.planner.PlannerGA;
 import ar.utn.ccaffa.services.interfaces.MaquinaService;
@@ -23,8 +23,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/planner")
@@ -59,7 +57,7 @@ public class PlannerController {
 
 
     @PostMapping("/simulate/")
-    public ResponseEntity<Pair<List<OrdenDeTrabajoResponseDto>, List<RolloDto>>> generatePlan(@RequestBody PlannerDTO plannerInfo) {
+    public ResponseEntity<Plan<List<OrdenDeTrabajoResponseDto>, List<RolloDto>>> generatePlan(@RequestBody PlannerDTO plannerInfo) {
         PlannerGA plannerGA = plannerMapper.toEntity(plannerInfo);
         List<Long> maquinasIDs = new ArrayList<>(plannerGA.getMaquinasIDs());
         List<Long> rollosIDs = new ArrayList<>(plannerGA.getRollosIDs());
@@ -101,18 +99,18 @@ public class PlannerController {
 
         plannerGA.setOrdenesDeTrabajoMaquina(ordenDeTrabajoMaquinas);
 
-        Pair<List<OrdenDeTrabajo>, List<Rollo>> result = plannerGA.execute();
+        Plan<List<OrdenDeTrabajo>, List<Rollo>> result = plannerGA.execute();
         
         List<OrdenDeTrabajoResponseDto> ordenesDeTrabajoDto = ordenDeTrabajoResponseMapper.toDtoList(result.ordenesDeTrabajo);
         List<RolloDto> rollosDto = rolloMapper.toDtoListOnlyWithRolloPadreID(result.rollosHijos);
 
-        Pair<List<OrdenDeTrabajoResponseDto>, List<RolloDto>> dtoResult = new Pair<>(ordenesDeTrabajoDto, rollosDto);
+        Plan<List<OrdenDeTrabajoResponseDto>, List<RolloDto>> dtoResult = new Plan<>(ordenesDeTrabajoDto, rollosDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(dtoResult);
     }
 
     @PostMapping("/create/")
-    public  ResponseEntity<Pair<List<OrdenDeTrabajoResponseDto>, List<RolloDto>>> generatePlan(@RequestBody Pair<List<OrdenDeTrabajoResponseDto>, List<RolloDto>> structuresToCreate) {
+    public  ResponseEntity<Plan<List<OrdenDeTrabajoResponseDto>, List<RolloDto>>> generatePlan(@RequestBody Plan<List<OrdenDeTrabajoResponseDto>, List<RolloDto>> structuresToCreate) {
 
         List<OrdenDeTrabajoResponseDto> ordenesDeTrabajo = structuresToCreate.ordenesDeTrabajo;
         List<RolloDto> rollosHijos = structuresToCreate.rollosHijos;
@@ -149,7 +147,7 @@ public class PlannerController {
 
         List<OrdenDeTrabajoResponseDto> ordenesDeTrabajoDto = ordenDeTrabajoResponseMapper.toDtoList(ordenesDeTrabajoCreadas);
 
-        Pair<List<OrdenDeTrabajoResponseDto>, List<RolloDto>> dtoResult = new Pair<>(ordenesDeTrabajoDto, rollosHijos);
+        Plan<List<OrdenDeTrabajoResponseDto>, List<RolloDto>> dtoResult = new Plan<>(ordenesDeTrabajoDto, rollosHijos);
 
 
         return ResponseEntity.status(HttpStatus.OK).body(dtoResult);
