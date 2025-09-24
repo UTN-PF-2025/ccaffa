@@ -60,8 +60,8 @@ public class CertificadoCalidadServiceImpl implements CertificadoCalidadService 
     @Transactional
     public void generarCertificado(CertificadoRequestDTO certificadoRequestDTO) {
         try {
-            OrdenDeTrabajo ot = this.ordenDeTrabajoService.findById(certificadoRequestDTO.getOrdenDeTrabajoId()).get();
-            ControlDeProcesoDto controlProceso = this.controlDeCalidadService.getControlDeProcesoByOrdenTrabajo(certificadoRequestDTO.getOrdenDeTrabajoId());
+            ControlDeProcesoDto controlProceso = this.controlDeCalidadService.getControlDeProceso(certificadoRequestDTO.getControlDeCalidadId());
+            OrdenDeTrabajo ot = this.ordenDeTrabajoService.findById(controlProceso.getIdOrden()).get();
             OrdenVentaDto ordenVentaDto = this.ordenVentaMapper.toDto(ot.getOrdenDeVenta());
             LocalDate fechaEmision = LocalDate.now();
 
@@ -79,15 +79,39 @@ public class CertificadoCalidadServiceImpl implements CertificadoCalidadService 
             agregarSeccionControlado(certificadoRequestDTO, controlProceso);
             agregarEspacio();
 
+            agregarSeccionCalidad();
+            agregarEspacio();
+
             armarTablaComposicion(certificadoRequestDTO);
 
             cerrarDocumento();
 
-            guardarCertificado(certificadoRequestDTO, fechaEmision, controlProceso, ot);
+   //         guardarCertificado(certificadoRequestDTO, fechaEmision, controlProceso, ot);
 
         } catch (FileNotFoundException | DocumentException e) {
             log.error("No se pudo crear el certificado PDF");
         }
+    }
+
+    private void agregarSeccionCalidad() throws DocumentException {
+        PdfPTable table = new PdfPTable(2);
+        table.setTotalWidth(210);
+        table.setLockedWidth(true);
+        table.addCell(new Phrase("CALIDAD"));
+        table.addCell(new Phrase("SAE 1006"));
+        table.addCell(new Phrase("PLANITUD"));
+        table.addCell(new Phrase("OK"));
+        table.addCell(new Phrase("SUPERFICIE"));
+        table.addCell(new Phrase("OK"));
+        table.addCell(new Phrase("CAMBER"));
+        table.addCell(new Phrase("OK"));
+        table.addCell(new Phrase("PLEGADO"));
+        table.addCell(new Phrase("OK"));
+        table.addCell(new Phrase("REBABA"));
+        table.addCell(new Phrase("OK"));
+        table.addCell(new Phrase("CAMBER"));
+        table.addCell(new Phrase("OK"));
+        documentParagraph.add(table);
     }
 
     @Override

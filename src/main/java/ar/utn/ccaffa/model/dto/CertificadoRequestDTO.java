@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class CertificadoRequestDTO {
-    private Long ordenDeTrabajoId;
+    private Long controlDeCalidadId;
     private String partida1;
     private String partida2;
     private String partida3;
