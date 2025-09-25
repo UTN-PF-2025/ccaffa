@@ -6,6 +6,7 @@ import lombok.Data;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.hibernate.annotations.BatchSize;
 
 @Entity
 @Data
@@ -39,6 +40,7 @@ public class ControlDeCalidad {
     private String estado;
 
     @OneToMany(cascade = CascadeType.ALL)
+    @BatchSize(size = 32)
     @JoinColumn(name = "control_de_calidad_id")
     @JsonManagedReference("control-medida")
     private List<MedidaDeCalidad> medidasDeCalidad;
@@ -48,6 +50,7 @@ public class ControlDeCalidad {
     private CertificadoDeCalidad certificadoDeCalidad;
 
     @OneToMany(mappedBy = "controlDeCalidad", cascade = CascadeType.ALL)
+    @BatchSize(size = 32)
     @JsonManagedReference("control-defecto")
     private List<Defecto> defectos;
 

@@ -4,6 +4,7 @@ import ar.utn.ccaffa.model.dto.CreateControlDeCalidadRequest;
 import ar.utn.ccaffa.model.entity.ControlDeCalidad;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import ar.utn.ccaffa.repository.interfaces.ControlDeCalidadRepository;
+import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.model.dto.AddMedidaRequest;
 import ar.utn.ccaffa.model.dto.ControlDeProcesoDto;
 import ar.utn.ccaffa.model.entity.*;
@@ -11,9 +12,11 @@ import ar.utn.ccaffa.repository.interfaces.MedidaDeCalidadRepository;
 import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoRepository;
 import ar.utn.ccaffa.repository.interfaces.OrdenVentaRepository;
 import ar.utn.ccaffa.repository.interfaces.ProveedorRepository;
+import ar.utn.ccaffa.repository.interfaces.RolloRepository;
 import ar.utn.ccaffa.repository.interfaces.UsuarioRepository;
 import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoMaquinaRepository;
 import ar.utn.ccaffa.services.interfaces.ControlDeCalidadService;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +33,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
     private final OrdenDeTrabajoRepository ordenDeTrabajoRepository;
     private final MedidaDeCalidadRepository medidaDeCalidadRepository;
     private final ProveedorRepository proveedorRepository;
-    private final OrdenVentaRepository ordenDeVentaRepository;
+    private final RolloRepository rolloRepository;
     private final OrdenDeTrabajoMaquinaRepository ordenDeTrabajoMaquinaRepository;
 
     @Override
@@ -131,7 +134,9 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ControlDeCalidad> getAllControlesCalidad() {
+        // Evita N+1 cargando usuario, medidas y defectos en menos consultas (override con @EntityGraph)
         return controlDeCalidadRepository.findAll();
     }
 
@@ -141,12 +146,11 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
                 .orElseThrow(() -> new RuntimeException("Control de Calidad no encontrado con ID: " + id));
         OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoRepository.findById(Long.parseLong(control.getOrdenDeTrabajoId())).orElseThrow(
             () -> new RuntimeException("Orden de Trabajo no encontrada con ID: " + control.getOrdenDeTrabajoId()));
-        
+        Rollo rollo = ordenDeTrabajo.getRollo();
         if (!control.getDefectos().isEmpty() || control.getEstado().equals("Defectuoso")) {
             control.setEstado("Defectuoso");
             ordenDeTrabajo.setEstado("Defectuoso");
-           //TODO mandar a cancelar orden de trabajo
-    
+            rollo.setEstado(EstadoRollo.VERFICAR);
         } else {
             control.setEstado("Finalizado");
             ordenDeTrabajo.setEstado("Finalizado");
@@ -154,6 +158,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
         control.setFechaFinalizacion(LocalDateTime.now());
         ordenDeTrabajo.setFechaFin(LocalDateTime.now());
         ordenDeTrabajoRepository.save(ordenDeTrabajo);
+        rolloRepository.save(rollo);
         return controlDeCalidadRepository.save(control);
     }
 

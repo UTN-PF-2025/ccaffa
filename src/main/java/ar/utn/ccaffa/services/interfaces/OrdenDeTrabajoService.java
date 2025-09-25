@@ -17,7 +17,11 @@ public interface OrdenDeTrabajoService {
     List<OrdenDeTrabajo> findAll();
     Optional<OrdenDeTrabajo> findById(Long id);
     Optional<OrdenDeTrabajo> update(Long id, OrdenDeTrabajo orden);
-    Optional<OrdenDeTrabajo> cancelar(Long id);
+    Optional<OrdenDeTrabajo> desactivar(Long id);
+
+    OrdenDeTrabajo cancelarOrdenDeTrabajo(Long id);
+
+    ar.utn.ccaffa.model.dto.CancelacionSimulacionDto simularCancelacion(Long id);
     List<OrdenDeTrabajo> findByRolloId(Long rolloId);
     OrdenDeTrabajo findByProcesoId(Long rolloId);
     List<OrdenDeTrabajo> filtrarOrdenes(FiltroOrdenDeTrabajoDto filtros);
