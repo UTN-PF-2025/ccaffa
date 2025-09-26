@@ -86,7 +86,7 @@ public class CertificadoCalidadServiceImpl implements CertificadoCalidadService 
 
             cerrarDocumento();
 
-   //         guardarCertificado(certificadoRequestDTO, fechaEmision, controlProceso, ot);
+            guardarCertificado(certificadoRequestDTO, fechaEmision, controlProceso, ot);
 
         } catch (FileNotFoundException | DocumentException e) {
             log.error("No se pudo crear el certificado PDF");
