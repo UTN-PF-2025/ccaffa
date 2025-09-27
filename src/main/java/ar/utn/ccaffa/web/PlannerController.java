@@ -1,6 +1,7 @@
 package ar.utn.ccaffa.web;
 
 import ar.utn.ccaffa.enums.EstadoRollo;
+import ar.utn.ccaffa.exceptions.ErrorResponse;
 import ar.utn.ccaffa.mapper.interfaces.OrdenDeTrabajoResponseMapper;
 import ar.utn.ccaffa.mapper.interfaces.PlannerMapper;
 import ar.utn.ccaffa.mapper.interfaces.RolloMapper;
@@ -57,8 +58,32 @@ public class PlannerController {
 
 
     @PostMapping("/simulate/")
-    public ResponseEntity<Plan<List<OrdenDeTrabajoResponseDto>, List<RolloDto>>> generatePlan(@RequestBody PlannerDTO plannerInfo) {
+    public ResponseEntity<?> generatePlan(@RequestBody PlannerDTO plannerInfo) {
         PlannerGA plannerGA = plannerMapper.toEntity(plannerInfo);
+        if (plannerGA.getOrdenesDeVentaIDs().isEmpty()){
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("ORDENES_DE_VENTAS_VACIO")
+                    .message("No se ha seleccionado ninguna orden de venta")
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+        if (plannerGA.getMaquinasIDs().isEmpty() && !plannerInfo.usarTodasLasMaquinas){
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("MAQUINAS_VACIO")
+                    .message("No se ha seleccionado ninguna maquina")
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+
+        if (plannerGA.getRollosIDs().isEmpty() && !plannerInfo.usarTodosLosRollosDisponibles){
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("ROLLOS_VACIO")
+                    .message("No se ha seleccionado ningun rollo")
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+
+
         List<Long> maquinasIDs = new ArrayList<>(plannerGA.getMaquinasIDs());
         List<Long> rollosIDs = new ArrayList<>(plannerGA.getRollosIDs());
         List<Maquina> maquinas;
