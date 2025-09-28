@@ -60,7 +60,7 @@ public class OrdenDeTrabajoResponseMapperImpl implements OrdenDeTrabajoResponseM
                 .activa(ordenDeTrabajo.getActiva())
                 .ordenDeVenta(mapOrdenVentaSimple(ordenDeTrabajo.getOrdenDeVenta()))
                 .ordenDeTrabajoMaquinas(mapOrdenDeTrabajoMaquinas(ordenDeTrabajo.getOrdenDeTrabajoMaquinas()))
-                .rollo(rolloMapper.toDto(ordenDeTrabajo.getRollo()))
+                .rollo(rolloMapper.toDtoOnlyWithRolloPadreID(ordenDeTrabajo.getRollo()))
                 .controlDeCalidad(mapControlDeCalidad(ordenDeTrabajo.getControlDeCalidad()))
                 .build();
     }
