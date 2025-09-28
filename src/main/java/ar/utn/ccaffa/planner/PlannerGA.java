@@ -66,6 +66,8 @@ public class PlannerGA {
     private int MULTIPLIER_OF_WASTE = 1;
     @Builder.Default
     private int TOP_DAYS_IN_ADVANCE = 3;
+    @Builder.Default
+    private List<Integer> valid_days_of_the_week = List.of(1,2,3,4,5); // 1=Monday, 2=Tuesday, ..., 7=Sunday
 
     public int num_sales(){return ordenesDeVentaIDs.size();}
     public Plan<List<OrdenDeTrabajo>, List<Rollo>> execute() {
@@ -537,6 +539,11 @@ public class PlannerGA {
                     possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
                 }
 
+                while (!this.valid_days_of_the_week.contains(possibleStart.getDayOfWeek().getValue())) {
+                    possibleStart = possibleStart.plusDays(1).withHour(this.horaDeInicioLaboral).withMinute(0).withSecond(0);
+                    possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
+                }
+
                 // 'a,b' and 'x,y':
                 // if (!((b < x) || (a > y)))
                 for (OrdenDeTrabajoMaquina orden : ordenesDeTrabajoConMaquina){
@@ -544,6 +551,11 @@ public class PlannerGA {
                         possibleStart = orden.getFechaFin();
                         possibleEnd= possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
                         if (possibleEnd.getHour() >= this.horaDeFinLaboral){
+                            possibleStart = possibleStart.plusDays(1).withHour(this.horaDeInicioLaboral).withMinute(0).withSecond(0);
+                            possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
+                        }
+
+                        while (!this.valid_days_of_the_week.contains(possibleStart.getDayOfWeek().getValue())) {
                             possibleStart = possibleStart.plusDays(1).withHour(this.horaDeInicioLaboral).withMinute(0).withSecond(0);
                             possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
                         }
@@ -600,6 +612,11 @@ public class PlannerGA {
                     possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
                 }
 
+                while (!this.valid_days_of_the_week.contains(possibleStart.getDayOfWeek().getValue())) {
+                    possibleStart = possibleStart.plusDays(1).withHour(this.horaDeInicioLaboral).withMinute(0).withSecond(0);
+                    possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
+                }
+
                 // 'a,b' and 'x,y':
                 // if (!((b < x) || (a > y)))
                 for (OrdenDeTrabajoMaquina orden : ordenesDeTrabajoConMaquina){
@@ -607,6 +624,11 @@ public class PlannerGA {
                         possibleStart = orden.getFechaFin();
                         possibleEnd= possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
                         if (possibleEnd.getHour() >= this.horaDeFinLaboral){
+                            possibleStart = possibleStart.plusDays(1).withHour(this.horaDeInicioLaboral).withMinute(0).withSecond(0);
+                            possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
+                        }
+
+                        while (!this.valid_days_of_the_week.contains(possibleStart.getDayOfWeek().getValue())) {
                             possibleStart = possibleStart.plusDays(1).withHour(this.horaDeInicioLaboral).withMinute(0).withSecond(0);
                             possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
                         }
