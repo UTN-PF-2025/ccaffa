@@ -4,6 +4,7 @@ import ar.utn.ccaffa.model.dto.AddMedidaRequest;
 import ar.utn.ccaffa.model.dto.ControlDeProcesoDto;
 import ar.utn.ccaffa.model.dto.CreateControlDeCalidadRequest;
 import ar.utn.ccaffa.model.entity.ControlDeCalidad;
+import ar.utn.ccaffa.model.entity.Usuario;
 import ar.utn.ccaffa.services.interfaces.ControlDeCalidadService;
 import lombok.RequiredArgsConstructor;
 
@@ -11,6 +12,8 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import ar.utn.ccaffa.services.impl.UserDetailsImpl;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,6 +25,12 @@ public class ControlDeCalidadController {
 
     @PostMapping
     public ResponseEntity<ControlDeCalidad> createControlDeCalidad(@RequestBody CreateControlDeCalidadRequest request) {
+        if (request.getEmpleadoId() == null) {
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (principal instanceof UserDetailsImpl userDetails) {
+                request.setEmpleadoId(userDetails.getUsuario().getId());
+            }
+        }
         ControlDeCalidad nuevoControl = controlDeCalidadService.createControlDeCalidad(request);
         return new ResponseEntity<>(nuevoControl, HttpStatus.CREATED);
     }
