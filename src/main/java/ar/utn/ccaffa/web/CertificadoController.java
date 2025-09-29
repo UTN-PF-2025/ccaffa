@@ -4,6 +4,8 @@ import ar.utn.ccaffa.model.dto.CertificadoDeCalidadDto;
 import ar.utn.ccaffa.model.dto.CertificadoRequestDTO;
 import ar.utn.ccaffa.services.interfaces.CertificadoCalidadService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,5 +26,19 @@ public class CertificadoController {
     public ResponseEntity<CertificadoDeCalidadDto> getCertificado(@PathVariable Long id) {
         return ResponseEntity.ok(this.certificadoCalidadService.findById(id));
     }
+
+    @GetMapping(value = "/pdf/{id}")
+    public ResponseEntity<byte[]> obtenerPDF(@PathVariable Long id) {
+        byte[] pdfData = certificadoCalidadService.obtenerPdf(id);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "certificado" +id + ".pdf");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(pdfData);
+    }
+
 
 }

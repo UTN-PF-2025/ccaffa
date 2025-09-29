@@ -29,6 +29,8 @@ public class CertificadoDeCalidad {
     @JoinColumn(name = "aprobador_id")
     private Empleado aprobador;
 
+    @Column(name = "nombre_archivo")
+    private String nombreArchivo;
     
     @OneToOne
     @JoinColumn(name = "control_de_calidad_id")

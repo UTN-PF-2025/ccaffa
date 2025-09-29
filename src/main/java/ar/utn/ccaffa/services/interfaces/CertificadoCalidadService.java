@@ -6,4 +6,6 @@ import ar.utn.ccaffa.model.dto.CertificadoRequestDTO;
 public interface CertificadoCalidadService {
     void generarCertificado(CertificadoRequestDTO certificadoRequestDTO);
     CertificadoDeCalidadDto findById(Long id);
+
+    byte[] obtenerPdf(Long certificadoId);
 }

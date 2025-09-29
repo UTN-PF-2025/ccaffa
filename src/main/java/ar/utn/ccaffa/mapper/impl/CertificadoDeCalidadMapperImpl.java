@@ -26,6 +26,7 @@ public class CertificadoDeCalidadMapperImpl implements CertificadoDeCalidadMappe
                         ? Empleado.builder().id(certificado.getAprobador().getId()).build()
                         : null)
                 .controlDeCalidad(ControlDeCalidad.builder().id(certificado.getControlDeCalidadId()).build())
+                .nombreArchivo(certificado.getNombreArchivo())
                 .build();
     }
 
@@ -50,6 +51,7 @@ public class CertificadoDeCalidadMapperImpl implements CertificadoDeCalidadMappe
                 .controlDeCalidadId(certificado.getControlDeCalidad() != null
                         ? certificado.getControlDeCalidad().getId()
                         : null)
+                .nombreArchivo(certificado.getNombreArchivo())
                 .build();
     }
 

@@ -17,4 +17,5 @@ public class CertificadoDeCalidadDto {
     private LocalDate fechaDeEmision;
     private EmpleadoDto aprobador;
     private Long controlDeCalidadId;
+    private String nombreArchivo;
 } 
