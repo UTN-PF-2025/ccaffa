@@ -1,6 +1,5 @@
 package ar.utn.ccaffa.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,9 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class OrdenVentaDto {
     private Long orderId;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "DEFAULT_TIMEZONE")
     private LocalDateTime fechaCreacion;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "DEFAULT_TIMEZONE")
     private LocalDateTime fechaEntregaEstimada;
     private String estado;
     private String observaciones;

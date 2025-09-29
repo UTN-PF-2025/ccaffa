@@ -92,6 +92,10 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
         OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoRepository.findByIdFetchRollo(Long.parseLong(control.getOrdenDeTrabajoId()))
                 .orElseThrow(() -> new RuntimeException("Orden de Trabajo no encontrada con ID: " + control.getOrdenDeTrabajoId()));
 
+        return createControlDeProcesoDto(ordenDeTrabajo, control);
+    }
+
+    private ControlDeProcesoDto createControlDeProcesoDto(OrdenDeTrabajo ordenDeTrabajo, ControlDeCalidad control) {
         Rollo rollo = ordenDeTrabajo.getRollo();
         Proveedor proveedor = null;
         if (rollo != null && rollo.getProveedorId() != null) {
@@ -134,7 +138,16 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    public ControlDeProcesoDto getControlDeProcesoByOrdenTrabajo(Long ordenTrabajoId) {
+        OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoRepository.findByIdFetchRollo(ordenTrabajoId)
+                .orElseThrow(() -> new RuntimeException("Orden de Trabajo no encontrada con ID: " + ordenTrabajoId));
+        List<ControlDeCalidad> controlCalidad = this.controlDeCalidadRepository.findByOrdenDeTrabajoId(ordenTrabajoId);
+        ControlDeCalidad control = controlCalidad.isEmpty() ? null : controlCalidad.getFirst();
+
+        return createControlDeProcesoDto(ordenDeTrabajo, control);
+    }
+
+    @Override
     public List<ControlDeCalidad> getAllControlesCalidad() {
         // Evita N+1 cargando usuario, medidas y defectos en menos consultas (override con @EntityGraph)
         return controlDeCalidadRepository.findAll();

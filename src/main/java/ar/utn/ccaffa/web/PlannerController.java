@@ -1,13 +1,14 @@
 package ar.utn.ccaffa.web;
 
 import ar.utn.ccaffa.enums.EstadoRollo;
+import ar.utn.ccaffa.exceptions.ErrorResponse;
 import ar.utn.ccaffa.mapper.interfaces.OrdenDeTrabajoResponseMapper;
 import ar.utn.ccaffa.mapper.interfaces.PlannerMapper;
 import ar.utn.ccaffa.mapper.interfaces.RolloMapper;
 import ar.utn.ccaffa.model.dto.OrdenDeTrabajoResponseDto;
 import ar.utn.ccaffa.model.dto.RolloDto;
 import ar.utn.ccaffa.model.entity.*;
-import ar.utn.ccaffa.planner.Pair;
+import ar.utn.ccaffa.planner.Plan;
 import ar.utn.ccaffa.planner.PlannerDTO;
 import ar.utn.ccaffa.planner.PlannerGA;
 import ar.utn.ccaffa.services.interfaces.MaquinaService;
@@ -57,8 +58,32 @@ public class PlannerController {
 
 
     @PostMapping("/simulate/")
-    public ResponseEntity<Pair<List<OrdenDeTrabajoResponseDto>, List<RolloDto>>> generatePlan(@RequestBody PlannerDTO plannerInfo) {
+    public ResponseEntity<?> generatePlan(@RequestBody PlannerDTO plannerInfo) {
         PlannerGA plannerGA = plannerMapper.toEntity(plannerInfo);
+        if (plannerGA.getOrdenesDeVentaIDs().isEmpty()){
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("ORDENES_DE_VENTAS_VACIO")
+                    .message("No se ha seleccionado ninguna orden de venta")
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+        if (plannerGA.getMaquinasIDs().isEmpty() && !plannerInfo.usarTodasLasMaquinas){
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("MAQUINAS_VACIO")
+                    .message("No se ha seleccionado ninguna maquina")
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+
+        if (plannerGA.getRollosIDs().isEmpty() && !plannerInfo.usarTodosLosRollosDisponibles){
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("ROLLOS_VACIO")
+                    .message("No se ha seleccionado ningun rollo")
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+
+
         List<Long> maquinasIDs = new ArrayList<>(plannerGA.getMaquinasIDs());
         List<Long> rollosIDs = new ArrayList<>(plannerGA.getRollosIDs());
         List<Maquina> maquinas;
@@ -99,18 +124,18 @@ public class PlannerController {
 
         plannerGA.setOrdenesDeTrabajoMaquina(ordenDeTrabajoMaquinas);
 
-        Pair<List<OrdenDeTrabajo>, List<Rollo>> result = plannerGA.execute();
+        Plan<List<OrdenDeTrabajo>, List<Rollo>> result = plannerGA.execute();
         
         List<OrdenDeTrabajoResponseDto> ordenesDeTrabajoDto = ordenDeTrabajoResponseMapper.toDtoList(result.ordenesDeTrabajo);
         List<RolloDto> rollosDto = rolloMapper.toDtoListOnlyWithRolloPadreID(result.rollosHijos);
 
-        Pair<List<OrdenDeTrabajoResponseDto>, List<RolloDto>> dtoResult = new Pair<>(ordenesDeTrabajoDto, rollosDto);
+        Plan<List<OrdenDeTrabajoResponseDto>, List<RolloDto>> dtoResult = new Plan<>(ordenesDeTrabajoDto, rollosDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(dtoResult);
     }
 
     @PostMapping("/create/")
-    public  ResponseEntity<Pair<List<OrdenDeTrabajoResponseDto>, List<RolloDto>>> generatePlan(@RequestBody Pair<List<OrdenDeTrabajoResponseDto>, List<RolloDto>> structuresToCreate) {
+    public  ResponseEntity<Plan<List<OrdenDeTrabajoResponseDto>, List<RolloDto>>> generatePlan(@RequestBody Plan<List<OrdenDeTrabajoResponseDto>, List<RolloDto>> structuresToCreate) {
 
         List<OrdenDeTrabajoResponseDto> ordenesDeTrabajo = structuresToCreate.ordenesDeTrabajo;
         List<RolloDto> rollosHijos = structuresToCreate.rollosHijos;
@@ -141,9 +166,13 @@ public class PlannerController {
 
         List<OrdenDeTrabajo> ordenesDeTrabajoCreadas = this.ordenDeTrabajoService.saveAllDtos(ordenesDeTrabajo);
 
+        List<Long> ordenesDeVentaIDs = ordenesDeTrabajo.stream().map(ot -> ot.getOrdenDeVenta().getOrderId()).distinct().toList();
+
+        this.ordenVentaService.setToProgamada(ordenesDeVentaIDs);
+
         List<OrdenDeTrabajoResponseDto> ordenesDeTrabajoDto = ordenDeTrabajoResponseMapper.toDtoList(ordenesDeTrabajoCreadas);
 
-        Pair<List<OrdenDeTrabajoResponseDto>, List<RolloDto>> dtoResult = new Pair<>(ordenesDeTrabajoDto, rollosHijos);
+        Plan<List<OrdenDeTrabajoResponseDto>, List<RolloDto>> dtoResult = new Plan<>(ordenesDeTrabajoDto, rollosHijos);
 
 
         return ResponseEntity.status(HttpStatus.OK).body(dtoResult);

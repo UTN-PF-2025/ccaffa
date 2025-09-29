@@ -3,7 +3,7 @@ import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.enums.MaquinaTipoEnum;
 import ar.utn.ccaffa.enums.TipoMaterial;
 import ar.utn.ccaffa.model.entity.*;
-import ar.utn.ccaffa.planner.Pair;
+import ar.utn.ccaffa.planner.Plan;
 import ar.utn.ccaffa.planner.PlannerGA;
 import org.junit.jupiter.api.Test;
 
@@ -132,7 +132,7 @@ public class PlannerTest {
                     .horaDeInicioLaboral(8)
                     .build();
 
-            Pair<List<OrdenDeTrabajo>, List<Rollo>> result = plannerGA.execute();
+            Plan<List<OrdenDeTrabajo>, List<Rollo>> result = plannerGA.execute();
 
             List<OrdenDeTrabajo> ordenDeTrabajoList = result.ordenesDeTrabajo;
             List<Rollo> rolloList = result.rollosHijos;

@@ -16,5 +16,7 @@ public interface MaquinaService {
 
     List<Maquina> findAllIDsOfAvailableMachinesEntity();
 
+    List<MaquinaDto> findAllIDsOfAvailableMachinesDto();
+
     List<Maquina> findByIdIn(List<Long> ids);
 }

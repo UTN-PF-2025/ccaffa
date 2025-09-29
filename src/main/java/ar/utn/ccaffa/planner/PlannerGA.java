@@ -66,9 +66,16 @@ public class PlannerGA {
     private int MULTIPLIER_OF_WASTE = 1;
     @Builder.Default
     private int TOP_DAYS_IN_ADVANCE = 3;
+    @Builder.Default
+    private List<Integer> valid_days_of_the_week = List.of(1,2,3,4,5); // 1=Monday, 2=Tuesday, ..., 7=Sunday
 
     public int num_sales(){return ordenesDeVentaIDs.size();}
-    public Pair<List<OrdenDeTrabajo>, List<Rollo>> execute() {
+    public Plan<List<OrdenDeTrabajo>, List<Rollo>> execute() {
+        if (this.ordenesDeVenta == null || this.ordenesDeVenta.isEmpty()) {
+            log.warn("No hay órdenes de venta para planificar. Devolviendo un plan vacío.");
+            return new Plan<>(Collections.emptyList(), Collections.emptyList());
+        }
+
         Engine<IntegerGene, Double> engine = Engine
                 .builder(this::evaluate, genotypeFactory())
                 .offspringFraction(0.6) // we'll control rates via alterers
@@ -164,7 +171,7 @@ public class PlannerGA {
     }
 
     private Maquina getMaquinaByID(Long id){
-        return (maquinas.stream().filter(maquina -> Objects.equals(maquina.getId(), id))).toList().get(0);
+        return maquinas.stream().filter(maquina -> Objects.equals(maquina.getId(), id)).findFirst().orElse(null);
     }
     private List<Long> getMaquinasIDsByType(MaquinaTipoEnum type){
         return (maquinas.stream().filter(maquina -> Objects.equals(maquina.getTipo(), type)))
@@ -272,6 +279,11 @@ public class PlannerGA {
                 Seq<Phenotype<IntegerGene, Double>> population,
                 long generation
         ) {
+            if (num_sales() <= 1) {
+                // No se puede realizar el cruce con un solo bloque (orden de venta)
+                return new AltererResult<>(population.asISeq(), 0);
+            }
+
             RandomGenerator rnd = RandomRegistry.random();
             // Create a mutable copy of the population
             MSeq<Phenotype<IntegerGene, Double>> pop = population.asISeq().copy();
@@ -414,7 +426,7 @@ public class PlannerGA {
 
         if (!shouldGenerateJobOrders) return fitness;
 
-        Pair<List<OrdenDeTrabajo>, List<Rollo>> res = generateJobOrders(blocks);
+        Plan<List<OrdenDeTrabajo>, List<Rollo>> res = generateJobOrders(blocks);
         List<OrdenDeTrabajo> jobOrders = res.ordenesDeTrabajo; List<Rollo> children = res.rollosHijos;
         if (jobOrders.isEmpty()) { fitness -= INVALIDATE_SCORE; return fitness; }
 
@@ -441,7 +453,7 @@ public class PlannerGA {
     }
 
 
-    public Pair<List<OrdenDeTrabajo>, List<Rollo>> generateJobOrders(List<int[]> blocks)  {
+    public Plan<List<OrdenDeTrabajo>, List<Rollo>> generateJobOrders(List<int[]> blocks)  {
         List<OrdenDeTrabajo> jobs = new ArrayList<>();
         List<OrdenDeTrabajoMaquina> ordenesMaquina = new ArrayList<>(this.getOrdenesDeTrabajoMaquina());
         Set<Integer> processedRolls = new HashSet<>();
@@ -472,7 +484,7 @@ public class PlannerGA {
             // CHECK IF MAIN ROLL CAN BE USED FOR SALE
             if (!checkRollCharacteristics(sale, roll)) {
                 log.debug("Main roll cannot be used in sale");
-                return new Pair<>(List.of(), List.of());
+                return new Plan<>(List.of(), List.of());
             }
 
             // USE A CHILD IF NECESSARY
@@ -480,7 +492,7 @@ public class PlannerGA {
                 List<Rollo> childrenCandidates = this.childrenCandidatesOfRoll(childrenMap, rollId, sale);
                 if (childrenCandidates.isEmpty()) { // no available children, then return as failed
                     log.debug("No available children");
-                    return new Pair<>(List.of(), List.of());
+                    return new Plan<>(List.of(), List.of());
                 }
                 usingRoll = childrenCandidates.get(0); // grab the one with less area
                 ordenDeTrabajo.setRollo(usingRoll);
@@ -495,7 +507,7 @@ public class PlannerGA {
             if (m1 == 0 && m2 == 0) {
                 if (!ordenDeTrabajo.rolloIgualQueEspecificacion()){
                     log.debug("m1=0 | m2=0 | sale != rollo");
-                    return new Pair<>(List.of(), List.of()); // THEN IT NEEDS A MACHINE, SO FAILED
+                    return new Plan<>(List.of(), List.of()); // THEN IT NEEDS A MACHINE, SO FAILED
                 }
                 ordenDeTrabajo.setFechaEstimadaDeInicio(possibleStart);
                 ordenDeTrabajo.setFechaEstimadaDeFin(possibleStart.plusHours(grace_hours));
@@ -507,11 +519,15 @@ public class PlannerGA {
 
             if (this.isThereAInvalidCombinationOfMachinesForRollAndSale(m1, m2, usingRoll, sale)) {
                 log.debug("InvalidCombinationOfMachinesForRollAndSale");
-                return new Pair<>(List.of(), List.of()); // BAD COMBINATION OF MACHINE FOR SALE AND ROLL, SO FAILED
+                return new Plan<>(List.of(), List.of()); // BAD COMBINATION OF MACHINE FOR SALE AND ROLL, SO FAILED
             }
 
             if (m1 != 0) {
                 Maquina machine1 = this.getMaquinaByID((long) m1);
+                if (machine1 == null) {
+                    log.debug("Máquina m1 con ID {} no encontrada.", m1);
+                    return new Plan<>(List.of(), List.of());
+                }
 
                 List<OrdenDeTrabajoMaquina> ordenesDeTrabajoConMaquina = ordenesMaquina.stream().filter(u -> u.getMaquina() == machine1).toList();
 
@@ -523,6 +539,11 @@ public class PlannerGA {
                     possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
                 }
 
+                while (!this.valid_days_of_the_week.contains(possibleStart.getDayOfWeek().getValue())) {
+                    possibleStart = possibleStart.plusDays(1).withHour(this.horaDeInicioLaboral).withMinute(0).withSecond(0);
+                    possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
+                }
+
                 // 'a,b' and 'x,y':
                 // if (!((b < x) || (a > y)))
                 for (OrdenDeTrabajoMaquina orden : ordenesDeTrabajoConMaquina){
@@ -530,6 +551,11 @@ public class PlannerGA {
                         possibleStart = orden.getFechaFin();
                         possibleEnd= possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
                         if (possibleEnd.getHour() >= this.horaDeFinLaboral){
+                            possibleStart = possibleStart.plusDays(1).withHour(this.horaDeInicioLaboral).withMinute(0).withSecond(0);
+                            possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
+                        }
+
+                        while (!this.valid_days_of_the_week.contains(possibleStart.getDayOfWeek().getValue())) {
                             possibleStart = possibleStart.plusDays(1).withHour(this.horaDeInicioLaboral).withMinute(0).withSecond(0);
                             possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
                         }
@@ -571,6 +597,10 @@ public class PlannerGA {
 
             if (m2 != 0) {
                 Maquina machine2 = this.getMaquinaByID((long) m2);
+                if (machine2 == null) {
+                    log.debug("Máquina m2 con ID {} no encontrada.", m2);
+                    return new Plan<>(List.of(), List.of());
+                }
 
                 List<OrdenDeTrabajoMaquina> ordenesDeTrabajoConMaquina = ordenesMaquina.stream().filter(u -> u.getMaquina() == machine2).toList();
 
@@ -582,6 +612,11 @@ public class PlannerGA {
                     possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
                 }
 
+                while (!this.valid_days_of_the_week.contains(possibleStart.getDayOfWeek().getValue())) {
+                    possibleStart = possibleStart.plusDays(1).withHour(this.horaDeInicioLaboral).withMinute(0).withSecond(0);
+                    possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
+                }
+
                 // 'a,b' and 'x,y':
                 // if (!((b < x) || (a > y)))
                 for (OrdenDeTrabajoMaquina orden : ordenesDeTrabajoConMaquina){
@@ -589,6 +624,11 @@ public class PlannerGA {
                         possibleStart = orden.getFechaFin();
                         possibleEnd= possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
                         if (possibleEnd.getHour() >= this.horaDeFinLaboral){
+                            possibleStart = possibleStart.plusDays(1).withHour(this.horaDeInicioLaboral).withMinute(0).withSecond(0);
+                            possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
+                        }
+
+                        while (!this.valid_days_of_the_week.contains(possibleStart.getDayOfWeek().getValue())) {
                             possibleStart = possibleStart.plusDays(1).withHour(this.horaDeInicioLaboral).withMinute(0).withSecond(0);
                             possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
                         }
@@ -623,7 +663,7 @@ public class PlannerGA {
         }
 
 
-        return new Pair<>(jobs, children);
+        return new Plan<>(jobs, children);
     }
 
     private Long generateUniqueRandomId() {
@@ -651,6 +691,8 @@ public class PlannerGA {
         // No machine2, then roll one needs to be modified in one characteristic (thickness or width)
         if (m1 != 0 && m2 == 0) {
             Maquina machine1 = this.getMaquinaByID((long) m1);
+            if (machine1 == null) return true; // Máquina no válida
+
             if (machine1.getTipo() == MaquinaTipoEnum.CORTADORA) {
                 if (!equalsD(usingRoll.getEspesorMM(), sale.getEspecificacion().getEspesor())
                         || equalsD(usingRoll.getAnchoMM(), sale.getEspecificacion().getAncho()))
@@ -665,6 +707,8 @@ public class PlannerGA {
         // If both machines, then rolls needs to be modified in all characteristics and machine1 cannot be a Laminadora
         if (m1 != 0 && m2 != 0) {
             Maquina machine1 = this.getMaquinaByID((long) m1);
+            if (machine1 == null) return true; // Máquina no válida
+
 
             if (equalsD(usingRoll.getEspesorMM(), sale.getEspecificacion().getEspesor())
                     || equalsD(usingRoll.getAnchoMM(), sale.getEspecificacion().getAncho()))
@@ -676,6 +720,8 @@ public class PlannerGA {
 
         if(m1 != 0){
             Maquina machine1 = this.getMaquinaByID((long) m1);
+            if (machine1 == null) return true; // Máquina no válida
+
 
             if (sale.getEspecificacion().getAncho() > machine1.getAnchoMaximoMilimetros())
                     return true;
@@ -692,6 +738,8 @@ public class PlannerGA {
 
         if(m2 != 0){
             Maquina machine2 = this.getMaquinaByID((long) m2);
+            if (machine2 == null) return true; // Máquina no válida
+
 
             if (sale.getEspecificacion().getAncho() > machine2.getAnchoMaximoMilimetros())
                 return true;

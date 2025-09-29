@@ -30,6 +30,12 @@ public class MaquinaController {
         return new ResponseEntity<>(entidades, HttpStatus.OK);
     }
 
+    @GetMapping("/disponibles")
+    public ResponseEntity<List<MaquinaDto>> obtenerDisponibles() {
+        List<MaquinaDto> maquinas = maquinaService.findAllIDsOfAvailableMachinesDto();
+        return new ResponseEntity<>(maquinas, HttpStatus.OK);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<MaquinaDto> obtenerPorId(@PathVariable Long id) {
         MaquinaDto entidad = maquinaService.findById(id);

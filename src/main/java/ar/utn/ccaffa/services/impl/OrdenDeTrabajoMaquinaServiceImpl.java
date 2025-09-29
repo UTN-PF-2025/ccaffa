@@ -24,4 +24,8 @@ public class OrdenDeTrabajoMaquinaServiceImpl implements OrdenDeTrabajoMaquinaSe
       return repository.findTopByMaquina_IdAndEstadoOrderByFechaInicioAsc(maquinaId, "Planificada");
     }
 
+    @Override
+    public OrdenDeTrabajoMaquina findById(Long id) {
+      return repository.findById(id).orElse(null);
+    }
 }

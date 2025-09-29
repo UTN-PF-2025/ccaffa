@@ -2,7 +2,11 @@ package ar.utn.ccaffa.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,6 +15,9 @@ import org.hibernate.annotations.BatchSize;
 @Entity
 @Data
 @Table(name = "controles_calidad")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ControlDeCalidad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

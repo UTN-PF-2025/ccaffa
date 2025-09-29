@@ -8,6 +8,7 @@ import org.apache.coyote.BadRequestException;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 public interface OrdenVentaService {
     List<OrdenVentaDto> findAll();
@@ -17,6 +18,8 @@ public interface OrdenVentaService {
     List<OrdenVentaDto> searchByFiltros(FiltroOrdenVentaDTO filtros);
 
     OrdenVentaDto save(OrdenVentaDto ordenVenta);
+
+    List<OrdenVentaDto> setToProgamada(List<Long> ids);
     
     void deleteById(Long id);
 

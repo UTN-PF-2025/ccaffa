@@ -16,4 +16,5 @@ public class CertificadoDeCalidadDto {
     private String numeroDeCertificado;
     private LocalDate fechaDeEmision;
     private EmpleadoDto aprobador;
+    private Long controlDeCalidadId;
 } 
