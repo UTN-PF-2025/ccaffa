@@ -89,13 +89,17 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
         OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoRepository.findByIdFetchRollo(Long.parseLong(control.getOrdenDeTrabajoId()))
                 .orElseThrow(() -> new RuntimeException("Orden de Trabajo no encontrada con ID: " + control.getOrdenDeTrabajoId()));
 
+        return createControlDeProcesoDto(ordenDeTrabajo, control);
+    }
+
+    private ControlDeProcesoDto createControlDeProcesoDto(OrdenDeTrabajo ordenDeTrabajo, ControlDeCalidad control) {
         Rollo rollo = ordenDeTrabajo.getRollo();
         Proveedor proveedor = null;
         if (rollo != null && rollo.getProveedorId() != null) {
             proveedor = proveedorRepository.findById(rollo.getProveedorId()).orElse(null);
         }
 
-        OrdenVenta ordenDeVenta = ordenDeVentaRepository.findByOrdenDeTrabajoIdFetchClienteEspecificacion(ordenDeTrabajo.getId());
+        OrdenVenta ordenDeVenta = ordenDeTrabajo.getOrdenDeVenta();
         Cliente cliente = null;
         Especificacion especificacion = null;
         if (ordenDeVenta != null) {
@@ -131,6 +135,16 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
     }
 
     @Override
+    public ControlDeProcesoDto getControlDeProcesoByOrdenTrabajo(Long ordenTrabajoId) {
+        OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoRepository.findByIdFetchRollo(ordenTrabajoId)
+                .orElseThrow(() -> new RuntimeException("Orden de Trabajo no encontrada con ID: " + ordenTrabajoId));
+        List<ControlDeCalidad> controlCalidad = this.controlDeCalidadRepository.findByOrdenDeTrabajoId(ordenTrabajoId);
+        ControlDeCalidad control = controlCalidad.isEmpty() ? null : controlCalidad.getFirst();
+
+        return createControlDeProcesoDto(ordenDeTrabajo, control);
+    }
+
+    @Override
     public List<ControlDeCalidad> getAllControlesCalidad() {
         return controlDeCalidadRepository.findAll();
     }
@@ -139,12 +153,21 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
     public ControlDeCalidad finalizarControl(Long id) {
         ControlDeCalidad control = controlDeCalidadRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Control de Calidad no encontrado con ID: " + id));
-        if (!control.getDefectos().isEmpty()) {
+        OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoRepository.findById(Long.parseLong(control.getOrdenDeTrabajoId())).orElseThrow(
+            () -> new RuntimeException("Orden de Trabajo no encontrada con ID: " + control.getOrdenDeTrabajoId()));
+        
+        if (!control.getDefectos().isEmpty() || control.getEstado().equals("Defectuoso")) {
             control.setEstado("Defectuoso");
+            ordenDeTrabajo.setEstado("Defectuoso");
+           //TODO mandar a cancelar orden de trabajo
+    
         } else {
             control.setEstado("Finalizado");
+            ordenDeTrabajo.setEstado("Finalizado");
         }
         control.setFechaFinalizacion(LocalDateTime.now());
+        ordenDeTrabajo.setFechaFin(LocalDateTime.now());
+        ordenDeTrabajoRepository.save(ordenDeTrabajo);
         return controlDeCalidadRepository.save(control);
     }
 

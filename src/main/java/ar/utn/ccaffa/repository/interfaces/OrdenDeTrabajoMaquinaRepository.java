@@ -17,4 +17,6 @@ public interface OrdenDeTrabajoMaquinaRepository extends JpaRepository<OrdenDeTr
     OrdenDeTrabajoMaquina findTopByOrdenDeTrabajo_IdOrderByFechaInicioDesc(Long ordenDeTrabajoId);
 
     List<OrdenDeTrabajoMaquina> findByMaquinaId(Long maquinaId);
+
+    OrdenDeTrabajoMaquina findTopByMaquina_IdAndEstadoOrderByFechaInicioAsc(Long maquinaId, String estado);
 }

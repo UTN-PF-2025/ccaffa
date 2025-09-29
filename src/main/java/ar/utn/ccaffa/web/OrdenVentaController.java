@@ -39,19 +39,20 @@ public class OrdenVentaController {
     }
 
     @PostMapping
-    public ResponseEntity<OrdenVenta> crearOrden(@Valid @RequestBody OrdenVentaDto ordenVentaDto) {
-        OrdenVenta nuevaOrden = ordenVentaService.save(ordenVentaDto);
+    public ResponseEntity<OrdenVentaDto> crearOrden(@Valid @RequestBody OrdenVentaDto ordenVentaDto) {
+        OrdenVentaDto nuevaOrden = ordenVentaService.save(ordenVentaDto);
+
         return new ResponseEntity<>(nuevaOrden, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<OrdenVenta> actualizarOrden(
+    public ResponseEntity<OrdenVentaDto> actualizarOrden(
             @PathVariable Long id,
             @Valid @RequestBody OrdenVentaDto ordenVentaDto) {
-        if (!id.equals(ordenVentaDto.getId())) {
+        if (!id.equals(ordenVentaDto.getOrderId())) {
             return ResponseEntity.badRequest().build();
         }
-        OrdenVenta ordenActualizada = ordenVentaService.save(ordenVentaDto);
+        OrdenVentaDto ordenActualizada = ordenVentaService.save(ordenVentaDto);
         return ResponseEntity.ok(ordenActualizada);
     }
 

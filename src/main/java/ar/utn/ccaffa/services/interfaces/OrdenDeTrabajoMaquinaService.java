@@ -6,4 +6,5 @@ public interface OrdenDeTrabajoMaquinaService {
     void iniciarOrden(Long idOrden);
 
     List<OrdenDeTrabajoMaquina> findByMaquinaId(Long maquinaId);
+    OrdenDeTrabajoMaquina findFirstByMaquinaId(Long maquinaId);
 }

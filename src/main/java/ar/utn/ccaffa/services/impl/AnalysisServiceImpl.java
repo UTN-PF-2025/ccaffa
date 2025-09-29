@@ -35,15 +35,16 @@ public class AnalysisServiceImpl implements AnalysisService {
     private final ControlDeCalidadRepository controlDeCalidadRepository;
 
     @Override
-    public void analyzeAndNotify(MultipartFile file, String id) throws IOException {
+    public void analyzeAndNotify(MultipartFile file, String id, String cameraId) throws IOException {
         byte[] fileBytes = file.getBytes();
-        processAnalysis(fileBytes, file.getOriginalFilename(), file.getContentType(), id);
+        processAnalysis(fileBytes, file.getOriginalFilename(), file.getContentType(), id, cameraId);
     }
 
     @Async
     @Override
-    public void processAnalysis(byte[] fileBytes, String originalFilename, String contentType, String id) {
-        log.info("Iniciando análisis asíncrono para el archivo: {}", originalFilename);
+    public void processAnalysis(byte[] fileBytes, String originalFilename, String contentType, String id, String cameraId) {
+        String effectiveCameraId = (cameraId == null || cameraId.isBlank()) ? "cam-1" : cameraId;
+        log.info("Iniciando análisis asíncrono para el archivo: {} (cameraId={})", originalFilename, effectiveCameraId);
         ManagedChannel channel = null;
         try {
             // 1. Conectarse al servidor gRPC
@@ -61,15 +62,15 @@ public class AnalysisServiceImpl implements AnalysisService {
                     .build();
 
             // 4. Llamar al servicio gRPC
-            log.info("Enviando imagen a análisis a través de gRPC");
+            log.info("Enviando imagen a análisis a través de gRPC (cameraId={})", effectiveCameraId);
             ImageResponses response = stub.classifyImage(request);
 
             // 5. Procesar la respuesta
             if (response != null && response.getFound()) {
-                log.info("¡Defecto detectado! Detalles: {}", response.getResponsesList());
+                log.info("¡Defecto detectado! Detalles: {} (cameraId={})", response.getResponsesList(), effectiveCameraId);
 
-                // 6. Guardar la imagen en el sistema de archivos
-                String filePath = fileStorageService.save(fileBytes, originalFilename);
+                // 6. Guardar la imagen en el sistema de archivos bajo subdirectorio de cámara
+                String filePath = fileStorageService.save(fileBytes, originalFilename, effectiveCameraId);
                 log.info("Imagen con defecto guardada en: {}", filePath);
 
                 // Buscar el control de calidad y añadir el nuevo defecto
@@ -86,20 +87,22 @@ public class AnalysisServiceImpl implements AnalysisService {
 
                 controlDeCalidad.getDefectos().add(defecto);
 
-                // 7. Enviar notificación por WebSocket
+                // 7. Construir y enviar notificación por WebSocket
                 AnalysisResponse analysis = new AnalysisResponse();
                 analysis.setDefect(true);
                 analysis.setDetails("Defecto detectado en " + originalFilename);
                 analysis.setImageId(filePath);
                 analysis.setId(defecto.getId());
+                analysis.setCameraId(effectiveCameraId);
 
                 // Guardar la entidad actualizada
                 controlDeCalidadRepository.save(controlDeCalidad);
-                log.info("Defecto guardado para el control de calidad ID: {}", id);
+                log.info("Defecto guardado para el control de calidad ID: {} (cameraId={})", id, effectiveCameraId);
 
-                // Enviar notificación por WebSocket
+                // Enviar notificaciones por WebSocket: general y por cámara
                 messagingTemplate.convertAndSend("/topic/defects", analysis);
-                log.info("Notificación de defecto enviada a /topic/defects");
+                messagingTemplate.convertAndSend("/topic/defects/" + effectiveCameraId, analysis);
+                log.info("Notificaciones enviadas a /topic/defects y /topic/defects/{}", effectiveCameraId);
             }
         } catch (StatusRuntimeException e) {
             log.error("Error durante la llamada gRPC: {}", e.getStatus(), e);

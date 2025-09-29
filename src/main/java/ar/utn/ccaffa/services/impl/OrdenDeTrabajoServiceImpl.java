@@ -1,13 +1,14 @@
 package ar.utn.ccaffa.services.impl;
 
+import ar.utn.ccaffa.mapper.interfaces.OrdenDeTrabajoResponseMapper;
 import ar.utn.ccaffa.model.dto.FiltroOrdenDeTrabajoDto;
+import ar.utn.ccaffa.model.dto.OrdenDeTrabajoResponseDto;
 import ar.utn.ccaffa.model.entity.Maquina;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajoMaquina;
 import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoMaquinaRepository;
 import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoRepository;
 import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoService;
-import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
@@ -25,13 +26,23 @@ public class OrdenDeTrabajoServiceImpl implements OrdenDeTrabajoService {
     private final OrdenDeTrabajoRepository repository;
     private final OrdenDeTrabajoMaquinaRepository ordenDeTrabajoMaquinaRepository;
 
-    public OrdenDeTrabajoServiceImpl (OrdenDeTrabajoRepository repository, OrdenDeTrabajoMaquinaRepository ordenDeTrabajoMaquinaRepository){
+    private final OrdenDeTrabajoResponseMapper ordenDeTrabajoResponseMapper;
+
+    public OrdenDeTrabajoServiceImpl (OrdenDeTrabajoRepository repository, OrdenDeTrabajoMaquinaRepository ordenDeTrabajoMaquinaRepository, OrdenDeTrabajoResponseMapper ordenDeTrabajoResponseMapper){
         this.repository = repository;
         this.ordenDeTrabajoMaquinaRepository = ordenDeTrabajoMaquinaRepository;
+        this.ordenDeTrabajoResponseMapper = ordenDeTrabajoResponseMapper;
     }
     @Override
     public OrdenDeTrabajo save(OrdenDeTrabajo orden) {
         return repository.save(orden);
+    }
+
+    @Override
+    public List<OrdenDeTrabajo> saveAllDtos(List<OrdenDeTrabajoResponseDto> ordenes) {
+        List<OrdenDeTrabajo> ordenDeTrabajos = this.ordenDeTrabajoResponseMapper.toEntityList(ordenes);
+        return this.repository.saveAll(ordenDeTrabajos);
+
     }
 
     @Override
@@ -63,6 +74,11 @@ public class OrdenDeTrabajoServiceImpl implements OrdenDeTrabajoService {
     @Override
     public List<OrdenDeTrabajo> findByRolloId(Long rolloId) {
         return repository.findByRolloId(rolloId);
+    }
+
+    @Override
+    public OrdenDeTrabajo findByProcesoId(Long procesoId) {
+      return repository.findByOrdenDeTrabajoMaquinas_Id(procesoId);
     }
 
     @Override

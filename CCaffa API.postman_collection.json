@@ -1,10 +1,11 @@
 {
 	"info": {
-		"_postman_id": "c3ebf675-caae-4e14-8918-5b7cac59f212",
+		"_postman_id": "8f06717f-c169-489e-8e24-a0f4c5dc99c5",
 		"name": "CCaffa API",
 		"description": "Colección de endpoints para la API de CCaffa",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "36725469"
+		"_exporter_id": "45716994",
+		"_collection_link": "https://juani-2165688.postman.co/workspace/Juani's-Workspace~a2fc2525-08a8-4a1c-81ea-674a08049f9f/collection/45716994-8f06717f-c169-489e-8e24-a0f4c5dc99c5?action=share&source=collection_link&creator=45716994"
 	},
 	"item": [
 		{
@@ -377,7 +378,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"orderId\":101,\n    \"fechaCreacion\": \"2025-07-01\",\n    \"fechaEntregaEstimada\":\"2025-07-28\",\n    \"estado\": \"Pendiente\",\n    \"observaciones\":\"Ninguna\",\n    \"cliente\": {\n        \"id\":1\n    },\n\"especificaciones\": [\n           {\n            \"ancho\":22.44,\n            \"espesor\": 8.0,\n            \"cantidad\":1,\n            \"tipoMaterial\":\"GALVANIZADO\",\n            \"pesoMaximoPorRollo\":2.0,\n            \"tipoDeEmbalaje\":\"tipoEmbalaje\",\n            \"toleranciaAncho\": 1.22,\n            \"toleranciaEspesor\": 0.33,\n            \"diametroInterno\": 10,\n            \"diametroExterno\":100\n        }\n    ]\n}",
+							"raw": "{\n    \"orderId\":1,\n    \"fechaCreacion\": \"2025-09-06\",\n    \"fechaEntregaEstimada\":\"2025-09-28\",\n    \"estado\": \"A_PLANIFICAR\",\n    \"observaciones\":\"Ninguna\",\n    \"cliente\": {\n        \"id\":1\n    },\n\"especificacion\":\n           {\n            \"ancho\":22.44,\n            \"espesor\": 8.0,\n            \"cantidad\":1,\n            \"tipoMaterial\":\"GALVANIZADO\",\n            \"pesoMaximoPorRollo\":2.0,\n            \"tipoDeEmbalaje\":\"tipoEmbalaje\",\n            \"toleranciaAncho\": 1.22,\n            \"toleranciaEspesor\": 0.33,\n            \"diametroInterno\": 10,\n            \"diametroExterno\":100\n        }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -711,7 +712,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"codigoProveedor\": \"0XBDKJ2222R\",\n    \"proveedorId\": 2,\n    \"pesoKG\": 20,\n    \"anchoMM\": 200,\n    \"espesorMM\": 40,\n    \"tipoMaterial\": \"LAMINADO_EN_FRIO\",\n    \"estado\": \"DISPONIBLE\",\n    \"fechaIngreso\": \"2025-06-21 18:34:00\"\n\n}\n"
+							"raw": "{\n    \"codigoProveedor\": \"0XBDKJ2222R\",\n    \"proveedorId\": 2,\n    \"pesoKG\": 15,\n    \"anchoMM\": 200,\n    \"espesorMM\": 100,\n    \"tipoMaterial\": \"GALVANIZADO\",\n    \"estado\": \"DISPONIBLE\",\n    \"fechaIngreso\": \"2025-06-21 18:34:00\"\n\n}\n"
 						},
 						"url": {
 							"raw": "http://localhost:8080/api/rollos",
@@ -822,6 +823,14 @@
 								"rollosDisponibles"
 							]
 						}
+					},
+					"response": []
+				},
+				{
+					"name": "Anular",
+					"request": {
+						"method": "GET",
+						"header": []
 					},
 					"response": []
 				}
@@ -1007,13 +1016,39 @@
 					"response": []
 				},
 				{
+					"name": "Crear Orden",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"ordenDeVentaId\": 2,\n  \"rolloId\": 1,\n  \"estado\":0,\n  \"fechaInicio\": \"2025-09-19T08:00:00\",\n  \"fechaFin\": \"2025-10-01T18:00:00\",\n  \"observaciones\": \"OT para corte. Prioridad media.\",\n  \"maquinas\": [\n    {\n      \"id\": 1,\n      \"fechaInicio\": \"2025-09-19T08:00:00\",\n      \"fechaFin\": \"2025-10-01T18:00:00\",\n      \"estado\": \"Planificada\",\n      \"observaciones\": \"Corte inicial\"\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/ordenes-trabajo",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"ordenes-trabajo"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "New Request",
 					"request": {
 						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": ""
-						}
+						"header": []
 					},
 					"response": []
 				}
@@ -1502,205 +1537,6 @@
 						}
 					},
 					"response": []
-				}
-			]
-		},
-		{
-			"name": "Orden de Trabajo",
-			"item": [
-				{
-					"name": "Create orden de trabajo",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc1MTQyMDc4NywiZXhwIjoxNzUxNDM4Nzg3fQ.mv_TiMZ0aO8ZGFMIXBY_nphasxq8MRUf0eXgyuNnd-s",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc1MDIxNzA2MSwiZXhwIjoxNzUwMjM1MDYxfQ.uaKF6pKv5QOT_u0za0W1w4SK4-Ez8B7N3SU8zZ1Fr6A",
-								"disabled": true
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"ordenDeVentaId\": 16,\n    \"rolloId\": 25,\n    \"fechaInicio\": \"2025-06-23T10:00:00\",\n    \"fechaFin\": \"2025-06-23T18:00:00\",\n    \"observaciones\": \"Orden de trabajo de prueba\",\n    \"maquinas\": [\n      {\n        \"id\": 1,\n        \"fechaInicio\": \"2025-06-23T10:00:00\",\n        \"fechaFin\": \"2025-06-23T14:00:00\",\n        \"estado\": \"En Proceso\",\n        \"observaciones\": \"Máquina 1 asignada\"\n      }\n    ]\n  }",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8080/api/ordenes-trabajo",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"ordenes-trabajo"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get orden de trabajo",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc1MDgyMzcxMCwiZXhwIjoxNzUwODQxNzEwfQ.R9BTBHzBflmmeV8qu24OULULu92a4LhgoTgOWNdeLRE",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc1MDIxNzA2MSwiZXhwIjoxNzUwMjM1MDYxfQ.uaKF6pKv5QOT_u0za0W1w4SK4-Ez8B7N3SU8zZ1Fr6A",
-								"disabled": true
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"ordenDeVentaId\": 5,\n    \"rolloId\": 5,\n    \"fechaInicio\": \"2025-06-22T10:00:00\",\n    \"fechaFin\": \"2025-06-22T18:00:00\",\n    \"observaciones\": \"Orden de trabajo de prueba\",\n    \"maquinas\": [\n      {\n        \"id\": 1,\n        \"fechaInicio\": \"2025-06-22T10:00:00\",\n        \"fechaFin\": \"2025-06-22T14:00:00\",\n        \"estado\": \"En Proceso\",\n        \"observaciones\": \"Máquina 1 asignada\"\n      }\n    ]\n  }",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8080/api/ordenes-trabajo/:id",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"ordenes-trabajo",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "4"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Actualizar orden de trabajo",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc1MDYyNjU0NSwiZXhwIjoxNzUwNjQ0NTQ1fQ.Ey1Fng7-E1sGjcmQUuG9dPNZnB4t5fqNa6AVCRf8Jr0",
-									"type": "string"
-								}
-							]
-						},
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer TU_TOKEN_JWT"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"id\": 1,\n    \"nombre\": \"Orden de trabajo actualizada\",\n    \"fechaInicio\": \"2025-06-22T10:00:00\",\n    \"fechaFin\": \"2025-06-22T18:00:00\",\n    \"estado\": \"En Proceso\",\n    \"observaciones\": \"Observaciones actualizadas\",\n    \"fechaEstimadaDeInicio\": \"2025-06-22T10:00:00\",\n    \"fechaEstimadaDeFin\": \"2025-06-22T18:00:00\",\n    \"activa\": true\n  }",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8080/api/ordenes-trabajo/1",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"ordenes-trabajo",
-								"1"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Cancelar orden de trabajo",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc1MTQyMDc4NywiZXhwIjoxNzUxNDM4Nzg3fQ.mv_TiMZ0aO8ZGFMIXBY_nphasxq8MRUf0eXgyuNnd-s",
-									"type": "string"
-								}
-							]
-						},
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer TU_TOKEN_JWT"
-							}
-						],
-						"url": {
-							"raw": "http://localhost:8080/api/ordenes-trabajo/23/cancelar",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"ordenes-trabajo",
-								"23",
-								"cancelar"
-							]
-						}
-					},
-					"response": []
 				},
 				{
 					"name": "New Request",
@@ -1713,21 +1549,26 @@
 			]
 		},
 		{
-			"name": "Camaras",
+			"name": "Certificado PDF",
 			"item": [
 				{
-					"name": "Crear camara",
+					"name": "Generar PDF",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
+						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"nombre\": \"Camara de Vigilancia 1\",\n  \"descripcion\": \"Camara en la entrada principal\",\n  \"url\": \"rtsp://192.168.1.100:554/stream1\",\n  \"ubicacion\": \"Entrada Principal\"\n}",
+							"raw": "{\n    \"ordenDeTrabajoId\":27,\n    \"partida1\": \" \",\n    \"partida2\": \" \",\n    \"partida3\": \" \",\n    \"partida4\": \" \",\n    \"fecha\":\"2025-09-15\",\n    \"cantidadOriginal\":\"200\",\n    \"durezaOriginal\":\"XXXX\",\n    \"errorDurezaOriginal\":\"1\",\n    \"resistencia\":\"-----\",\n    \"cantidadReal\":\"XXXX\",\n    \"errorDurezaReal\":\"0\",\n    \"composicionCarbono\":\"0,06\",\n    \"composicionManganeso\":\"0,20\",\n    \"composicionFosforo\":\"0,011\",\n    \"composicionAzufre\":\"0,014\",\n    \"composicionAluminio\":\"0,029\",\n    \"composicionSilicio\":\"0,02\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1735,7 +1576,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/camaras",
+							"raw": "http://localhost:8080/api/certificados",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1743,19 +1584,19 @@
 							"port": "8080",
 							"path": [
 								"api",
-								"camaras"
+								"certificados"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "GET all camaras",
+					"name": "Obtener PDF",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/camaras",
+							"raw": "http://localhost:8080/api/certificados/7",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1763,75 +1604,25 @@
 							"port": "8080",
 							"path": [
 								"api",
-								"camaras"
+								"certificados",
+								"7"
 							]
 						}
 					},
 					"response": []
-				},
+				}
+			]
+		},
+		{
+			"name": "Defectos",
+			"item": [
 				{
-					"name": "GET por ID",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:8080/api/camaras/{id}",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"camaras",
-								"{id}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "UPDATE camara",
+					"name": "Aceptar Defecto",
 					"request": {
 						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"nombre\": \"Camara de Vigilancia 1 (Actualizada)\",\n  \"descripcion\": \"Camara actualizada en la entrada principal\",\n  \"url\": \"rtsp://192.168.1.100:554/stream1_updated\",\n  \"ubicacion\": \"Entrada Principal - Sector A\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8080/api/camaras/{id}",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"camaras",
-								"{id}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "DELETE camara",
-					"request": {
-						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/camaras/{id}",
+							"raw": "http://localhost:8080/api/defectos/cam-1/your-image-filename.jpg/aceptar",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1839,81 +1630,22 @@
 							"port": "8080",
 							"path": [
 								"api",
-								"camaras",
-								"{id}"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Control de Calidad",
-			"item": [
-				{
-					"name": "Crear Control de Calidad",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"empleadoId\": 1,\n    \"ordenDeTrabajoId\": 1\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8080/api/controles-calidad",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"controles-calidad"
+								"defectos",
+								"cam-1",
+								"your-image-filename.jpg",
+								"aceptar"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Añadir Medida a Control de Calidad",
+					"name": "Rechazar Defecto",
 					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"espesorMedido\": 5.2,\n    \"anchoMedido\": 100.5,\n    \"rebabaMedio\": 0.1\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
+						"method": "PUT",
+						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/controles-calidad/1/medidas",
+							"raw": "http://localhost:8080/api/defectos/cam-1/your-image-filename.jpg/rechazar",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1921,130 +1653,14 @@
 							"port": "8080",
 							"path": [
 								"api",
-								"controles-calidad",
-								"1",
-								"medidas"
+								"defectos",
+								"cam-1",
+								"your-image-filename.jpg",
+								"rechazar"
 							]
 						}
 					},
 					"response": []
-				},
-				{
-					"name": "Obtener Control de Proceso",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "http://localhost:8080/api/controles-calidad/1/proceso",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"controles-calidad",
-								"1",
-								"proceso"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Obtener Todos los Controles de Calidad",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "http://localhost:8080/api/controles-calidad",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"controles-calidad"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Ordenes de Trabajo Maquina",
-			"item": [
-				{
-					"name": "Get Ordenes de Trabajo by Maquina ID",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "https://ccaffa.art/api/ordenes-trabajo-maquina/por-maquina/1",
-							"protocol": "https",
-							"host": [
-								"ccaffa",
-								"art"
-							],
-							"path": [
-								"api",
-								"ordenes-trabajo-maquina",
-								"por-maquina",
-								"1"
-							]
-						}
-					},
-					"response": [
-						{
-							"name": "Sample Response",
-							"originalRequest": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "https://ccaffa.art/api/ordenes-trabajo-maquina/por-maquina/1",
-									"protocol": "https",
-									"host": [
-										"ccaffa",
-										"art"
-									],
-									"path": [
-										"api",
-										"ordenes-trabajo-maquina",
-										"por-maquina",
-										"1"
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								}
-							],
-							"cookie": [],
-							"body": "[\n    {\n        \"id\": 1,\n        \"ordenDeTrabajoId\": 100,\n        \"maquinaId\": 1,\n        \"fechaInicio\": \"2025-09-07T18:30:00\",\n        \"fechaFin\": \"2025-09-07T19:30:00\",\n        \"estado\": \"Completada\",\n        \"observaciones\": \"Corte realizado sin problemas.\"\n    }\n]"
-						}
-					]
 				}
 			]
 		}

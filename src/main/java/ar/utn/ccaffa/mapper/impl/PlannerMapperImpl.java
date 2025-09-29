@@ -27,6 +27,7 @@ public class PlannerMapperImpl implements PlannerMapper {
                 .POPULATION_SIZE_PER_SALE(plannerDTO.getPOPULATION_SIZE_PER_SALE())
                 .horaDeInicioLaboral(plannerDTO.getHoraDeInicioLaboral())
                 .horaDeFinLaboral(plannerDTO.getHoraDeFinLaboral())
+                .valid_days_of_the_week(plannerDTO.getValid_days_of_the_week())
                 .build();
     }
 

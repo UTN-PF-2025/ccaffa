@@ -70,9 +70,7 @@ public class RolloServiceImpl implements RolloService {
         Rollo rolloEntity = this.rolloMapper.toEntity(rollo);
 
         if (rollo.getRolloPadreId() != null) {
-            Rollo padre = new Rollo();
-            padre.setId(rollo.getRolloPadreId());
-            rolloEntity.setRolloPadre(padre);
+            rolloEntity.setRolloPadre(rolloRepository.getReferenceById(rollo.getRolloPadreId()));
         } else {
             rolloEntity.setRolloPadre(null);
         }

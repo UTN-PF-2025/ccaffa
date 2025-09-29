@@ -8,12 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 @Entity
 @Table(name = "ordenes_de_trabajo")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(exclude = {"ordenDeVenta", "ordenDeTrabajoMaquinas"})
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class OrdenDeTrabajo {
@@ -46,8 +48,8 @@ public class OrdenDeTrabajo {
     @Column(name = "activa")
     private Boolean activa = true;
 
-    
-    @OneToOne(mappedBy = "ordenDeTrabajo")
+    @JoinColumn(name = "orden_venta_id")
+    @ManyToOne()
     private OrdenVenta ordenDeVenta;
 
     @OneToMany(mappedBy = "ordenDeTrabajo", cascade = CascadeType.ALL)

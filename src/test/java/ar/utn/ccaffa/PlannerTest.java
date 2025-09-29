@@ -3,7 +3,7 @@ import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.enums.MaquinaTipoEnum;
 import ar.utn.ccaffa.enums.TipoMaterial;
 import ar.utn.ccaffa.model.entity.*;
-import ar.utn.ccaffa.planner.Pair;
+import ar.utn.ccaffa.planner.Plan;
 import ar.utn.ccaffa.planner.PlannerGA;
 import org.junit.jupiter.api.Test;
 
@@ -44,14 +44,12 @@ public class PlannerTest {
                 Especificacion randomEspecificacion = especificaciones.get(RANDOM.nextInt(especificaciones.size()));
                 OrdenVenta ov = OrdenVenta.builder()
                         .id(i)
-                        .orderId(i)
                         .fechaCreacion(LocalDateTime.now().minusDays(RANDOM.nextInt(1)))
                         .fechaEntregaEstimada(LocalDateTime.now().plusDays(RANDOM.nextInt(30)))
                         .estado("Creada")
                         .observaciones("Generada automáticamente")
                         .cliente(Cliente.builder()
                                 .id(1L)
-                                .activo(true)
                                 .email("test@example.com")
                                 .name("Cliente " + i)
                                 .build())
@@ -134,10 +132,10 @@ public class PlannerTest {
                     .horaDeInicioLaboral(8)
                     .build();
 
-            Pair<List<OrdenDeTrabajo>, List<Rollo>> result = plannerGA.execute();
+            Plan<List<OrdenDeTrabajo>, List<Rollo>> result = plannerGA.execute();
 
-            List<OrdenDeTrabajo> ordenDeTrabajoList = result.first;
-            List<Rollo> rolloList = result.second;
+            List<OrdenDeTrabajo> ordenDeTrabajoList = result.ordenesDeTrabajo;
+            List<Rollo> rolloList = result.rollosHijos;
 
             for (OrdenDeTrabajo job : ordenDeTrabajoList) {
                 for (OrdenDeTrabajoMaquina ordenDeTrabajoMaquina : job.getOrdenDeTrabajoMaquinas()){
