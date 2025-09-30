@@ -1,8 +1,10 @@
 package ar.utn.ccaffa.services.impl;
 
+import ar.utn.ccaffa.exceptions.ResourceNotFoundException;
 import ar.utn.ccaffa.mapper.interfaces.CertificadoDeCalidadMapper;
 import ar.utn.ccaffa.mapper.interfaces.OrdenVentaMapper;
 import ar.utn.ccaffa.model.dto.*;
+import ar.utn.ccaffa.model.entity.CertificadoDeCalidad;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import ar.utn.ccaffa.repository.interfaces.CertificadoDeCalidadRepository;
 import ar.utn.ccaffa.services.interfaces.CertificadoCalidadService;
@@ -18,6 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.stream.Stream;
 
@@ -86,7 +92,7 @@ public class CertificadoCalidadServiceImpl implements CertificadoCalidadService 
 
             cerrarDocumento();
 
-            guardarCertificado(certificadoRequestDTO, fechaEmision, controlProceso, ot);
+            guardarCertificado(certificadoRequestDTO, fechaEmision, controlProceso, nombreArchivo);
 
         } catch (FileNotFoundException | DocumentException e) {
             log.error("No se pudo crear el certificado PDF");
@@ -119,12 +125,38 @@ public class CertificadoCalidadServiceImpl implements CertificadoCalidadService 
         return this.certificadoDeCalidadMapper.toDto(this.certificadoDeCalidadRepository.findById(id));
     }
 
-    private void guardarCertificado(CertificadoRequestDTO certificadoRequestDTO, LocalDate fechaEmision, ControlDeProcesoDto controlProceso, OrdenDeTrabajo ot) {
+    @Override
+    public byte[] obtenerPdf(Long certificadoId) {
+        try {
+            CertificadoDeCalidad certificado = this.certificadoDeCalidadRepository.findById(certificadoId).orElseThrow(() -> new ResourceNotFoundException("Obtener Certificado", "id de certificado", certificadoId));
+            
+            String nombreCompleto = certificado.getNombreArchivo().endsWith(".pdf") ? certificado.getNombreArchivo() : certificado.getNombreArchivo() + ".pdf";
+            Path rutaArchivo = Paths.get(nombreCompleto);
+
+            if (!Files.exists(rutaArchivo)) {
+                log.error("El archivo PDF no existe: {}", rutaArchivo.toAbsolutePath());
+                throw new ResourceNotFoundException("Obtener PDF", "nombre de archivo", nombreCompleto);
+            }
+
+            byte[] contenidoPdf = Files.readAllBytes(rutaArchivo);
+            log.info("Archivo PDF leído exitosamente: {}", nombreCompleto);
+
+            return contenidoPdf;
+
+        } catch (IOException e) {
+            log.error("Error al leer el archivo PDF: {}", certificadoId, e);
+            throw new RuntimeException("Error al obtener el archivo PDF: " + e.getMessage(), e);
+        }
+
+    }
+
+    private void guardarCertificado(CertificadoRequestDTO certificadoRequestDTO, LocalDate fechaEmision, ControlDeProcesoDto controlProceso, String nombreArchivo) {
         CertificadoDeCalidadDto certificado = new CertificadoDeCalidadDto();
         certificado.setNumeroDeCertificado(construirNumeroCertificado(certificadoRequestDTO));
         certificado.setFechaDeEmision(fechaEmision);
         certificado.setAprobador(EmpleadoDto.builder().nombre(controlProceso.getNombreOperario()).id(controlProceso.getIdOperario()).build());
         certificado.setControlDeCalidadId(controlProceso.getIdControl());
+        certificado.setNombreArchivo(nombreArchivo);
 
         this.certificadoDeCalidadRepository.save(this.certificadoDeCalidadMapper.toEntity(certificado));
     }
