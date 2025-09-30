@@ -5,6 +5,7 @@ import ar.utn.ccaffa.model.dto.OrdenDeTrabajoResponseDto;
 import ar.utn.ccaffa.model.entity.Maquina;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajoMaquina;
+import ar.utn.ccaffa.enums.EstadoOrdenTrabajoEnum;
 import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.mapper.interfaces.OrdenDeTrabajoResponseMapper;
 import ar.utn.ccaffa.mapper.interfaces.RolloMapper;
@@ -101,7 +102,7 @@ public class OrdenDeTrabajoServiceImpl implements OrdenDeTrabajoService {
 
         // 1. Cancelar todas las órdenes de trabajo
         afectados.getOrdenesTrabajoACancelar().forEach(orden -> {
-            if (!"Cancelada".equals(orden.getEstado())) {
+            if (!EstadoOrdenTrabajoEnum.ANULADA.equals(orden.getEstado())) {
                 cancelarOrden(orden);
                 repository.save(orden);
             }
@@ -222,13 +223,13 @@ public class OrdenDeTrabajoServiceImpl implements OrdenDeTrabajoService {
     }
 
     private void validarCancelacion(OrdenDeTrabajo orden) {
-        if ("Cancelada".equals(orden.getEstado()) || "Completada".equals(orden.getEstado())) {
+        if (EstadoOrdenTrabajoEnum.ANULADA.equals(orden.getEstado()) || EstadoOrdenTrabajoEnum.FINALIZADA.equals(orden.getEstado())) {
             throw new IllegalStateException("No se puede cancelar una orden que ya está " + orden.getEstado());
         }
     }
 
     private void cancelarOrden(OrdenDeTrabajo orden) {
-        orden.setEstado("Cancelada");
+        orden.setEstado(EstadoOrdenTrabajoEnum.ANULADA);
         orden.setActiva(false);
     }
 

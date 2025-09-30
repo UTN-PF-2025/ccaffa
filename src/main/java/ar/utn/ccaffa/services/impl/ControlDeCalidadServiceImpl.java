@@ -4,19 +4,18 @@ import ar.utn.ccaffa.model.dto.CreateControlDeCalidadRequest;
 import ar.utn.ccaffa.model.entity.ControlDeCalidad;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import ar.utn.ccaffa.repository.interfaces.ControlDeCalidadRepository;
+import ar.utn.ccaffa.enums.EstadoOrdenTrabajoEnum;
 import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.model.dto.AddMedidaRequest;
 import ar.utn.ccaffa.model.dto.ControlDeProcesoDto;
 import ar.utn.ccaffa.model.entity.*;
 import ar.utn.ccaffa.repository.interfaces.MedidaDeCalidadRepository;
 import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoRepository;
-import ar.utn.ccaffa.repository.interfaces.OrdenVentaRepository;
 import ar.utn.ccaffa.repository.interfaces.ProveedorRepository;
 import ar.utn.ccaffa.repository.interfaces.RolloRepository;
 import ar.utn.ccaffa.repository.interfaces.UsuarioRepository;
 import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoMaquinaRepository;
 import ar.utn.ccaffa.services.interfaces.ControlDeCalidadService;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -162,11 +161,11 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
         Rollo rollo = ordenDeTrabajo.getRollo();
         if (!control.getDefectos().isEmpty() || control.getEstado().equals("Defectuoso")) {
             control.setEstado("Defectuoso");
-            ordenDeTrabajo.setEstado("Defectuoso");
+            ordenDeTrabajo.setEstado(EstadoOrdenTrabajoEnum.DEFECTUOSO);
             rollo.setEstado(EstadoRollo.VERFICAR);
         } else {
             control.setEstado("Finalizado");
-            ordenDeTrabajo.setEstado("Finalizado");
+            ordenDeTrabajo.setEstado(EstadoOrdenTrabajoEnum.FINALIZADA);
         }
         control.setFechaFinalizacion(LocalDateTime.now());
         ordenDeTrabajo.setFechaFin(LocalDateTime.now());

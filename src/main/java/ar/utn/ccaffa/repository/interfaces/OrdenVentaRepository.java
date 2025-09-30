@@ -5,9 +5,11 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,5 +26,15 @@ public interface OrdenVentaRepository extends JpaRepository<OrdenVenta, Long>, J
     List<OrdenVenta> findAll(Specification<OrdenVenta> spec);
     
     List<OrdenVenta> findByIdIn(List<Long> ids);
+
+    OrdenVenta findByOrdenDeTrabajoId(Long ordenDeTrabajoId);
+
+    @Query("select ov from OrdenVenta ov left join fetch ov.cliente left join fetch ov.especificacion where ov.ordenDeTrabajo.id = :ordenDeTrabajoId")
+    OrdenVenta findByOrdenDeTrabajoIdFetchClienteEspecificacion(@Param("ordenDeTrabajoId") Long ordenDeTrabajoId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Transactional
+    @Query("update OrdenVenta ov set ov.estado = :estado where ov.id = :ordenVentaId")
+    void updateOrdenDeVentaEstado(@Param("ordenVentaId") Long ordenVentaId, @Param("estado") String estado);
 
 }

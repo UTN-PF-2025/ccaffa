@@ -1,5 +1,6 @@
 package ar.utn.ccaffa.model.entity;
 
+import ar.utn.ccaffa.enums.EstadoOrdenTrabajoMaquinaEnum;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -37,7 +38,8 @@ public class OrdenDeTrabajoMaquina {
     private LocalDateTime fechaFin;
     
     @Column(name = "estado")
-    private String estado;
+    @Enumerated(EnumType.STRING)
+    private EstadoOrdenTrabajoMaquinaEnum estado;
     
     @Column(name = "observaciones")
     private String observaciones;

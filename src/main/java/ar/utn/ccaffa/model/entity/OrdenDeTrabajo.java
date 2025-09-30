@@ -1,7 +1,7 @@
 package ar.utn.ccaffa.model.entity;
 
+import ar.utn.ccaffa.enums.EstadoOrdenTrabajoEnum;
 import ar.utn.ccaffa.enums.EstadoRollo;
-import ar.utn.ccaffa.model.dto.Bloque;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -33,7 +33,8 @@ public class OrdenDeTrabajo {
     private LocalDateTime fechaFin;
 
     @Column(length = 50)
-    private String estado;
+    @Enumerated(EnumType.STRING)
+    private EstadoOrdenTrabajoEnum estado;
 
     @Column(length = 100)
     private String observaciones;
@@ -63,7 +64,7 @@ public class OrdenDeTrabajo {
     private ControlDeCalidad controlDeCalidad;
 
     public boolean yaComenzo() {
-        return !getEstado().equalsIgnoreCase("Pendiente");
+        return !EstadoOrdenTrabajoEnum.is(this.estado, EstadoOrdenTrabajoEnum.PROGRAMADA);
     }
 
     public boolean tieneMaquinaAsociada(Maquina maquina){

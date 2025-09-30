@@ -15,6 +15,13 @@ public class OrdenDeTrabajoMaquinaServiceImpl implements OrdenDeTrabajoMaquinaSe
     private final OrdenDeTrabajoMaquinaRepository repository;
 
     @Override
+    public void iniciarOrden(Long idOrden) {
+        /*
+        implementar inicio de orden de trabajo
+         */
+    }
+
+    @Override
     public List<OrdenDeTrabajoMaquina> findByMaquinaId(Long maquinaId) {
         return repository.findByMaquinaId(maquinaId);
     }

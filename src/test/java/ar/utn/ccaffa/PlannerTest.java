@@ -1,4 +1,5 @@
 package ar.utn.ccaffa;
+import ar.utn.ccaffa.enums.EstadoOrdenTrabajoMaquinaEnum;
 import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.enums.MaquinaTipoEnum;
 import ar.utn.ccaffa.enums.TipoMaterial;
@@ -102,7 +103,7 @@ public class PlannerTest {
                         .id(i)
                         .ordenDeTrabajo(ordenDeTrabajo)
                         .maquina(maquinas.get(RANDOM.nextInt(maquinas.size())))
-                        .estado("Programada")
+                        .estado(EstadoOrdenTrabajoMaquinaEnum.PROGRAMADA)
                         .observaciones("Generada automáticamente")
                         .fechaInicio(start)
                         .fechaFin(start.plusHours(1 + RANDOM.nextInt(5)))

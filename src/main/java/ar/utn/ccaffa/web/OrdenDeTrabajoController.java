@@ -1,6 +1,6 @@
 package ar.utn.ccaffa.web;
 
-import ar.utn.ccaffa.enums.MaquinaTipoEnum;
+import ar.utn.ccaffa.enums.*;
 import ar.utn.ccaffa.mapper.interfaces.OrdenDeTrabajoMaquinaMapper;
 import ar.utn.ccaffa.mapper.interfaces.OrdenDeTrabajoResponseMapper;
 import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoMaquinaService;
@@ -198,7 +198,7 @@ public class OrdenDeTrabajoController {
                 .maquina(maquina)
                 .fechaInicio(mreq.getFechaInicio())
                 .fechaFin(mreq.getFechaFin())
-                .estado(mreq.getEstado())
+                .estado(EstadoOrdenTrabajoMaquinaEnum.valueOf(mreq.getEstado()))
                 .observaciones(mreq.getObservaciones())
                 .build();
     }
@@ -226,7 +226,7 @@ public class OrdenDeTrabajoController {
         orden.setFechaEstimadaDeInicio(request.getFechaInicio());
         orden.setFechaEstimadaDeFin(request.getFechaFin());
         orden.setObservaciones(request.getObservaciones());
-        orden.setEstado("En Proceso");
+        orden.setEstado(EstadoOrdenTrabajoEnum.PROGRAMADA);
     }
 
 
@@ -247,7 +247,7 @@ public class OrdenDeTrabajoController {
     }
 
     private void validarModificacion(OrdenDeTrabajo orden) {
-        if ("En Ejecucion".equals(orden.getEstado()) || "Ejecutando".equals(orden.getEstado())) {
+        if (EstadoOrdenTrabajoEnum.is(orden.getEstado(), EstadoOrdenTrabajoEnum.EN_CURSO)) {
             throw new IllegalStateException("No se puede modificar una orden de trabajo que está en ejecución");
         }
     }

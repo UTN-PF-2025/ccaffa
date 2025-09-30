@@ -13,11 +13,9 @@ import java.util.stream.Collectors;
 
 @Component
 public class OrdenDeTrabajoMaquinaResponseMapperImpl implements OrdenDeTrabajoMaquinaResponseMapper {
-    private final OrdenDeTrabajoRepository ordenDeTrabajoRepository;
     private final MaquinaRepository maquinaRepository;
 
-    public OrdenDeTrabajoMaquinaResponseMapperImpl(OrdenDeTrabajoRepository ordenDeTrabajoRepository, MaquinaRepository maquinaRepository) {
-        this.ordenDeTrabajoRepository = ordenDeTrabajoRepository;
+    public OrdenDeTrabajoMaquinaResponseMapperImpl(MaquinaRepository maquinaRepository) {
         this.maquinaRepository = maquinaRepository;
     }
 

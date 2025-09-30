@@ -1,5 +1,7 @@
 package ar.utn.ccaffa.services.impl;
 
+import ar.utn.ccaffa.enums.EstadoOrdenTrabajoEnum;
+import ar.utn.ccaffa.enums.EstadoOrdenVentaEnum;
 import ar.utn.ccaffa.exceptions.ResourceNotFoundException;
 import ar.utn.ccaffa.exceptions.UnprocessableContentException;
 import ar.utn.ccaffa.mapper.interfaces.OrdenVentaMapper;
@@ -64,15 +66,15 @@ public class OrdenVentaServiceImpl implements OrdenVentaService {
         OrdenVentaDto ordenVentaAAnular = this.findById(ordenVentaId);
         List<OrdenDeTrabajo> ordenesDeTrabajo = this.ordenDeTrabajoRepository.findByOrdenDeVenta_Id(ordenVentaAAnular.getOrderId());
         if(ordenesDeTrabajo.isEmpty()){
-            ordenVentaAAnular.setEstado("Cancelada");
+            ordenVentaAAnular.setEstado(EstadoOrdenVentaEnum.ANULADA);
             this.save(ordenVentaAAnular);
         } else {
             OrdenDeTrabajo ordenDeTrabajo1 = ordenesDeTrabajo.getFirst();
             if(ordenDeTrabajo1.yaComenzo()){
                 throw new UnprocessableContentException("Orden de Venta - Anulación");
             } else {
-                this.ordenDeTrabajoService.desactivar(ordenDeTrabajo1.getId());
-                ordenVentaAAnular.setEstado("Cancelada");
+                this.ordenDeTrabajoService.cancelarOrdenDeTrabajo(ordenDeTrabajo1.getId());
+                ordenVentaAAnular.setEstado(EstadoOrdenVentaEnum.ANULADA);
                 this.save(ordenVentaAAnular);
             }
         }
@@ -116,15 +118,14 @@ public class OrdenVentaServiceImpl implements OrdenVentaService {
 
     @Override
     public void finalizar(Long ordenVentaId) {
-        OrdenVenta ordenVenta = this.ordenVentaRepository.findById(ordenVentaId).orElseThrow(() -> new ResourceNotFoundException("Orden de venta", "id", ordenVentaId));
-        if(ordenVenta.getEstado().equals("Finalizada")){
+        OrdenVentaDto ordenVentaDto =this.ordenVentaMapper.toDto(this.ordenVentaRepository.findById(ordenVentaId).orElseThrow(() -> new ResourceNotFoundException("Orden de venta", "id", ordenVentaId)));
+        if(EstadoOrdenVentaEnum.is(ordenVentaDto.getEstado(), EstadoOrdenVentaEnum.FINALIZADA)){
             throw new UnprocessableContentException("Orden de Venta - Finalizar");
         }
         List<OrdenDeTrabajo> ordenesDeTrabajo = this.ordenDeTrabajoRepository.findByOrdenDeVenta_Id(ordenVentaId);
         
-        if(ordenesDeTrabajo.getFirst().getEstado().equals("Finalizada")){
-            ordenVenta.setEstado("Finalizada");
-            this.ordenVentaRepository.save(ordenVenta);
+        if(EstadoOrdenTrabajoEnum.is(ordenesDeTrabajo.getFirst().getEstado(), EstadoOrdenTrabajoEnum.FINALIZADA)){
+            this.ordenVentaRepository.updateOrdenDeVentaEstado(ordenVentaId, EstadoOrdenVentaEnum.FINALIZADA.name());
         } else {
             throw new UnprocessableContentException("Orden de Venta - Finalizar");
         }

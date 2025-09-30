@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import ar.utn.ccaffa.enums.EstadoOrdenTrabajoEnum;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -17,7 +19,7 @@ public class OrdenDeTrabajoResponseDto {
     private String nombre;
     private LocalDateTime fechaInicio;
     private LocalDateTime fechaFin;
-    private String estado;
+    private EstadoOrdenTrabajoEnum estado;
     private String observaciones;
     private LocalDateTime fechaEstimadaDeInicio;
     private LocalDateTime fechaEstimadaDeFin;
