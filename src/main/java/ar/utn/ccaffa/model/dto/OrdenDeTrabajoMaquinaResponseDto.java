@@ -1,5 +1,6 @@
 package ar.utn.ccaffa.model.dto;
 
+import ar.utn.ccaffa.enums.EstadoOrdenTrabajoMaquinaEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

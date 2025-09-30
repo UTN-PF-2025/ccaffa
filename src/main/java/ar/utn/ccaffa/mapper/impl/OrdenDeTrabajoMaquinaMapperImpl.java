@@ -19,7 +19,7 @@ public class OrdenDeTrabajoMaquinaMapperImpl implements OrdenDeTrabajoMaquinaMap
                 .maquinaId(entity.getMaquina() != null ? entity.getMaquina().getId() : null)
                 .fechaInicio(entity.getFechaInicio())
                 .fechaFin(entity.getFechaFin())
-                .estado(entity.getEstado().name())
+                .estado(entity.getEstado())
                 .observaciones(entity.getObservaciones())
                 .build();
     }

@@ -1,5 +1,6 @@
 package ar.utn.ccaffa.web;
 
+import ar.utn.ccaffa.enums.EstadoOrdenTrabajoMaquinaEnum;
 import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.exceptions.ErrorResponse;
 import ar.utn.ccaffa.mapper.interfaces.OrdenDeTrabajoResponseMapper;
@@ -120,7 +121,7 @@ public class PlannerController {
         LocalDateTime fechaHasta = ordenVentas.stream().max(Comparator.comparing(OrdenVenta::getFechaEntregaEstimada)).get().getFechaEntregaEstimada();
 
         List<OrdenDeTrabajoMaquina> ordenDeTrabajoMaquinas = this.ordenDeTrabajoService
-                .findOrdenDeTrabajoMaquinaByEstadoAndFechaFinAfterAndFechaFinBeforeAndMaquinaIn("Progamada", fechaDesde, fechaHasta, maquinas);
+                .findOrdenDeTrabajoMaquinaByEstadoInAndFechaFinAfterAndFechaFinBeforeAndMaquinaIn(List.of(EstadoOrdenTrabajoMaquinaEnum.PROGRAMADA, EstadoOrdenTrabajoMaquinaEnum.EN_CURSO), fechaDesde, fechaHasta, maquinas);
 
         plannerGA.setOrdenesDeTrabajoMaquina(ordenDeTrabajoMaquinas);
 

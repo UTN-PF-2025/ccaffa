@@ -291,7 +291,7 @@ public class RolloServiceImpl implements RolloService {
                 
 
                 log.info("Replanificando orden de venta ID: {}", ordenTrabajo.getOrdenDeVenta().getId());
-                ordenVentaRepository.updateOrdenDeVentaEstado(ordenTrabajo.getOrdenDeVenta().getId(), EstadoOrdenVentaEnum.REPLANIFICAR.name());
+                ordenVentaRepository.updateOrdenDeVentaEstado(ordenTrabajo.getOrdenDeVenta().getId(), EstadoOrdenVentaEnum.REPLANIFICAR);
             
             }
         }

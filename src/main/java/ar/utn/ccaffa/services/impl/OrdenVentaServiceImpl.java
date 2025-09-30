@@ -53,7 +53,7 @@ public class OrdenVentaServiceImpl implements OrdenVentaService {
     @Override
     public List<OrdenVentaDto> setToProgamada(List<Long> ids){
         List<OrdenVenta> ordenVentas = this.ordenVentaRepository.findByIdIn(ids);
-        ordenVentas.forEach(ov -> ov.setEstado("Programada"));
+        ordenVentas.forEach(ov -> ov.setEstado(EstadoOrdenVentaEnum.PROGRAMADA));
         return ordenVentaMapper.toDtoList(this.ordenVentaRepository.saveAll(ordenVentas));
     }
     @Override
@@ -125,7 +125,7 @@ public class OrdenVentaServiceImpl implements OrdenVentaService {
         List<OrdenDeTrabajo> ordenesDeTrabajo = this.ordenDeTrabajoRepository.findByOrdenDeVenta_Id(ordenVentaId);
         
         if(EstadoOrdenTrabajoEnum.is(ordenesDeTrabajo.getFirst().getEstado(), EstadoOrdenTrabajoEnum.FINALIZADA)){
-            this.ordenVentaRepository.updateOrdenDeVentaEstado(ordenVentaId, EstadoOrdenVentaEnum.FINALIZADA.name());
+            this.ordenVentaRepository.updateOrdenDeVentaEstado(ordenVentaId, EstadoOrdenVentaEnum.FINALIZADA);
         } else {
             throw new UnprocessableContentException("Orden de Venta - Finalizar");
         }

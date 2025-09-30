@@ -1,5 +1,6 @@
 package ar.utn.ccaffa.model.entity;
 
+import ar.utn.ccaffa.enums.EstadoOrdenVentaEnum;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -44,7 +45,7 @@ public class OrdenVenta {
 
     @Column(name = "estado", nullable = false)
     @NotNull(message = "El estado es obligatorio")
-    private String estado;
+    private EstadoOrdenVentaEnum estado;
 
     @Column(name = "observaciones")
     private String observaciones;

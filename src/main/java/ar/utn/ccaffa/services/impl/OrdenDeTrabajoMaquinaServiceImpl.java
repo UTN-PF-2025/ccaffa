@@ -1,5 +1,6 @@
 package ar.utn.ccaffa.services.impl;
 
+import ar.utn.ccaffa.enums.EstadoOrdenTrabajoMaquinaEnum;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajoMaquina;
 import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoMaquinaRepository;
 import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoMaquinaService;
@@ -28,7 +29,7 @@ public class OrdenDeTrabajoMaquinaServiceImpl implements OrdenDeTrabajoMaquinaSe
 
     @Override
     public OrdenDeTrabajoMaquina findFirstByMaquinaId(Long maquinaId) {
-      return repository.findTopByMaquina_IdAndEstadoOrderByFechaInicioAsc(maquinaId, "Planificada");
+      return repository.findTopByMaquina_IdAndEstadoOrderByFechaInicioAsc(maquinaId, EstadoOrdenTrabajoMaquinaEnum.PROGRAMADA);
     }
 
     @Override
