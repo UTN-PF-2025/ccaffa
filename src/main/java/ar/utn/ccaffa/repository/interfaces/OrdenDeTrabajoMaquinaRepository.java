@@ -1,5 +1,6 @@
 package ar.utn.ccaffa.repository.interfaces;
 
+import ar.utn.ccaffa.enums.EstadoOrdenTrabajoMaquinaEnum;
 import ar.utn.ccaffa.model.entity.Maquina;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajoMaquina;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,11 +13,12 @@ import java.util.List;
 @Repository
 public interface OrdenDeTrabajoMaquinaRepository extends JpaRepository<OrdenDeTrabajoMaquina, Long> {
     List<OrdenDeTrabajoMaquina> findOrdenDeTrabajoMaquinaByEstadoAndFechaFinAfterAndFechaFinBeforeAndMaquinaIn(String estado, LocalDateTime fechaFinDesde, LocalDateTime fecaFinHasta, List<Maquina> maquinas);
-    
+    List<OrdenDeTrabajoMaquina> findOrdenDeTrabajoMaquinaByEstadoInAndFechaFinAfterAndFechaFinBeforeAndMaquinaIn(List <EstadoOrdenTrabajoMaquinaEnum> estados, LocalDateTime fechaFinDesde, LocalDateTime fecaFinHasta, List<Maquina> maquinas);
+
     @EntityGraph(attributePaths = {"maquina"})
     OrdenDeTrabajoMaquina findTopByOrdenDeTrabajo_IdOrderByFechaInicioDesc(Long ordenDeTrabajoId);
 
     List<OrdenDeTrabajoMaquina> findByMaquinaId(Long maquinaId);
 
-    OrdenDeTrabajoMaquina findTopByMaquina_IdAndEstadoOrderByFechaInicioAsc(Long maquinaId, String estado);
+    OrdenDeTrabajoMaquina findTopByMaquina_IdAndEstadoOrderByFechaInicioAsc(Long maquinaId, EstadoOrdenTrabajoMaquinaEnum estado);
 }

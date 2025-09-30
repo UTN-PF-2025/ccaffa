@@ -1,5 +1,6 @@
 package ar.utn.ccaffa.services.impl;
 
+import ar.utn.ccaffa.enums.EstadoOrdenTrabajoMaquinaEnum;
 import ar.utn.ccaffa.mapper.interfaces.OrdenDeTrabajoResponseMapper;
 import ar.utn.ccaffa.model.dto.FiltroOrdenDeTrabajoDto;
 import ar.utn.ccaffa.model.dto.OrdenDeTrabajoResponseDto;
@@ -125,7 +126,7 @@ public class OrdenDeTrabajoServiceImpl implements OrdenDeTrabajoService {
     }
 
     @Override
-    public List<OrdenDeTrabajoMaquina> findOrdenDeTrabajoMaquinaByEstadoAndFechaFinAfterAndFechaFinBeforeAndMaquinaIn(String estado, LocalDateTime fechaFinDesde, LocalDateTime fecaFinHasta, List<Maquina> maquinas){
-        return this.ordenDeTrabajoMaquinaRepository.findOrdenDeTrabajoMaquinaByEstadoAndFechaFinAfterAndFechaFinBeforeAndMaquinaIn(estado, fechaFinDesde, fecaFinHasta, maquinas);
+    public List<OrdenDeTrabajoMaquina> findOrdenDeTrabajoMaquinaByEstadoInAndFechaFinAfterAndFechaFinBeforeAndMaquinaIn(List <EstadoOrdenTrabajoMaquinaEnum> estados, LocalDateTime fechaFinDesde, LocalDateTime fecaFinHasta, List<Maquina> maquinas){
+        return this.ordenDeTrabajoMaquinaRepository.findOrdenDeTrabajoMaquinaByEstadoInAndFechaFinAfterAndFechaFinBeforeAndMaquinaIn(estados, fechaFinDesde, fecaFinHasta, maquinas);
     }
 }

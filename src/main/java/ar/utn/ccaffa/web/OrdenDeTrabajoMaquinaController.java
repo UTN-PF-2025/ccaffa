@@ -6,10 +6,7 @@ import ar.utn.ccaffa.model.entity.OrdenDeTrabajoMaquina;
 import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoMaquinaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -18,13 +15,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrdenDeTrabajoMaquinaController {
 
-    private final OrdenDeTrabajoMaquinaService service;
+    private final OrdenDeTrabajoMaquinaService ordenDeTrabajoMaquinaService;
     private final OrdenDeTrabajoMaquinaMapper mapper;
 
     @GetMapping("/por-maquina/{id}")
     public ResponseEntity<List<OrdenDeTrabajoMaquinaDto>> obtenerOrdenesDeTrabajoPorMaquina(@PathVariable Long id) {
-        List<OrdenDeTrabajoMaquina> ordenes = service.findByMaquinaId(id);
+        List<OrdenDeTrabajoMaquina> ordenes = ordenDeTrabajoMaquinaService.findByMaquinaId(id);
         List<OrdenDeTrabajoMaquinaDto> ordenesDto = mapper.toDtoList(ordenes);
         return ResponseEntity.ok(ordenesDto);
+    }
+
+    @PostMapping(value = "/iniciar")
+    public ResponseEntity<Void> iniciar(@RequestBody Long id) {
+        this.ordenDeTrabajoMaquinaService.iniciarOrden(id);
+        return ResponseEntity.ok().build();
     }
 }

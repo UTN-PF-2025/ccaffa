@@ -1,6 +1,11 @@
 package ar.utn.ccaffa.services.impl;
 
+import ar.utn.ccaffa.enums.EstadoControlDeCalidadEnum;
+import ar.utn.ccaffa.enums.EstadoOrdenTrabajoEnum;
+import ar.utn.ccaffa.enums.EstadoOrdenVentaEnum;
+import ar.utn.ccaffa.exceptions.ResourceNotFoundException;
 import ar.utn.ccaffa.model.dto.CreateControlDeCalidadRequest;
+import ar.utn.ccaffa.model.dto.MedidaDeCalidadDto;
 import ar.utn.ccaffa.model.entity.ControlDeCalidad;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import ar.utn.ccaffa.repository.interfaces.ControlDeCalidadRepository;
@@ -17,6 +22,7 @@ import ar.utn.ccaffa.services.interfaces.ControlDeCalidadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -44,7 +50,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
         ControlDeCalidad control = new ControlDeCalidad();
         control.setUsuario(usuario);
         control.setOrdenDeTrabajoId(ordenDeTrabajo.getId().toString());
-        control.setEstado("listo");
+        control.setEstado(EstadoControlDeCalidadEnum.PENDIENTE);
 
         control.setAnchoMedido(0.0f); // Valor por defecto
         control.setEspesorMedido(0.0f); // Valor por defecto
@@ -156,14 +162,13 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
         OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoRepository.findById(Long.parseLong(control.getOrdenDeTrabajoId())).orElseThrow(
             () -> new RuntimeException("Orden de Trabajo no encontrada con ID: " + control.getOrdenDeTrabajoId()));
         
-        if (!control.getDefectos().isEmpty() || control.getEstado().equals("Defectuoso")) {
-            control.setEstado("Defectuoso");
-            ordenDeTrabajo.setEstado("Defectuoso");
-           //TODO mandar a cancelar orden de trabajo
-    
+        if (!control.getDefectos().isEmpty() || control.getEstado().equals("A corregir")) {
+            control.setEstado(EstadoControlDeCalidadEnum.DEFECTUOSO);
+            ordenDeTrabajo.setEstado(EstadoOrdenTrabajoEnum.DEFECTUOSO);
+
         } else {
-            control.setEstado("Finalizado");
-            ordenDeTrabajo.setEstado("Finalizado");
+            control.setEstado(EstadoControlDeCalidadEnum.FINALIZADO);
+            ordenDeTrabajo.setEstado(EstadoOrdenTrabajoEnum.FINALIZADA);
         }
         control.setFechaFinalizacion(LocalDateTime.now());
         ordenDeTrabajo.setFechaFin(LocalDateTime.now());
@@ -175,7 +180,18 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
     public ControlDeCalidad iniciarControl(Long id) {
         ControlDeCalidad control = controlDeCalidadRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Control de Calidad no encontrado con ID: " + id));
+        control.setEstado(EstadoControlDeCalidadEnum.EN_PROCESO);
         control.setFechaControl(LocalDateTime.now());
+
+        OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoRepository.findById(Long.parseLong(control.getOrdenDeTrabajoId())).orElseThrow(
+                () -> new RuntimeException("Orden de Trabajo no encontrada con ID: " + control.getOrdenDeTrabajoId()));
+        ordenDeTrabajo.setEstado(EstadoOrdenTrabajoEnum.EN_CURSO);
+
+       OrdenVenta ordenVenta = ordenDeTrabajo.getOrdenDeVenta();
+       ordenVenta.setEstado(EstadoOrdenVentaEnum.EN_CURSO);
+
+        ordenDeVentaRepository.save(ordenVenta);
+        ordenDeTrabajoRepository.save(ordenDeTrabajo);
         return controlDeCalidadRepository.save(control);
     }
 
@@ -183,7 +199,9 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
     public ControlDeCalidad marcarComoACorregir(Long id) {
         ControlDeCalidad control = controlDeCalidadRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Control de Calidad no encontrado con ID: " + id));
-        control.setEstado("A corregir");
+        control.setEstado(EstadoControlDeCalidadEnum.A_CORREGIR);
         return controlDeCalidadRepository.save(control);
     }
+
+
 }

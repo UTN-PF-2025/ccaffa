@@ -1,5 +1,7 @@
 package ar.utn.ccaffa.services.impl;
 
+import ar.utn.ccaffa.enums.EstadoOrdenTrabajoEnum;
+import ar.utn.ccaffa.enums.EstadoOrdenVentaEnum;
 import ar.utn.ccaffa.exceptions.ResourceNotFoundException;
 import ar.utn.ccaffa.mapper.interfaces.RolloMapper;
 import ar.utn.ccaffa.model.dto.FiltroRolloDto;
@@ -275,11 +277,11 @@ public class RolloServiceImpl implements RolloService {
         
         for (OrdenDeTrabajo ordenTrabajo : ordenesTrabajo) {
             // Solo cancelar si no está ya cancelada
-            if (!"Cancelada".equals(ordenTrabajo.getEstado())) {
+            if (!EstadoOrdenTrabajoEnum.is(ordenTrabajo.getEstado(), EstadoOrdenTrabajoEnum.ANULADA)) {
                 log.info("Cancelando orden de trabajo ID: {}", ordenTrabajo.getId());
                 
                 // Cancelar la orden de trabajo
-                ordenTrabajo.setEstado("Cancelada");
+                ordenTrabajo.setEstado(EstadoOrdenTrabajoEnum.ANULADA);
                 ordenTrabajo.setActiva(false);
                 ordenTrabajo.setObservaciones("Cancelada - Rollo modificado (peso/ancho reducido)");
                 ordenTrabajo.setFechaFin(LocalDateTime.now());
@@ -289,8 +291,7 @@ public class RolloServiceImpl implements RolloService {
                 
 
                 log.info("Replanificando orden de venta ID: {}", ordenTrabajo.getOrdenDeVenta().getId());
-                ordenTrabajo.getOrdenDeVenta().setEstado("REPLANIFICADO");
-                ordenVentaRepository.save(ordenTrabajo.getOrdenDeVenta());
+                ordenVentaRepository.updateOrdenDeVentaEstado(ordenTrabajo.getOrdenDeVenta().getId(), EstadoOrdenVentaEnum.REPLANIFICAR);
             
             }
         }

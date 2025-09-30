@@ -1,11 +1,10 @@
 package ar.utn.ccaffa.web;
 
+import ar.utn.ccaffa.enums.*;
 import ar.utn.ccaffa.enums.EstadoRollo;
-import ar.utn.ccaffa.enums.MaquinaTipoEnum;
 import ar.utn.ccaffa.mapper.interfaces.OrdenDeTrabajoMaquinaMapper;
 import ar.utn.ccaffa.mapper.interfaces.OrdenDeTrabajoResponseMapper;
 import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoMaquinaService;
-import ar.utn.ccaffa.model.dto.OrdenDeTrabajoMaquinaDto;
 import ar.utn.ccaffa.model.dto.OrdenDeTrabajoResponseDto;
 import ar.utn.ccaffa.model.entity.*;
 import ar.utn.ccaffa.repository.interfaces.*;
@@ -13,7 +12,6 @@ import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoService;
 import ar.utn.ccaffa.model.dto.Bloque;
 import ar.utn.ccaffa.model.dto.FiltroOrdenDeTrabajoDto;
 import ar.utn.ccaffa.model.dto.OrdenDeTrabajoDto;
-import java.util.Comparator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import lombok.extern.slf4j.Slf4j;
@@ -163,7 +161,7 @@ public class OrdenDeTrabajoController {
                         
                         // 5. Cancelar todas las órdenes de trabajo
                         for (OrdenDeTrabajo orden : ordenesTrabajoACancelar) {
-                            if (!orden.getEstado().equals("Cancelada")) {
+                            if (!EstadoOrdenTrabajoEnum.is(orden.getEstado(), EstadoOrdenTrabajoEnum.ANULADA)) {
                                 cancelarOrden(orden);
                                 ordenDeTrabajoService.save(orden);
                                 
@@ -185,8 +183,7 @@ public class OrdenDeTrabajoController {
 
                         // 7. Replanificar todas las órdenes de venta afectadas
                         for (OrdenVenta ordenVenta : ordenesVentaAReplanificar) {
-                            ordenVenta.setEstado("Replanificar");
-                            ordenDeVentaRepository.save(ordenVenta);
+                            ordenDeVentaRepository.updateOrdenDeVentaEstado(ordenVenta.getId(), EstadoOrdenVentaEnum.REPLANIFICAR);
                         }
 
                         return ResponseEntity.ok(ordenDeTrabajoResponseMapper.toDto(ordenACancelar));
@@ -305,6 +302,7 @@ public class OrdenDeTrabajoController {
         }
 
         OrdenVenta ordenVenta = ordenVentaOpt.get();
+        ordenVenta.setEstado(EstadoOrdenVentaEnum.PROGRAMADA);
         orden.setOrdenDeVenta(ordenVenta);
         return ordenVenta;
     }
@@ -335,7 +333,7 @@ public class OrdenDeTrabajoController {
                 .maquina(maquina)
                 .fechaInicio(mreq.getFechaInicio())
                 .fechaFin(mreq.getFechaFin())
-                .estado(mreq.getEstado())
+                .estado(EstadoOrdenTrabajoMaquinaEnum.valueOf(mreq.getEstado()))
                 .observaciones(mreq.getObservaciones())
                 .build();
     }
@@ -363,7 +361,7 @@ public class OrdenDeTrabajoController {
         orden.setFechaEstimadaDeInicio(request.getFechaInicio());
         orden.setFechaEstimadaDeFin(request.getFechaFin());
         orden.setObservaciones(request.getObservaciones());
-        orden.setEstado("En Proceso");
+        orden.setEstado(EstadoOrdenTrabajoEnum.PROGRAMADA);
     }
 
 
@@ -384,20 +382,20 @@ public class OrdenDeTrabajoController {
     }
 
     private void validarModificacion(OrdenDeTrabajo orden) {
-        if ("En Ejecucion".equals(orden.getEstado()) || "Ejecutando".equals(orden.getEstado())) {
+        if (EstadoOrdenTrabajoEnum.is(orden.getEstado(), EstadoOrdenTrabajoEnum.EN_CURSO)) {
             throw new IllegalStateException("No se puede modificar una orden de trabajo que está en ejecución");
         }
     }
 
     private void validarCancelacion(OrdenDeTrabajo orden) {
-        if ("Cancelada".equals(orden.getEstado()) || "Completada".equals(orden.getEstado())) {
+        if (EstadoOrdenTrabajoEnum.in(orden.getEstado(), EstadoOrdenTrabajoEnum.ANULADA, EstadoOrdenTrabajoEnum.FINALIZADA)) {
             throw new IllegalStateException("No se puede cancelar una orden que ya está " + orden.getEstado());
         }
     }
 
 
     private OrdenDeTrabajo cancelarOrden(OrdenDeTrabajo orden) {
-        orden.setEstado("Cancelada");
+        orden.setEstado(EstadoOrdenTrabajoEnum.ANULADA);
         orden.setActiva(false);
         liberarRecursos(orden);
         return orden;
@@ -420,7 +418,7 @@ public class OrdenDeTrabajoController {
     }
 
     private void cancelarMaquina(OrdenDeTrabajoMaquina otm) {
-        otm.setEstado("Cancelada");
+        otm.setEstado(EstadoOrdenTrabajoMaquinaEnum.ANULADA);
         otm.setFechaFin(LocalDateTime.now());
         otm.setObservaciones("Cancelada - " + otm.getObservaciones());
     }
@@ -434,7 +432,7 @@ public class OrdenDeTrabajoController {
         if (rollo.getEstado().equals(EstadoRollo.AGOTADO)) {
             rollo.setEstado(EstadoRollo.DISPONIBLE);
             rolloRepository.save(rollo);
-        } else if (rollo.getEstado().equals(EstadoRollo.DIVIDO)) {
+        } else if (rollo.getEstado().equals(EstadoRollo.DIVIDIDO)) {
             procesarRolloDividido(rollo);
         }
     }
@@ -450,7 +448,7 @@ public class OrdenDeTrabajoController {
 
             // Cancelar cada orden de trabajo asociada
             for (OrdenDeTrabajo ordenHijo : ordenesTrabajoHijo) {
-                if (!"Cancelada".equals(ordenHijo.getEstado())) {
+                if (!EstadoOrdenTrabajoEnum.is(ordenHijo.getEstado(), EstadoOrdenTrabajoEnum.ANULADA)) {
                     cancelarOrden(ordenHijo);
                     ordenDeTrabajoService.save(ordenHijo);
 
@@ -473,9 +471,7 @@ public class OrdenDeTrabajoController {
 
     private void replanificarOrdenVenta(OrdenDeTrabajo orden) {
         if (orden.getOrdenDeVenta() != null) {
-            OrdenVenta ordenVenta = orden.getOrdenDeVenta();
-            ordenVenta.setEstado("Replanificar");
-            ordenDeVentaRepository.save(ordenVenta);
+            ordenDeVentaRepository.updateOrdenDeVentaEstado(orden.getOrdenDeVenta().getId(), EstadoOrdenVentaEnum.REPLANIFICAR);
         }
     }
 
@@ -520,7 +516,7 @@ public class OrdenDeTrabajoController {
     private void cancelarOrdenesDeTrabajo(Rollo rollo, Set<OrdenVenta> ordenesVentaAReplanificar) {
         List<OrdenDeTrabajo> ordenesDelRollo = ordenDeTrabajoService.findByRolloId(rollo.getId());
         for (OrdenDeTrabajo orden : ordenesDelRollo) {
-            if (!orden.getEstado().equals("Cancelada")) {
+            if (!EstadoOrdenTrabajoEnum.is(orden.getEstado(), EstadoOrdenTrabajoEnum.ANULADA)) {
                 cancelarOrden(orden);
                 ordenDeTrabajoService.save(orden);
                 

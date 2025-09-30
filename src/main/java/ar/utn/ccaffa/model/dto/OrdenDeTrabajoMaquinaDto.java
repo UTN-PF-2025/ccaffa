@@ -1,5 +1,6 @@
 package ar.utn.ccaffa.model.dto;
 
+import ar.utn.ccaffa.enums.EstadoOrdenTrabajoMaquinaEnum;
 import lombok.Builder;
 import lombok.Data;
 
@@ -13,6 +14,6 @@ public class OrdenDeTrabajoMaquinaDto {
     private Long maquinaId;
     private LocalDateTime fechaInicio;
     private LocalDateTime fechaFin;
-    private String estado;
+    private EstadoOrdenTrabajoMaquinaEnum estado;
     private String observaciones;
 }
