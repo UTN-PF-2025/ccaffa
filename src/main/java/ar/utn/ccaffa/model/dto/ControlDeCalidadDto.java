@@ -1,5 +1,6 @@
 package ar.utn.ccaffa.model.dto;
 
+import ar.utn.ccaffa.enums.EstadoControlDeCalidadEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +20,7 @@ public class ControlDeCalidadDto {
     private Float espesorMedido;
     private Float anchoMedido;
     private Float rebabaMedio;
-    private String estado;
+    private EstadoControlDeCalidadEnum estado;
     private List<MedidaDeCalidadDto> medidasDeCalidad;
     private CertificadoDeCalidadDto certificadoDeCalidad;
     

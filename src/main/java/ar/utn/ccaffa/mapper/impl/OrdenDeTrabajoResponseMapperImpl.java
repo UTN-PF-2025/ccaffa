@@ -53,7 +53,7 @@ public class OrdenDeTrabajoResponseMapperImpl implements OrdenDeTrabajoResponseM
                 .nombre(ordenDeTrabajo.getNombre())
                 .fechaInicio(ordenDeTrabajo.getFechaInicio())
                 .fechaFin(ordenDeTrabajo.getFechaFin())
-                .estado(ordenDeTrabajo.getEstado().name())
+                .estado(ordenDeTrabajo.getEstado())
                 .observaciones(ordenDeTrabajo.getObservaciones())
                 .fechaEstimadaDeInicio(ordenDeTrabajo.getFechaEstimadaDeInicio())
                 .fechaEstimadaDeFin(ordenDeTrabajo.getFechaEstimadaDeFin())
@@ -125,7 +125,7 @@ public class OrdenDeTrabajoResponseMapperImpl implements OrdenDeTrabajoResponseM
                         ordenVenta.getFechaCreacion().format(formatter) : null)
                 .fechaEntregaEstimada(ordenVenta.getFechaEntregaEstimada() != null ? 
                         ordenVenta.getFechaEntregaEstimada().format(formatter) : null)
-                .estado(ordenVenta.getEstado())
+                .estado(ordenVenta.getEstado().name())
                 .observaciones(ordenVenta.getObservaciones())
                 .cliente(clienteMapper.toDto(ordenVenta.getCliente()))
                 .especificacion(especificacionMapper.toDto(ordenVenta.getEspecificacion()))
@@ -152,7 +152,7 @@ public class OrdenDeTrabajoResponseMapperImpl implements OrdenDeTrabajoResponseM
                 .maquina(maquinaMapper.toDto(otm.getMaquina()))
                 .fechaInicio(otm.getFechaInicio())
                 .fechaFin(otm.getFechaFin())
-                .estado(otm.getEstado().name())
+                .estado(otm.getEstado())
                 .observaciones(otm.getObservaciones())
                 .build();
     }

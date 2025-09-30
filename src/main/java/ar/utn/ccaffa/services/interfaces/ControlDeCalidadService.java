@@ -5,6 +5,7 @@ import java.util.List;
 import ar.utn.ccaffa.model.dto.AddMedidaRequest;
 import ar.utn.ccaffa.model.dto.ControlDeProcesoDto;
 import ar.utn.ccaffa.model.dto.CreateControlDeCalidadRequest;
+import ar.utn.ccaffa.model.dto.MedidaDeCalidadDto;
 import ar.utn.ccaffa.model.entity.ControlDeCalidad;
 
 public interface ControlDeCalidadService {
@@ -23,4 +24,5 @@ public interface ControlDeCalidadService {
     ControlDeCalidad iniciarControl(Long id);
 
     ControlDeCalidad marcarComoACorregir(Long id);
+
 }

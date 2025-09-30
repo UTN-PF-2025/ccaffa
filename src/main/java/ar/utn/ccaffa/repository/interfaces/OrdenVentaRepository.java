@@ -1,5 +1,6 @@
 package ar.utn.ccaffa.repository.interfaces;
 
+import ar.utn.ccaffa.enums.EstadoOrdenVentaEnum;
 import ar.utn.ccaffa.model.entity.OrdenVenta;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,14 +28,11 @@ public interface OrdenVentaRepository extends JpaRepository<OrdenVenta, Long>, J
     
     List<OrdenVenta> findByIdIn(List<Long> ids);
 
-    OrdenVenta findByOrdenDeTrabajoId(Long ordenDeTrabajoId);
-
-    @Query("select ov from OrdenVenta ov left join fetch ov.cliente left join fetch ov.especificacion where ov.ordenDeTrabajo.id = :ordenDeTrabajoId")
-    OrdenVenta findByOrdenDeTrabajoIdFetchClienteEspecificacion(@Param("ordenDeTrabajoId") Long ordenDeTrabajoId);
+    
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Transactional
     @Query("update OrdenVenta ov set ov.estado = :estado where ov.id = :ordenVentaId")
-    void updateOrdenDeVentaEstado(@Param("ordenVentaId") Long ordenVentaId, @Param("estado") String estado);
+    void updateOrdenDeVentaEstado(@Param("ordenVentaId") Long ordenVentaId, @Param("estado") EstadoOrdenVentaEnum estado);
 
 }

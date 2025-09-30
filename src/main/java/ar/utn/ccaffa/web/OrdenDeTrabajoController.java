@@ -2,11 +2,9 @@ package ar.utn.ccaffa.web;
 
 import ar.utn.ccaffa.enums.*;
 import ar.utn.ccaffa.enums.EstadoRollo;
-import ar.utn.ccaffa.enums.MaquinaTipoEnum;
 import ar.utn.ccaffa.mapper.interfaces.OrdenDeTrabajoMaquinaMapper;
 import ar.utn.ccaffa.mapper.interfaces.OrdenDeTrabajoResponseMapper;
 import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoMaquinaService;
-import ar.utn.ccaffa.model.dto.OrdenDeTrabajoMaquinaDto;
 import ar.utn.ccaffa.model.dto.OrdenDeTrabajoResponseDto;
 import ar.utn.ccaffa.model.entity.*;
 import ar.utn.ccaffa.repository.interfaces.*;
@@ -14,7 +12,6 @@ import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoService;
 import ar.utn.ccaffa.model.dto.Bloque;
 import ar.utn.ccaffa.model.dto.FiltroOrdenDeTrabajoDto;
 import ar.utn.ccaffa.model.dto.OrdenDeTrabajoDto;
-import java.util.Comparator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import lombok.extern.slf4j.Slf4j;
@@ -186,7 +183,7 @@ public class OrdenDeTrabajoController {
 
                         // 7. Replanificar todas las órdenes de venta afectadas
                         for (OrdenVenta ordenVenta : ordenesVentaAReplanificar) {
-                            ordenDeVentaRepository.updateOrdenDeVentaEstado(ordenVenta.getId(), EstadoOrdenVentaEnum.REPLANIFICAR.name());
+                            ordenDeVentaRepository.updateOrdenDeVentaEstado(ordenVenta.getId(), EstadoOrdenVentaEnum.REPLANIFICAR);
                         }
 
                         return ResponseEntity.ok(ordenDeTrabajoResponseMapper.toDto(ordenACancelar));
@@ -305,6 +302,7 @@ public class OrdenDeTrabajoController {
         }
 
         OrdenVenta ordenVenta = ordenVentaOpt.get();
+        ordenVenta.setEstado(EstadoOrdenVentaEnum.PROGRAMADA);
         orden.setOrdenDeVenta(ordenVenta);
         return ordenVenta;
     }
@@ -434,7 +432,7 @@ public class OrdenDeTrabajoController {
         if (rollo.getEstado().equals(EstadoRollo.AGOTADO)) {
             rollo.setEstado(EstadoRollo.DISPONIBLE);
             rolloRepository.save(rollo);
-        } else if (rollo.getEstado().equals(EstadoRollo.DIVIDO)) {
+        } else if (rollo.getEstado().equals(EstadoRollo.DIVIDIDO)) {
             procesarRolloDividido(rollo);
         }
     }
@@ -473,7 +471,7 @@ public class OrdenDeTrabajoController {
 
     private void replanificarOrdenVenta(OrdenDeTrabajo orden) {
         if (orden.getOrdenDeVenta() != null) {
-            ordenDeVentaRepository.updateOrdenDeVentaEstado(orden.getOrdenDeVenta().getId(), EstadoOrdenVentaEnum.REPLANIFICAR.name());
+            ordenDeVentaRepository.updateOrdenDeVentaEstado(orden.getOrdenDeVenta().getId(), EstadoOrdenVentaEnum.REPLANIFICAR);
         }
     }
 

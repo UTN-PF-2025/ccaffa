@@ -1,5 +1,6 @@
 package ar.utn.ccaffa.model.entity;
 
+import ar.utn.ccaffa.enums.EstadoControlDeCalidadEnum;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -42,8 +43,9 @@ public class ControlDeCalidad {
     @Column(name = "rebaba_medio")
     private Float rebabaMedio;
 
-    @Column(length = 50)
-    private String estado;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado")
+    private EstadoControlDeCalidadEnum estado;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "control_de_calidad_id")

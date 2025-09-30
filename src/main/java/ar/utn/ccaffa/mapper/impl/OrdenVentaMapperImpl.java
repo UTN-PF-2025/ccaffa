@@ -32,7 +32,7 @@ public class OrdenVentaMapperImpl implements OrdenVentaMapper {
                 .fechaCreacion(ordenVenta.getFechaCreacion())
                 .fechaEntregaEstimada(ordenVenta.getFechaEntregaEstimada() != null ?
                         ordenVenta.getFechaEntregaEstimada() : null)
-                .estado(EstadoOrdenVentaEnum.valueOf(ordenVenta.getEstado()))
+                .estado(EstadoOrdenVentaEnum.valueOf(ordenVenta.getEstado().name()))
                 .observaciones(ordenVenta.getObservaciones())
                 .cliente(clienteMapper.toDto(ordenVenta.getCliente()))
                 .especificacion(especificacionMapper.toDto(ordenVenta.getEspecificacion()))
@@ -50,7 +50,7 @@ public class OrdenVentaMapperImpl implements OrdenVentaMapper {
                 .fechaCreacion(ordenVentaDto.getFechaCreacion())
                 .fechaEntregaEstimada(ordenVentaDto.getFechaEntregaEstimada() != null ?
                         ordenVentaDto.getFechaEntregaEstimada() : null)
-                .estado(ordenVentaDto.getEstado().name())
+                .estado(ordenVentaDto.getEstado())
                 .observaciones(ordenVentaDto.getObservaciones())
                 .cliente(clienteMapper.toEntity(ordenVentaDto.getCliente()))
                 .especificacion(especificacionMapper.toEntity(ordenVentaDto.getEspecificacion()))

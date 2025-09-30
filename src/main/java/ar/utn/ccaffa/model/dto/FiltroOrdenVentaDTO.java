@@ -1,5 +1,6 @@
 package ar.utn.ccaffa.model.dto;
 
+import ar.utn.ccaffa.enums.EstadoOrdenVentaEnum;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,8 +23,8 @@ public class FiltroOrdenVentaDTO {
     private LocalDateTime fechaInicio;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime fechaFin;
-    private String estado;
-    private List<String> estados;
+    private EstadoOrdenVentaEnum estado;
+    private List<EstadoOrdenVentaEnum> estados;
     private Long clienteId;
     private String observaciones;
     private Long orderId;

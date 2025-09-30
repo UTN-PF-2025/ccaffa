@@ -1,7 +1,5 @@
 package ar.utn.ccaffa;
-import ar.utn.ccaffa.enums.EstadoRollo;
-import ar.utn.ccaffa.enums.MaquinaTipoEnum;
-import ar.utn.ccaffa.enums.TipoMaterial;
+import ar.utn.ccaffa.enums.*;
 import ar.utn.ccaffa.model.entity.*;
 import ar.utn.ccaffa.planner.Plan;
 import ar.utn.ccaffa.planner.PlannerGA;
@@ -46,7 +44,7 @@ public class PlannerTest {
                         .id(i)
                         .fechaCreacion(LocalDateTime.now().minusDays(RANDOM.nextInt(1)))
                         .fechaEntregaEstimada(LocalDateTime.now().plusDays(RANDOM.nextInt(30)))
-                        .estado("Creada")
+                        .estado(EstadoOrdenVentaEnum.A_PLANIFICAR)
                         .observaciones("Generada automáticamente")
                         .cliente(Cliente.builder()
                                 .id(1L)
@@ -102,7 +100,7 @@ public class PlannerTest {
                         .id(i)
                         .ordenDeTrabajo(ordenDeTrabajo)
                         .maquina(maquinas.get(RANDOM.nextInt(maquinas.size())))
-                        .estado("Programada")
+                        .estado(EstadoOrdenTrabajoMaquinaEnum.PROGRAMADA)
                         .observaciones("Generada automáticamente")
                         .fechaInicio(start)
                         .fechaFin(start.plusHours(1 + RANDOM.nextInt(5)))
@@ -191,7 +189,7 @@ public class PlannerTest {
                     totalDisponible++;
                     pesoDisponible += roll.getPesoKG();
                 }
-                if (roll.getEstado() == EstadoRollo.DIVIDO){
+                if (roll.getEstado() == EstadoRollo.DIVIDIDO){
                     totalDividido++;
                     pesoDividido += roll.getPesoKG();
                 }

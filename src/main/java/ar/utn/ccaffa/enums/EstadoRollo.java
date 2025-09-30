@@ -4,8 +4,8 @@ public enum EstadoRollo {
     PLANIFICADO,
     DISPONIBLE,
     AGOTADO,
-    DIVIDO,
+    DIVIDIDO,
     CANCELADO,
     DESPERDICIO,
-    VERFICAR
+    VERIFICAR
 }

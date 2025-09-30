@@ -108,7 +108,7 @@ public class OrdenDeTrabajo {
         crearHijoPorLargo(rolloHijos);
 
         if (!rolloHijos.isEmpty()){
-            this.getRollo().setEstado(EstadoRollo.DIVIDO);
+            this.getRollo().setEstado(EstadoRollo.DIVIDIDO);
         }
 
         return rolloHijos;

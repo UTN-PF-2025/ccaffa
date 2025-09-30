@@ -1,5 +1,7 @@
 package ar.utn.ccaffa.services.interfaces;
 
+import ar.utn.ccaffa.enums.EstadoOrdenTrabajoEnum;
+import ar.utn.ccaffa.enums.EstadoOrdenTrabajoMaquinaEnum;
 import ar.utn.ccaffa.model.dto.FiltroOrdenDeTrabajoDto;
 import ar.utn.ccaffa.model.dto.OrdenDeTrabajoResponseDto;
 import ar.utn.ccaffa.model.entity.Maquina;
@@ -22,5 +24,5 @@ public interface OrdenDeTrabajoService {
     OrdenDeTrabajo findByProcesoId(Long rolloId);
     List<OrdenDeTrabajo> filtrarOrdenes(FiltroOrdenDeTrabajoDto filtros);
 
-    List<OrdenDeTrabajoMaquina> findOrdenDeTrabajoMaquinaByEstadoAndFechaFinAfterAndFechaFinBeforeAndMaquinaIn(String estado, LocalDateTime fechaFinDesde, LocalDateTime fecaFinHasta, List<Maquina> maquinas);
+    List<OrdenDeTrabajoMaquina> findOrdenDeTrabajoMaquinaByEstadoInAndFechaFinAfterAndFechaFinBeforeAndMaquinaIn(List <EstadoOrdenTrabajoMaquinaEnum> estados, LocalDateTime fechaFinDesde, LocalDateTime fecaFinHasta, List<Maquina> maquinas);
 }

@@ -2,6 +2,7 @@ package ar.utn.ccaffa.model.dto;
 
 import java.time.LocalDateTime;
 
+import ar.utn.ccaffa.enums.EstadoOrdenTrabajoEnum;
 import ar.utn.ccaffa.enums.MaquinaTipoEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,7 +16,7 @@ public class FiltroOrdenDeTrabajoDto {
     private Long rolloId;
     private Long maquinaId;
     private Long ordenDeVentaId;
-    private String estado;
+    private EstadoOrdenTrabajoEnum estado;
     private LocalDateTime fechaIngresoDesde;
     private LocalDateTime fechaIngresoHasta;
     private LocalDateTime fechaFinalizacionDesde;
