@@ -3,9 +3,7 @@ package ar.utn.ccaffa.services.impl;
 import ar.utn.ccaffa.enums.EstadoControlDeCalidadEnum;
 import ar.utn.ccaffa.enums.EstadoOrdenTrabajoEnum;
 import ar.utn.ccaffa.enums.EstadoOrdenVentaEnum;
-import ar.utn.ccaffa.exceptions.ResourceNotFoundException;
 import ar.utn.ccaffa.model.dto.CreateControlDeCalidadRequest;
-import ar.utn.ccaffa.model.dto.MedidaDeCalidadDto;
 import ar.utn.ccaffa.model.entity.ControlDeCalidad;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import ar.utn.ccaffa.repository.interfaces.ControlDeCalidadRepository;
@@ -22,7 +20,6 @@ import ar.utn.ccaffa.services.interfaces.ControlDeCalidadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -36,7 +33,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
     private final OrdenDeTrabajoRepository ordenDeTrabajoRepository;
     private final MedidaDeCalidadRepository medidaDeCalidadRepository;
     private final ProveedorRepository proveedorRepository;
-    private final OrdenVentaRepository ordenDeVentaRepository;
+    private final OrdenVentaRepository ordenVentaRepository;
     private final OrdenDeTrabajoMaquinaRepository ordenDeTrabajoMaquinaRepository;
 
     @Override
@@ -152,6 +149,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
 
     @Override
     public List<ControlDeCalidad> getAllControlesCalidad() {
+        // Evita N+1 cargando usuario, medidas y defectos en menos consultas (override con @EntityGraph)
         return controlDeCalidadRepository.findAll();
     }
 
@@ -161,8 +159,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
                 .orElseThrow(() -> new RuntimeException("Control de Calidad no encontrado con ID: " + id));
         OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoRepository.findById(Long.parseLong(control.getOrdenDeTrabajoId())).orElseThrow(
             () -> new RuntimeException("Orden de Trabajo no encontrada con ID: " + control.getOrdenDeTrabajoId()));
-        
-        if (!control.getDefectos().isEmpty() || control.getEstado().equals("A corregir")) {
+        if (!control.getDefectos().isEmpty() || control.getEstado().equals(EstadoControlDeCalidadEnum.A_CORREGIR)) {
             control.setEstado(EstadoControlDeCalidadEnum.DEFECTUOSO);
             ordenDeTrabajo.setEstado(EstadoOrdenTrabajoEnum.DEFECTUOSO);
 
@@ -190,7 +187,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
        OrdenVenta ordenVenta = ordenDeTrabajo.getOrdenDeVenta();
        ordenVenta.setEstado(EstadoOrdenVentaEnum.EN_CURSO);
 
-        ordenDeVentaRepository.save(ordenVenta);
+        ordenVentaRepository.save(ordenVenta);
         ordenDeTrabajoRepository.save(ordenDeTrabajo);
         return controlDeCalidadRepository.save(control);
     }

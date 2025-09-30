@@ -28,7 +28,9 @@ public interface OrdenVentaRepository extends JpaRepository<OrdenVenta, Long>, J
     
     List<OrdenVenta> findByIdIn(List<Long> ids);
 
-    
+    @Query("select ov from OrdenVenta ov left join fetch ov.cliente left join fetch ov.especificacion where ov.id = (select ot.ordenDeVenta.id from OrdenDeTrabajo ot where ot.id = :ordenDeTrabajoId)")
+    OrdenVenta findByOrdenDeTrabajoIdFetchClienteEspecificacion(@Param("ordenDeTrabajoId") Long ordenDeTrabajoId);
+
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Transactional

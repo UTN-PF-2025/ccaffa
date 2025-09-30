@@ -16,9 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class OrdenVentaDto {
     private Long orderId;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "DEFAULT_TIMEZONE")
     private LocalDateTime fechaCreacion;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "DEFAULT_TIMEZONE")
     private LocalDateTime fechaEntregaEstimada;
     private EstadoOrdenVentaEnum estado;
     private String observaciones;
