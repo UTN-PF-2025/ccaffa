@@ -2,19 +2,15 @@ package ar.utn.ccaffa.web;
 
 import ar.utn.ccaffa.model.dto.FiltroOrdenVentaDTO;
 import ar.utn.ccaffa.model.dto.OrdenVentaDto;
-import ar.utn.ccaffa.model.entity.Defecto;
-import ar.utn.ccaffa.model.entity.OrdenVenta;
 import ar.utn.ccaffa.services.interfaces.OrdenVentaService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -40,6 +36,7 @@ public class OrdenVentaController {
 
     @PostMapping
     public ResponseEntity<OrdenVentaDto> crearOrden(@Valid @RequestBody OrdenVentaDto ordenVentaDto) {
+        ordenVentaDto.setOrderId(null);
         OrdenVentaDto nuevaOrden = ordenVentaService.save(ordenVentaDto);
 
         return new ResponseEntity<>(nuevaOrden, HttpStatus.CREATED);
