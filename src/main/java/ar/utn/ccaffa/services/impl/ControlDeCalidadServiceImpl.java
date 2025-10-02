@@ -20,6 +20,7 @@ import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoMaquinaRepository;
 import ar.utn.ccaffa.services.interfaces.ControlDeCalidadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -90,6 +91,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ControlDeProcesoDto getControlDeProceso(Long controlDeCalidadId) {
         ControlDeCalidad control = controlDeCalidadRepository.findByIdWithMedidas(controlDeCalidadId)
                 .orElseThrow(() -> new RuntimeException("Control de Calidad no encontrado con ID: " + controlDeCalidadId));
@@ -139,10 +141,13 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
                 .nombreProveedor(proveedor != null ? proveedor.getNombre() : null)
                 .codigoEtiquetaMp(rollo != null ? rollo.getCodigoProveedor() : null)
                 .medidas(control.getMedidasDeCalidad())
+                .defectos(control.getDefectos())
+                .estado(control.getEstado())
                 .build();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ControlDeProcesoDto getControlDeProcesoByOrdenTrabajo(Long ordenTrabajoId) {
         OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoRepository.findByIdFetchRollo(ordenTrabajoId)
                 .orElseThrow(() -> new RuntimeException("Orden de Trabajo no encontrada con ID: " + ordenTrabajoId));
@@ -156,6 +161,12 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
     public List<ControlDeCalidad> getAllControlesCalidad() {
         // Evita N+1 cargando usuario, medidas y defectos en menos consultas (override con @EntityGraph)
         return controlDeCalidadRepository.findAll();
+    }
+
+    @Override
+    public ControlDeCalidad getControlDeCalidadById(Long id) {
+        return controlDeCalidadRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Control de Calidad no encontrado con ID: " + id));
     }
 
     @Override

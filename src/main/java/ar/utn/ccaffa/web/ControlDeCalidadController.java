@@ -4,7 +4,6 @@ import ar.utn.ccaffa.model.dto.AddMedidaRequest;
 import ar.utn.ccaffa.model.dto.ControlDeProcesoDto;
 import ar.utn.ccaffa.model.dto.CreateControlDeCalidadRequest;
 import ar.utn.ccaffa.model.entity.ControlDeCalidad;
-import ar.utn.ccaffa.model.entity.Usuario;
 import ar.utn.ccaffa.services.interfaces.ControlDeCalidadService;
 import lombok.RequiredArgsConstructor;
 
@@ -53,6 +52,12 @@ public class ControlDeCalidadController {
     public ResponseEntity<List<ControlDeCalidad>> getAllControlesCalidad() {
         List<ControlDeCalidad> controlesCalidad = controlDeCalidadService.getAllControlesCalidad();
         return ResponseEntity.ok(controlesCalidad);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ControlDeCalidad> getControlDeCalidadById(@PathVariable Long id) {
+        ControlDeCalidad controlDeCalidad = controlDeCalidadService.getControlDeCalidadById(id);
+        return ResponseEntity.ok(controlDeCalidad);
     }
 
     @PutMapping("/{id}/finalizar")
