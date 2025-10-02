@@ -13,6 +13,8 @@ import ar.utn.ccaffa.model.dto.Bloque;
 import ar.utn.ccaffa.model.dto.FiltroOrdenDeTrabajoDto;
 import ar.utn.ccaffa.model.dto.OrdenDeTrabajoDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -136,16 +138,19 @@ public class OrdenDeTrabajoController {
       return ResponseEntity.ok(ordenesDto);
     }
 
-    @GetMapping("/obtenerProximaOrdenPendienteConMaquina/{id}")
-    public ResponseEntity<OrdenDeTrabajoResponseDto> obtenerProximaOrdenPendienteConMaquina(@PathVariable Long id) {
+    @GetMapping("/programaciones-maquinas/maquina/{id}")
+    public ResponseEntity<Page<ar.utn.ccaffa.model.dto.OrdenDeTrabajoMaquinaDto>> obtenerProximaOrdenPendienteConMaquina(
+            @PathVariable Long id,
+            Pageable pageable) {
 
-      OrdenDeTrabajoMaquina ordenDeTrabajoMaquina = ordenDeTrabajoMaquinaService.findById(32L);
-      if (ordenDeTrabajoMaquina == null) {
+      Page<OrdenDeTrabajoMaquina> ordenesDeTrabajoMaquina = ordenDeTrabajoMaquinaService.findByMaquinaIdPaginated(id, pageable);
+      
+      if (ordenesDeTrabajoMaquina.isEmpty()) {
         return ResponseEntity.noContent().build();
       }
-      OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoService.findByProcesoId(ordenDeTrabajoMaquina.getId());
-      OrdenDeTrabajoResponseDto ordenDto = ordenDeTrabajoResponseMapper.toDto(ordenDeTrabajo);
-      return ResponseEntity.ok(ordenDto);
+      
+      Page<ar.utn.ccaffa.model.dto.OrdenDeTrabajoMaquinaDto> ordenesDto = ordenesDeTrabajoMaquina.map(ordenDeTrabajoMaquinaMapper::toDto);
+      return ResponseEntity.ok(ordenesDto);
     }
 
 

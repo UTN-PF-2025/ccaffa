@@ -5,6 +5,7 @@ public enum EstadoOrdenVentaEnum {
     PROGRAMADA,
     EN_CURSO,
     FINALIZADA,
+    TRABAJO_FINALIZADO,
     ANULADA,
     REPLANIFICAR;
 
