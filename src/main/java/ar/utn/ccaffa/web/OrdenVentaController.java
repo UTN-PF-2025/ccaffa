@@ -1,5 +1,7 @@
 package ar.utn.ccaffa.web;
 
+import ar.utn.ccaffa.exceptions.ErrorResponse;
+import ar.utn.ccaffa.model.dto.EspecificacionDto;
 import ar.utn.ccaffa.model.dto.FiltroOrdenVentaDTO;
 import ar.utn.ccaffa.model.dto.OrdenVentaDto;
 import ar.utn.ccaffa.services.interfaces.OrdenVentaService;
@@ -35,8 +37,48 @@ public class OrdenVentaController {
     }
 
     @PostMapping
-    public ResponseEntity<OrdenVentaDto> crearOrden(@Valid @RequestBody OrdenVentaDto ordenVentaDto) {
+    public ResponseEntity<?> crearOrden(@Valid @RequestBody OrdenVentaDto ordenVentaDto) {
         ordenVentaDto.setOrderId(null);
+
+        if (ordenVentaDto.getEspecificacion().getAncho() == null ||  ordenVentaDto.getEspecificacion().getAncho() <= 0){
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("ANCHO_INVALIDO")
+                    .message("El ancho debe ser mayor a 0")
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+        if (ordenVentaDto.getEspecificacion().getEspesor() == null || ordenVentaDto.getEspecificacion().getEspesor() <= 0){
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("ESPESOR_INVALIDO")
+                    .message("El espesor debe ser mayor a 0")
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+        if (ordenVentaDto.getEspecificacion().getCantidad() == null || ordenVentaDto.getEspecificacion().getCantidad() <= 0){
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("PESO_INVALIDO")
+                    .message("El peso debe ser mayor a 0")
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+        if (ordenVentaDto.getCliente() == null){
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("CLIENTE_INVALIDO")
+                    .message("Se debe otorgar un cliente")
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+        if (ordenVentaDto.getFechaEntregaEstimada() == null){
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("FECHA_INVALIDA")
+                    .message("Se debe otorgar un fecha de estimación")
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+
+
+
+
         OrdenVentaDto nuevaOrden = ordenVentaService.save(ordenVentaDto);
 
         return new ResponseEntity<>(nuevaOrden, HttpStatus.CREATED);
@@ -49,6 +91,7 @@ public class OrdenVentaController {
         if (!id.equals(ordenVentaDto.getOrderId())) {
             return ResponseEntity.badRequest().build();
         }
+        
         OrdenVentaDto ordenActualizada = ordenVentaService.save(ordenVentaDto);
         return ResponseEntity.ok(ordenActualizada);
     }
