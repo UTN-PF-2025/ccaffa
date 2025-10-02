@@ -118,8 +118,14 @@ public class OrdenDeTrabajoServiceImpl implements OrdenDeTrabajoService {
 
         // 3. Marcar el rollo padre como disponible si existe
         if (afectados.getRolloPadre() != null) {
-            afectados.getRolloPadre().setEstado(EstadoRollo.DISPONIBLE);
-            rolloRepository.save(afectados.getRolloPadre());
+            Rollo rolloPadre = afectados.getRolloPadre();
+            Rollo rolloAbuelo = rolloPadre.getRolloPadre();
+            if (rolloAbuelo != null && rolloAbuelo.getEstado() == EstadoRollo.DISPONIBLE){
+                rolloPadre.setEstado(EstadoRollo.DISPONIBLE);
+            } else {
+                rolloPadre.setEstado(EstadoRollo.PLANIFICADO);
+            }
+            rolloRepository.save(rolloPadre);
         }
 
         // 4. Replanificar todas las órdenes de venta afectadas

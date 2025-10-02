@@ -107,7 +107,7 @@ public class PlannerController {
         plannerGA.setMaquinas(maquinas);
 
         if (plannerInfo.usarTodosLosRollosDisponibles){
-            rollos = this.rolloService.findEntitiesByEstado(EstadoRollo.DISPONIBLE);
+            rollos = this.rolloService.findEntitiesByEstados(List.of(EstadoRollo.DISPONIBLE, EstadoRollo.PLANIFICADO));
             rollosIDs.addAll(rollos.stream().map(r -> r.getId()).toList());
         }else {
             rollos = this.rolloService.findEntitiesByIdIn(rollosIDs);

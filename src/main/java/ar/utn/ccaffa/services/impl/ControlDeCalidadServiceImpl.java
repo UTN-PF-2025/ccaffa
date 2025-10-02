@@ -1,22 +1,13 @@
 package ar.utn.ccaffa.services.impl;
 
-import ar.utn.ccaffa.enums.EstadoControlDeCalidadEnum;
-import ar.utn.ccaffa.enums.EstadoOrdenTrabajoEnum;
-import ar.utn.ccaffa.enums.EstadoOrdenTrabajoMaquinaEnum;
-import ar.utn.ccaffa.enums.EstadoOrdenVentaEnum;
+import ar.utn.ccaffa.enums.*;
 import ar.utn.ccaffa.model.dto.CreateControlDeCalidadRequest;
 import ar.utn.ccaffa.model.entity.ControlDeCalidad;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
-import ar.utn.ccaffa.repository.interfaces.ControlDeCalidadRepository;
+import ar.utn.ccaffa.repository.interfaces.*;
 import ar.utn.ccaffa.model.dto.AddMedidaRequest;
 import ar.utn.ccaffa.model.dto.ControlDeProcesoDto;
 import ar.utn.ccaffa.model.entity.*;
-import ar.utn.ccaffa.repository.interfaces.MedidaDeCalidadRepository;
-import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoRepository;
-import ar.utn.ccaffa.repository.interfaces.OrdenVentaRepository;
-import ar.utn.ccaffa.repository.interfaces.ProveedorRepository;
-import ar.utn.ccaffa.repository.interfaces.UsuarioRepository;
-import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoMaquinaRepository;
 import ar.utn.ccaffa.services.interfaces.ControlDeCalidadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -37,6 +28,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
     private final ProveedorRepository proveedorRepository;
     private final OrdenVentaRepository ordenVentaRepository;
     private final OrdenDeTrabajoMaquinaRepository ordenDeTrabajoMaquinaRepository;
+    private final RolloRepository rolloRepository;
 
     @Override
     public ControlDeCalidad createControlDeCalidad(CreateControlDeCalidadRequest request) {
@@ -171,20 +163,31 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
 
     @Override
     public ControlDeCalidad finalizarControl(Long id) {
+
+        // TODO: EL CONTROL DE CALIDAD DEBE TENER REFERENCIA UNA OTM, NO A UNA OT
         ControlDeCalidad control = controlDeCalidadRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Control de Calidad no encontrado con ID: " + id));
+
         OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoRepository.findById(Long.parseLong(control.getOrdenDeTrabajoId())).orElseThrow(
             () -> new RuntimeException("Orden de Trabajo no encontrada con ID: " + control.getOrdenDeTrabajoId()));
         OrdenVenta ordenVenta = ordenDeTrabajo.getOrdenDeVenta();
+
+        Rollo rolloDeOrdenDeTrabajo = ordenDeTrabajo.getRollo();
+
         if (!control.getDefectos().isEmpty() || control.getEstado().equals(EstadoControlDeCalidadEnum.A_CORREGIR)) {
             control.setEstado(EstadoControlDeCalidadEnum.DEFECTUOSO);
             ordenDeTrabajo.setEstado(EstadoOrdenTrabajoEnum.DEFECTUOSO);
             ordenVenta.setEstado(EstadoOrdenVentaEnum.REPLANIFICAR);
+            rolloDeOrdenDeTrabajo.setEstado(EstadoRollo.VERIFICAR);
         } else {
+            // TODO: SE FINALIZA EL OT, SOLO SI FINALIZO LA ULTIMA OTM RELACIONADA
             control.setEstado(EstadoControlDeCalidadEnum.FINALIZADO);
             ordenDeTrabajo.setEstado(EstadoOrdenTrabajoEnum.FINALIZADA);
             ordenVenta.setEstado(EstadoOrdenVentaEnum.TRABAJO_FINALIZADO);
+            // TODO: SI FINALIZO LA PRIMERA OTM, LOS ROLLOS HIJOS DEBE PASAR A ESTADO DISPONIBLE
+
         }
+        rolloRepository.save(rolloDeOrdenDeTrabajo);
         control.setFechaFinalizacion(LocalDateTime.now());
         ordenDeTrabajo.setFechaFin(LocalDateTime.now());
         ordenDeTrabajoRepository.save(ordenDeTrabajo);

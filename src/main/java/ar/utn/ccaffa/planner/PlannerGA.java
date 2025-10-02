@@ -253,7 +253,7 @@ public class PlannerGA {
 
     private double calcPenaltyForAvailableChildrenRolls(List<Rollo> rollosHijos){
         double p = 0;
-        for (Rollo c : rollosHijos) if (c.getEstado() == EstadoRollo.DISPONIBLE) p += (double) c.getPesoKG()/100000000; return p;
+        for (Rollo c : rollosHijos) if (c.getEstado() == EstadoRollo.PLANIFICADO) p += (double) c.getPesoKG()/100000000; return p;
     }
     private double calcScoreForDiffDates(List<OrdenDeTrabajo> jobs) {
         double score = 0;
@@ -683,7 +683,7 @@ public class PlannerGA {
     private List<Rollo> childrenCandidatesOfRoll(Map<Integer, List<Rollo>> childrenMap, int rollId, OrdenVenta sale){
         // returns the children of a roll in the map and orders them by volume
        return childrenMap.get(rollId).stream()
-                .filter(c -> EstadoRollo.DISPONIBLE.equals(c.getEstado()) && checkRollCharacteristics(sale, c ))
+                .filter(c -> EstadoRollo.PLANIFICADO.equals(c.getEstado()) && checkRollCharacteristics(sale, c ))
                 .sorted(Comparator.comparingDouble(c -> c.getAnchoMM() * c.getLargo()))
                 .toList();
 

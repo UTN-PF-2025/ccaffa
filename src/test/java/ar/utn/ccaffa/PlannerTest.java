@@ -186,7 +186,7 @@ public class PlannerTest {
                     totalDesperdicio++;
                     pesoDesperdicio += roll.getPesoKG();
                 }
-                if (roll.getEstado() == EstadoRollo.DISPONIBLE){
+                if (roll.getEstado() == EstadoRollo.PLANIFICADO){
                     totalDisponible++;
                     pesoDisponible += roll.getPesoKG();
                 }

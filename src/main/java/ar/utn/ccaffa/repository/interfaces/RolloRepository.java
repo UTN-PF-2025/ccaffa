@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface RolloRepository extends JpaRepository<Rollo, Long>, JpaSpecificationExecutor<Rollo> {
     List<Rollo> findByRolloPadreId(Long rolloPadreId);
-    List<Rollo> findByEstado(EstadoRollo estadoRollo);
+    List<Rollo> findByEstadoIn(List<EstadoRollo> estadosRollo);
     List<Rollo> findByIdIn(List<Long> ids);
     boolean existsRolloByProveedorIdAndCodigoProveedor(Long proovedorId, String codigoProveedor);
 }

@@ -155,7 +155,7 @@ public class OrdenDeTrabajo {
                 .pesoKG(pesoCalculado)
                 .espesorMM(this.getRollo().getEspesorMM())
                 .tipoMaterial(this.getRollo().getTipoMaterial())
-                .estado(EstadoRollo.DISPONIBLE)
+                .estado(EstadoRollo.PLANIFICADO)
                 .fechaIngreso(fechaFinalizacionPrimeraMaquina())
                 .rolloPadre(this.getRollo())
                 .build();
