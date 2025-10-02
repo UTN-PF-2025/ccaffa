@@ -7,5 +7,9 @@ public enum EstadoRollo {
     DIVIDIDO,
     CANCELADO,
     DESPERDICIO,
-    VERIFICAR
+    VERIFICAR;
+
+    public static boolean is(String estado, EstadoRollo estadoBuscadoEnum){
+        return estado.equals(estadoBuscadoEnum.name());
+    }
 }
