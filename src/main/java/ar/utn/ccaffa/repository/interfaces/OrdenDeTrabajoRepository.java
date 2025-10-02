@@ -14,6 +14,7 @@ import java.util.Optional;
 
 public interface OrdenDeTrabajoRepository extends JpaRepository<OrdenDeTrabajo, Long>, JpaSpecificationExecutor<OrdenDeTrabajo> {
     List<OrdenDeTrabajo> findByRolloId(Long rolloId);
+    @EntityGraph(attributePaths = {"ordenDeTrabajoMaquinas.maquina", "rollo", "ordenDeVenta.especificacion", "ordenDeVenta.cliente"})
     OrdenDeTrabajo findByOrdenDeTrabajoMaquinas_Id(Long ordenDeTrabajoMaquinaId);
     List<OrdenDeTrabajo> findByOrdenDeVenta_Id(Long ordenDeVentaId);
 
@@ -23,5 +24,13 @@ public interface OrdenDeTrabajoRepository extends JpaRepository<OrdenDeTrabajo, 
 
     @Query("select ot from OrdenDeTrabajo ot left join fetch ot.rollo where ot.id = :id")
     Optional<OrdenDeTrabajo> findByIdFetchRollo(@Param("id") Long id);
+
+    @Override
+    @EntityGraph(attributePaths = {"ordenDeTrabajoMaquinas.maquina", "rollo", "ordenDeVenta.especificacion", "ordenDeVenta.cliente"})
+    Optional<OrdenDeTrabajo> findById(Long id);
+
+    @Override
+    @EntityGraph(attributePaths = {"ordenDeTrabajoMaquinas.maquina", "rollo", "ordenDeVenta.especificacion", "ordenDeVenta.cliente"})
+    List<OrdenDeTrabajo> findAll();
 
 }

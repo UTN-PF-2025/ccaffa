@@ -125,7 +125,7 @@ public class OrdenDeTrabajoResponseMapperImpl implements OrdenDeTrabajoResponseM
                         ordenVenta.getFechaCreacion().format(formatter) : null)
                 .fechaEntregaEstimada(ordenVenta.getFechaEntregaEstimada() != null ? 
                         ordenVenta.getFechaEntregaEstimada().format(formatter) : null)
-                .estado(ordenVenta.getEstado().name())
+                .estado(ordenVenta.getEstado())
                 .observaciones(ordenVenta.getObservaciones())
                 .cliente(clienteMapper.toDto(ordenVenta.getCliente()))
                 .especificacion(especificacionMapper.toDto(ordenVenta.getEspecificacion()))

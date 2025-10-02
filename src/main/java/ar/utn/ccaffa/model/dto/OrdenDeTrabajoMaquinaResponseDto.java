@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+import ar.utn.ccaffa.enums.EstadoOrdenTrabajoMaquinaEnum;
+
 @Data
 @Builder
 @NoArgsConstructor

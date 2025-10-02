@@ -73,7 +73,7 @@ public class OrdenVentaServiceImpl implements OrdenVentaService {
             if(ordenDeTrabajo1.yaComenzo()){
                 throw new UnprocessableContentException("Orden de Venta - Anulación");
             } else {
-                this.ordenDeTrabajoService.cancelar(ordenDeTrabajo1.getId());
+                this.ordenDeTrabajoService.cancelarOrdenDeTrabajo(ordenDeTrabajo1.getId());
                 ordenVentaAAnular.setEstado(EstadoOrdenVentaEnum.ANULADA);
                 this.save(ordenVentaAAnular);
             }
