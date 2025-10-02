@@ -5,6 +5,8 @@ import ar.utn.ccaffa.model.entity.OrdenDeTrabajoMaquina;
 import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoMaquinaRepository;
 import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoMaquinaService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +27,11 @@ public class OrdenDeTrabajoMaquinaServiceImpl implements OrdenDeTrabajoMaquinaSe
     @Override
     public List<OrdenDeTrabajoMaquina> findByMaquinaId(Long maquinaId) {
         return repository.findByMaquinaId(maquinaId);
+    }
+
+    @Override
+    public Page<OrdenDeTrabajoMaquina> findByMaquinaIdPaginated(Long maquinaId, Pageable pageable) {
+        return repository.findByMaquinaIdAndEstadoInOrderByFechaInicioAsc(maquinaId, List.of(EstadoOrdenTrabajoMaquinaEnum.PROGRAMADA, EstadoOrdenTrabajoMaquinaEnum.EN_CURSO), pageable);
     }
 
     @Override

@@ -3,6 +3,8 @@ package ar.utn.ccaffa.repository.interfaces;
 import ar.utn.ccaffa.enums.EstadoOrdenTrabajoMaquinaEnum;
 import ar.utn.ccaffa.model.entity.Maquina;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajoMaquina;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -19,6 +21,8 @@ public interface OrdenDeTrabajoMaquinaRepository extends JpaRepository<OrdenDeTr
     OrdenDeTrabajoMaquina findTopByOrdenDeTrabajo_IdOrderByFechaInicioDesc(Long ordenDeTrabajoId);
 
     List<OrdenDeTrabajoMaquina> findByMaquinaId(Long maquinaId);
+
+    Page<OrdenDeTrabajoMaquina> findByMaquinaIdAndEstadoInOrderByFechaInicioAsc(Long maquinaId, List<EstadoOrdenTrabajoMaquinaEnum> estados, Pageable pageable);
 
     OrdenDeTrabajoMaquina findTopByMaquina_IdAndEstadoOrderByFechaInicioAsc(Long maquinaId, EstadoOrdenTrabajoMaquinaEnum estado);
 }

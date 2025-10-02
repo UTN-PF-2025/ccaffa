@@ -159,13 +159,15 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
                 .orElseThrow(() -> new RuntimeException("Control de Calidad no encontrado con ID: " + id));
         OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoRepository.findById(Long.parseLong(control.getOrdenDeTrabajoId())).orElseThrow(
             () -> new RuntimeException("Orden de Trabajo no encontrada con ID: " + control.getOrdenDeTrabajoId()));
+        OrdenVenta ordenVenta = ordenDeTrabajo.getOrdenDeVenta();
         if (!control.getDefectos().isEmpty() || control.getEstado().equals(EstadoControlDeCalidadEnum.A_CORREGIR)) {
             control.setEstado(EstadoControlDeCalidadEnum.DEFECTUOSO);
             ordenDeTrabajo.setEstado(EstadoOrdenTrabajoEnum.DEFECTUOSO);
-
+            ordenVenta.setEstado(EstadoOrdenVentaEnum.REPLANIFICAR);
         } else {
             control.setEstado(EstadoControlDeCalidadEnum.FINALIZADO);
             ordenDeTrabajo.setEstado(EstadoOrdenTrabajoEnum.FINALIZADA);
+            ordenVenta.setEstado(EstadoOrdenVentaEnum.TRABAJO_FINALIZADO);
         }
         control.setFechaFinalizacion(LocalDateTime.now());
         ordenDeTrabajo.setFechaFin(LocalDateTime.now());
