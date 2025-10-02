@@ -15,12 +15,12 @@ import ar.utn.ccaffa.repository.interfaces.OrdenVentaRepository;
 import ar.utn.ccaffa.services.interfaces.RolloService;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import ar.utn.ccaffa.model.dto.ModificarRolloRequestDto;
 import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoService;
@@ -313,5 +313,19 @@ public class RolloServiceImpl implements RolloService {
         
         log.info("Rollo {} anulado exitosamente", id);
         return true;
+    }
+
+    @Override
+    public List<Long> simularAnularRollo(Long id) {
+        List<Long> ordenesVentaAAnular = new ArrayList<>();
+        Rollo rollo = rolloRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Rollo", "id", id));
+        List<OrdenDeTrabajo> ordenesTrabajo = ordenDeTrabajoService.findByRolloId(rollo.getId());
+        for (OrdenDeTrabajo ordenTrabajo : ordenesTrabajo) {
+            if (!EstadoOrdenTrabajoEnum.is(ordenTrabajo.getEstado(), EstadoOrdenTrabajoEnum.ANULADA)) {
+                ordenesVentaAAnular.add(ordenTrabajo.getOrdenDeVenta().getId());
+            }
+        }
+        return ordenesVentaAAnular;
     }
 }

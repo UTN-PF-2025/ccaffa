@@ -25,4 +25,6 @@ public interface RolloService {
     boolean deleteById(Long id);
     RolloDto modificarRollo(ModificarRolloRequestDto request);
     boolean anularRollo(Long id);
-} 
+
+    List<Long> simularAnularRollo(Long id);
+}

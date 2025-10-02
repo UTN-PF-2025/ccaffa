@@ -5,6 +5,7 @@ import ar.utn.ccaffa.enums.TipoMaterial;
 import ar.utn.ccaffa.exceptions.ErrorResponse;
 import ar.utn.ccaffa.model.dto.FiltroRolloDto;
 import ar.utn.ccaffa.model.dto.RolloDto;
+import ar.utn.ccaffa.model.dto.SimulacionAnulacionRolloResponse;
 import ar.utn.ccaffa.services.interfaces.RolloService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -103,5 +104,12 @@ public class RolloController {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{id}/anular")
+    public ResponseEntity<SimulacionAnulacionRolloResponse> simularAnularRollo(@PathVariable Long id) {
+        log.info("Se simula Anulacion de rollo con ID: {}", id);
+        SimulacionAnulacionRolloResponse response = new SimulacionAnulacionRolloResponse(rolloService.simularAnularRollo(id));
+        return ResponseEntity.ok(response);
     }
 }
