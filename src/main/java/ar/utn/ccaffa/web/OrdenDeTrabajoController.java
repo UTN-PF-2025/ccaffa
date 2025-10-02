@@ -1,7 +1,6 @@
 package ar.utn.ccaffa.web;
 
 import ar.utn.ccaffa.enums.*;
-import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.mapper.interfaces.OrdenDeTrabajoMaquinaMapper;
 import ar.utn.ccaffa.mapper.interfaces.OrdenDeTrabajoResponseMapper;
 import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoMaquinaService;

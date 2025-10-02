@@ -47,6 +47,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/rollos_productos/**").permitAll()
                 .requestMatchers("/api/ordenes-venta/**").permitAll()
                 .requestMatchers("/api/ordenes-trabajo/**").permitAll()
+                .requestMatchers("/api/controles-calidad/**").permitAll()
                 .requestMatchers("/api/defectos/{camaraId}/{imageId}/aceptar").permitAll()
                 .requestMatchers("/api/defectos/{camaraId}/{imageId}/rechazar").permitAll()
                 .requestMatchers("/api/defectos/**").hasRole("ADMIN")

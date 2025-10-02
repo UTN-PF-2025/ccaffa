@@ -5,6 +5,8 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import ar.utn.ccaffa.enums.EstadoControlDeCalidadEnum;
+import ar.utn.ccaffa.model.entity.Defecto;
 import ar.utn.ccaffa.model.entity.MedidaDeCalidad;
 
 @Data
@@ -32,4 +34,6 @@ public class ControlDeProcesoDto {
     private String nombreProveedor;
     private String codigoEtiquetaMp;
     private List<MedidaDeCalidad> medidas;
+    private List<Defecto> defectos;
+    private EstadoControlDeCalidadEnum estado;
 }
