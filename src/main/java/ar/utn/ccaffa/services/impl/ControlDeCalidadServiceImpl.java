@@ -2,6 +2,7 @@ package ar.utn.ccaffa.services.impl;
 
 import ar.utn.ccaffa.enums.EstadoControlDeCalidadEnum;
 import ar.utn.ccaffa.enums.EstadoOrdenTrabajoEnum;
+import ar.utn.ccaffa.enums.EstadoOrdenTrabajoMaquinaEnum;
 import ar.utn.ccaffa.enums.EstadoOrdenVentaEnum;
 import ar.utn.ccaffa.model.dto.CreateControlDeCalidadRequest;
 import ar.utn.ccaffa.model.entity.ControlDeCalidad;
@@ -55,7 +56,11 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
         control.setMedidasDeCalidad(Collections.emptyList());
         control.setDefectos(Collections.emptyList());
 
-        return controlDeCalidadRepository.save(control);
+        ordenDeTrabajo.setControlDeCalidad(control);
+        controlDeCalidadRepository.save(control);
+        ordenDeTrabajoRepository.save(ordenDeTrabajo);
+
+        return control;
     }
 
     @Override
@@ -177,20 +182,24 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
 
     @Override
     public ControlDeCalidad iniciarControl(Long id) {
-        ControlDeCalidad control = controlDeCalidadRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Control de Calidad no encontrado con ID: " + id));
+
+        OrdenDeTrabajoMaquina ordenTrabajoMaquina = ordenDeTrabajoMaquinaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Orden de Trabajo Maquina no encontrada con ID: " + id));
+        
+        ordenTrabajoMaquina.setEstado(EstadoOrdenTrabajoMaquinaEnum.EN_CURSO);
+        OrdenDeTrabajo ordenDeTrabajo = ordenTrabajoMaquina.getOrdenDeTrabajo();
+        ordenDeTrabajo.setEstado(EstadoOrdenTrabajoEnum.EN_CURSO);
+    
+        ControlDeCalidad control = ordenDeTrabajo.getControlDeCalidad();
         control.setEstado(EstadoControlDeCalidadEnum.EN_PROCESO);
         control.setFechaControl(LocalDateTime.now());
-
-        OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoRepository.findById(Long.parseLong(control.getOrdenDeTrabajoId())).orElseThrow(
-                () -> new RuntimeException("Orden de Trabajo no encontrada con ID: " + control.getOrdenDeTrabajoId()));
-        ordenDeTrabajo.setEstado(EstadoOrdenTrabajoEnum.EN_CURSO);
 
        OrdenVenta ordenVenta = ordenDeTrabajo.getOrdenDeVenta();
        ordenVenta.setEstado(EstadoOrdenVentaEnum.EN_CURSO);
 
         ordenVentaRepository.save(ordenVenta);
         ordenDeTrabajoRepository.save(ordenDeTrabajo);
+        ordenDeTrabajoMaquinaRepository.save(ordenTrabajoMaquina);
         return controlDeCalidadRepository.save(control);
     }
 
