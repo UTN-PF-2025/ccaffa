@@ -196,6 +196,7 @@ public class RolloServiceImpl implements RolloService {
         Specification<Rollo> spec = Specification.where(null);
         
         spec = spec.and((root, query, cb) -> cb.equal(root.get("estado"), EstadoRollo.DISPONIBLE));
+
         spec = spec.and((root, query, cb) -> cb.equal(root.get("asociadaAOrdenDeTrabajo"), false));
 
         if (especificacion.getTipoMaterial() != null) {

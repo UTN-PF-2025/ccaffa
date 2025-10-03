@@ -158,8 +158,8 @@ public class OrdenDeTrabajo {
                 .estado(EstadoRollo.PLANIFICADO)
                 .fechaIngreso(fechaFinalizacionPrimeraMaquina())
                 .rolloPadre(this.getRollo())
-                .ordeDeTrabajoAsociadaID(this.getId())
-                .asociadaAOrdenDeTrabajo(true)
+                .ordeDeTrabajoAsociadaID(null)
+                .asociadaAOrdenDeTrabajo(false)
                 .build();
     }
 
