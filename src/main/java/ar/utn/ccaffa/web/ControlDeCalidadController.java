@@ -1,5 +1,6 @@
 package ar.utn.ccaffa.web;
 
+import ar.utn.ccaffa.exceptions.ErrorResponse;
 import ar.utn.ccaffa.model.dto.AddMedidaRequest;
 import ar.utn.ccaffa.model.dto.ControlDeProcesoDto;
 import ar.utn.ccaffa.model.dto.CreateControlDeCalidadRequest;
@@ -62,9 +63,17 @@ public class ControlDeCalidadController {
     }
 
     @PutMapping("/{id}/iniciar")
-    public ResponseEntity<ControlDeCalidad> iniciarControl(@PathVariable Long id) {
-        ControlDeCalidad controlDeCalidad = controlDeCalidadService.iniciarControl(id);
-        return ResponseEntity.ok(controlDeCalidad);
+    public ResponseEntity<?> iniciarControl(@PathVariable Long id) {
+        try {
+            ControlDeCalidad controlDeCalidad = controlDeCalidadService.iniciarControl(id);
+            return ResponseEntity.ok(controlDeCalidad);
+        } catch (IllegalStateException e) {
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("UNABLE_TO_START_JOB")
+                    .message("No se puede iniciar control de calidad debido a que el rollo o la maquina no esta disponible")
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
     }
 
     @PutMapping("/{id}/a-corregir")

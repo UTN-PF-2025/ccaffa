@@ -48,9 +48,6 @@ public class Maquina {
     @Column(name = "anchoMinimoMilimetros", nullable = false)
     private Float anchoMinimoMilimetros;
 
-    @Column(name = "es_activa")
-    private Boolean esActiva;
-
     @OneToMany(mappedBy = "maquina", cascade = CascadeType.ALL)
     private List<OrdenDeTrabajoMaquina> ordenDeTrabajoMaquinas;
 

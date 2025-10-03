@@ -1,9 +1,8 @@
 package ar.utn.ccaffa.services.impl;
 
-import ar.utn.ccaffa.enums.EstadoControlDeCalidadEnum;
-import ar.utn.ccaffa.enums.EstadoOrdenTrabajoEnum;
-import ar.utn.ccaffa.enums.EstadoOrdenTrabajoMaquinaEnum;
-import ar.utn.ccaffa.enums.EstadoOrdenVentaEnum;
+import ar.utn.ccaffa.enums.*;
+import ar.utn.ccaffa.exceptions.ErrorResponse;
+import ar.utn.ccaffa.exceptions.ResourceNotFoundException;
 import ar.utn.ccaffa.model.dto.CreateControlDeCalidadRequest;
 import ar.utn.ccaffa.model.entity.ControlDeCalidad;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
@@ -45,22 +44,27 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
         OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoRepository.findById(request.getOrdenDeTrabajoId())
                 .orElseThrow(() -> new RuntimeException("Orden de Trabajo no encontrada con ID: " + request.getOrdenDeTrabajoId()));
 
-        ControlDeCalidad control = new ControlDeCalidad();
-        control.setUsuario(usuario);
-        control.setOrdenDeTrabajoId(ordenDeTrabajo.getId().toString());
-        control.setEstado(EstadoControlDeCalidadEnum.PENDIENTE);
+        OrdenDeTrabajoMaquina ordenTrabajoMaquina = this.ordenDeTrabajoMaquinaRepository.findTopByOrdenDeTrabajo_IdOrderByFechaInicioDesc(ordenDeTrabajo.getId());
+        if(!estaDisponible(ordenDeTrabajo.getRollo()) || !maquinaDisponible(ordenTrabajoMaquina)){
+            throw new IllegalStateException("El control de calidad no puede ser iniciado porque su rollo no esta en estado disponible o la maquina no esta disponible para trabajar");
+        } else {
+            ControlDeCalidad control = new ControlDeCalidad();
+            control.setUsuario(usuario);
+            control.setOrdenDeTrabajoId(ordenDeTrabajo.getId().toString());
+            control.setEstado(EstadoControlDeCalidadEnum.PENDIENTE);
 
-        control.setAnchoMedido(0.0f); // Valor por defecto
-        control.setEspesorMedido(0.0f); // Valor por defecto
-        control.setRebabaMedio(0.0f); // Valor por defecto
-        control.setMedidasDeCalidad(Collections.emptyList());
-        control.setDefectos(Collections.emptyList());
+            control.setAnchoMedido(0.0f); // Valor por defecto
+            control.setEspesorMedido(0.0f); // Valor por defecto
+            control.setRebabaMedio(0.0f); // Valor por defecto
+            control.setMedidasDeCalidad(Collections.emptyList());
+            control.setDefectos(Collections.emptyList());
 
-        ordenDeTrabajo.setControlDeCalidad(control);
-        controlDeCalidadRepository.save(control);
-        ordenDeTrabajoRepository.save(ordenDeTrabajo);
+            ordenDeTrabajo.setControlDeCalidad(control);
+            controlDeCalidadRepository.save(control);
+            ordenDeTrabajoRepository.save(ordenDeTrabajo);
 
-        return control;
+            return control;
+        }
     }
 
     @Override
@@ -189,18 +193,26 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
         ordenTrabajoMaquina.setEstado(EstadoOrdenTrabajoMaquinaEnum.EN_CURSO);
         OrdenDeTrabajo ordenDeTrabajo = ordenTrabajoMaquina.getOrdenDeTrabajo();
         ordenDeTrabajo.setEstado(EstadoOrdenTrabajoEnum.EN_CURSO);
-    
+
         ControlDeCalidad control = ordenDeTrabajo.getControlDeCalidad();
         control.setEstado(EstadoControlDeCalidadEnum.EN_PROCESO);
         control.setFechaControl(LocalDateTime.now());
 
-       OrdenVenta ordenVenta = ordenDeTrabajo.getOrdenDeVenta();
-       ordenVenta.setEstado(EstadoOrdenVentaEnum.EN_CURSO);
+        OrdenVenta ordenVenta = ordenDeTrabajo.getOrdenDeVenta();
+        ordenVenta.setEstado(EstadoOrdenVentaEnum.EN_CURSO);
 
         ordenVentaRepository.save(ordenVenta);
         ordenDeTrabajoRepository.save(ordenDeTrabajo);
         ordenDeTrabajoMaquinaRepository.save(ordenTrabajoMaquina);
-        return controlDeCalidadRepository.save(control);
+        return control;
+    }
+
+    private boolean maquinaDisponible(OrdenDeTrabajoMaquina ordenTrabajoMaquina) {
+        return ordenTrabajoMaquina.getMaquina().getActivo() && !ordenDeTrabajoMaquinaRepository.existsByMaquina_IdAndEstado(ordenTrabajoMaquina.getMaquina().getId(), EstadoOrdenTrabajoMaquinaEnum.EN_CURSO);
+    }
+
+    private boolean estaDisponible(Rollo rollo) {
+        return EstadoRollo.is(EstadoRollo.DISPONIBLE.name(),rollo.getEstado());
     }
 
     @Override
