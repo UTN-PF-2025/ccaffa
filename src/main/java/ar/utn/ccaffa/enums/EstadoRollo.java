@@ -4,7 +4,6 @@ public enum EstadoRollo {
     PLANIFICADO,
     DISPONIBLE,
     AGOTADO,
-    DIVIDIDO,
     CANCELADO,
     DESPERDICIO
 }

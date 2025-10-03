@@ -108,11 +108,8 @@ public class OrdenDeTrabajo {
         crearHijoPorAncho(rolloHijos);
         crearHijoPorLargo(rolloHijos);
 
-        if (!rolloHijos.isEmpty()){
-            this.getRollo().setEstado(EstadoRollo.DIVIDIDO);
-        }
-
-        this.getRollo().setAsociadoAOrdenDeTrabajo(true);
+        this.getRollo().setOrdeDeTrabajoAsociadaID(this.getId());
+        this.getRollo().setAsociadaAOrdenDeTrabajo(true);
 
         return rolloHijos;
 
@@ -161,7 +158,8 @@ public class OrdenDeTrabajo {
                 .estado(EstadoRollo.PLANIFICADO)
                 .fechaIngreso(fechaFinalizacionPrimeraMaquina())
                 .rolloPadre(this.getRollo())
-                .asociadoAOrdenDeTrabajo(false)
+                .ordeDeTrabajoAsociadaID(this.getId())
+                .asociadaAOrdenDeTrabajo(true)
                 .build();
     }
 

@@ -29,7 +29,8 @@ public class RolloMapperImpl implements RolloMapper {
                 .fechaIngreso(rollo.getFechaIngreso())
                 .rolloPadre(this.toDto(rollo.getRolloPadre()))
                 .rolloPadreId(rollo.getRolloPadreId())
-                .asociadoAOrdenDeTrabajo(rollo.getAsociadoAOrdenDeTrabajo())
+                .ordeDeTrabajoAsociadaID(rollo.getOrdeDeTrabajoAsociadaID())
+                .asociadaAOrdenDeTrabajo(rollo.getAsociadaAOrdenDeTrabajo())
                 .build();
     }
 
@@ -50,7 +51,8 @@ public class RolloMapperImpl implements RolloMapper {
                 .estado(rollo.getEstado())
                 .fechaIngreso(rollo.getFechaIngreso())
                 .rolloPadreId(rollo.getRolloPadreId())
-                .asociadoAOrdenDeTrabajo(rollo.getAsociadoAOrdenDeTrabajo())
+                .ordeDeTrabajoAsociadaID(rollo.getOrdeDeTrabajoAsociadaID())
+                .asociadaAOrdenDeTrabajo(rollo.getAsociadaAOrdenDeTrabajo())
                 .build();
     }
 
@@ -71,7 +73,8 @@ public class RolloMapperImpl implements RolloMapper {
                         .estado(rollo.getEstado())
                         .fechaIngreso(rollo.getFechaIngreso())
                         .rolloPadreId(rollo.getRolloPadreId())
-                        .asociadoAOrdenDeTrabajo(rollo.getAsociadoAOrdenDeTrabajo())
+                        .ordeDeTrabajoAsociadaID(rollo.getOrdeDeTrabajoAsociadaID())
+                        .asociadaAOrdenDeTrabajo(rollo.getAsociadaAOrdenDeTrabajo())
                         .build();
 
         if (rollo.getHijos() != null && !rollo.getHijos().isEmpty()) {
@@ -101,7 +104,8 @@ public class RolloMapperImpl implements RolloMapper {
                 .estado(rolloDto.getEstado())
                 .fechaIngreso(rolloDto.getFechaIngreso())
                 .rolloPadre(this.toEntity(rolloDto.getRolloPadre()))
-                .asociadoAOrdenDeTrabajo(rolloDto.getAsociadoAOrdenDeTrabajo())
+                .ordeDeTrabajoAsociadaID(rolloDto.getOrdeDeTrabajoAsociadaID())
+                .asociadaAOrdenDeTrabajo(rolloDto.getAsociadaAOrdenDeTrabajo())
                 .build();
 
     }

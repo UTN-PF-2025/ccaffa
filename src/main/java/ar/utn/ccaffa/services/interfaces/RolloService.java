@@ -26,5 +26,6 @@ public interface RolloService {
     RolloDto modificarRollo(ModificarRolloRequestDto request);
     boolean anularRollo(Long id);
 
+    boolean estaDisponible(Rollo rollo);
     List<Long> simularAnularRollo(Long id);
 }

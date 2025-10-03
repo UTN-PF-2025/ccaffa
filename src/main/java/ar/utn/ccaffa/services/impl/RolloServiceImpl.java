@@ -170,6 +170,11 @@ public class RolloServiceImpl implements RolloService {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("rolloPadre").get("id"), filtros.getRolloPadreId()));
         }
 
+        if (filtros.getAsociadaAOrdenDeTrabajo() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("asociadaAOrdenDeTrabajo"), filtros.getAsociadaAOrdenDeTrabajo()
+            ));
+        }
+
         return this.rolloMapper.toDtoListOnlyWithRolloPadreID(rolloRepository.findAll(spec));
     }
 
@@ -191,6 +196,7 @@ public class RolloServiceImpl implements RolloService {
         Specification<Rollo> spec = Specification.where(null);
         
         spec = spec.and((root, query, cb) -> cb.equal(root.get("estado"), EstadoRollo.DISPONIBLE));
+        spec = spec.and((root, query, cb) -> cb.equal(root.get("asociadaAOrdenDeTrabajo"), false));
 
         if (especificacion.getTipoMaterial() != null) {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("tipoMaterial"), especificacion.getTipoMaterial()));
@@ -321,6 +327,11 @@ public class RolloServiceImpl implements RolloService {
         
         log.info("Rollo {} anulado exitosamente", id);
         return true;
+    }
+
+    @Override
+    public boolean estaDisponible(Rollo rollo){
+        return rollo.getEstado() == EstadoRollo.DISPONIBLE;
     }
 
     @Override

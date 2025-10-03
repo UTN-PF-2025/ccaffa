@@ -1,13 +1,20 @@
 package ar.utn.ccaffa.web;
 
+import ar.utn.ccaffa.exceptions.ErrorResponse;
 import ar.utn.ccaffa.model.dto.AddMedidaRequest;
 import ar.utn.ccaffa.model.dto.ControlDeProcesoDto;
 import ar.utn.ccaffa.model.dto.CreateControlDeCalidadRequest;
 import ar.utn.ccaffa.model.entity.ControlDeCalidad;
+import ar.utn.ccaffa.model.entity.OrdenDeTrabajoMaquina;
+import ar.utn.ccaffa.model.entity.Rollo;
+import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoMaquinaRepository;
 import ar.utn.ccaffa.services.interfaces.ControlDeCalidadService;
+import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoMaquinaService;
+import ar.utn.ccaffa.services.interfaces.RolloService;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,15 +28,44 @@ import org.springframework.web.bind.annotation.*;
 public class ControlDeCalidadController {
 
     private final ControlDeCalidadService controlDeCalidadService;
+    private final OrdenDeTrabajoMaquinaRepository ordenDeTrabajoMaquinaRepository;
+    private final RolloService rolloService;
+    private final OrdenDeTrabajoMaquinaService ordenDeTrabajoMaquinaService;
 
     @PostMapping
-    public ResponseEntity<ControlDeCalidad> createControlDeCalidad(@RequestBody CreateControlDeCalidadRequest request) {
-        if (request.getEmpleadoId() == null) {
-            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            if (principal instanceof UserDetailsImpl userDetails) {
-                request.setEmpleadoId(userDetails.getUsuario().getId());
-            }
+    public ResponseEntity<?> createControlDeCalidad(@RequestBody CreateControlDeCalidadRequest request) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetailsImpl userDetails) {
+            request.setEmpleadoId(userDetails.getUsuario().getId());
         }
+        Optional<OrdenDeTrabajoMaquina> ordenDeTrabajoMaquina = ordenDeTrabajoMaquinaRepository.findById(request.getOrdenDeTrabajoMaquinaId());
+
+        if (ordenDeTrabajoMaquina.isEmpty()){
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("ORDEN_NO_EXISTENTE")
+                    .message("Orden de Trabajo Maquina no encontrada con ID: " + request.getOrdenDeTrabajoMaquinaId())
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+
+        Rollo rollo = ordenDeTrabajoMaquina.get().getOrdenDeTrabajo().getRollo();
+        if (!rolloService.estaDisponible(rollo)){
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("ROLLO_NO_DISPONIBLE")
+                    .message("El control de calidad no puede ser iniciado porque su rollo todavía no esta disponible")
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+
+        if(this.ordenDeTrabajoMaquinaService.hayOTMEnCursoParaMaquina(ordenDeTrabajoMaquina.get().getMaquina())){
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("MAQUINA_OCUPADA")
+                    .message("El control de calidad no puede ser iniciado porque la maquina se encuentra ocupada")
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+
+
         ControlDeCalidad nuevoControl = controlDeCalidadService.createControlDeCalidad(request);
         return new ResponseEntity<>(nuevoControl, HttpStatus.CREATED);
     }

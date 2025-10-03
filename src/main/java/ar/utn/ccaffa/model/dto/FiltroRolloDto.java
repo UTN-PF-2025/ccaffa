@@ -31,6 +31,7 @@ public class FiltroRolloDto {
     private LocalDateTime fechaIngresoDesde;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "DEFAULT_TIMEZONE")
     private LocalDateTime fechaIngresoHasta;
+    private Boolean asociadaAOrdenDeTrabajo;
     private Long rolloPadreId;
 }
 

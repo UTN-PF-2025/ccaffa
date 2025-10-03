@@ -1,5 +1,6 @@
 package ar.utn.ccaffa.services.interfaces;
 
+import ar.utn.ccaffa.model.entity.Maquina;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajoMaquina;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,4 +12,5 @@ public interface OrdenDeTrabajoMaquinaService {
     Page<OrdenDeTrabajoMaquina> findByMaquinaIdPaginated(Long maquinaId, Pageable pageable);
     OrdenDeTrabajoMaquina findFirstByMaquinaId(Long maquinaId);
     OrdenDeTrabajoMaquina findById(Long id);
+    Boolean hayOTMEnCursoParaMaquina(Maquina maquina);
 }

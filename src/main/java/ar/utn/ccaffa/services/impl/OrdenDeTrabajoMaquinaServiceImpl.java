@@ -1,6 +1,7 @@
 package ar.utn.ccaffa.services.impl;
 
 import ar.utn.ccaffa.enums.EstadoOrdenTrabajoMaquinaEnum;
+import ar.utn.ccaffa.model.entity.Maquina;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajoMaquina;
 import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoMaquinaRepository;
 import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoMaquinaService;
@@ -42,5 +43,11 @@ public class OrdenDeTrabajoMaquinaServiceImpl implements OrdenDeTrabajoMaquinaSe
     @Override
     public OrdenDeTrabajoMaquina findById(Long id) {
       return repository.findById(id).orElse(null);
+    }
+
+    @Override
+    public Boolean hayOTMEnCursoParaMaquina(Maquina maquina) {
+        return this.repository.existsByMaquinaIsAndEstadoIs(maquina, EstadoOrdenTrabajoMaquinaEnum.EN_CURSO);
+
     }
 }

@@ -1,6 +1,7 @@
 package ar.utn.ccaffa.services.impl;
 
 import ar.utn.ccaffa.enums.*;
+import ar.utn.ccaffa.exceptions.ErrorResponse;
 import ar.utn.ccaffa.model.dto.CreateControlDeCalidadRequest;
 import ar.utn.ccaffa.model.entity.ControlDeCalidad;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
@@ -9,6 +10,7 @@ import ar.utn.ccaffa.model.dto.AddMedidaRequest;
 import ar.utn.ccaffa.model.dto.ControlDeProcesoDto;
 import ar.utn.ccaffa.model.entity.*;
 import ar.utn.ccaffa.services.interfaces.ControlDeCalidadService;
+import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoMaquinaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,13 +36,8 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
 
     @Override
     public ControlDeCalidad createControlDeCalidad(CreateControlDeCalidadRequest request) {
-        //TODO: FALTA VALIDACIÓN DE DEPENDENCIA Y DE EN CURSO
         Usuario usuario = usuarioRepository.findById(request.getEmpleadoId())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + request.getEmpleadoId()));
-
-        if (!ordenDeTrabajoMaquinaRepository.existsById(request.getOrdenDeTrabajoMaquinaId())){
-            new RuntimeException("Orden de Trabajo Maquina no encontrada con ID: " + request.getOrdenDeTrabajoMaquinaId());
-        }
 
         ControlDeCalidad control = getNewControlDeCalidad(usuario, request.getOrdenDeTrabajoMaquinaId());
         controlDeCalidadRepository.save(control);

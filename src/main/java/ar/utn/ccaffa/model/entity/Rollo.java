@@ -2,7 +2,6 @@ package ar.utn.ccaffa.model.entity;
 
 import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.enums.TipoMaterial;
-import ar.utn.ccaffa.repository.interfaces.RolloRepository;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -12,7 +11,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,10 +69,13 @@ public class Rollo implements Cloneable {
     @JoinColumn(name = "rollo_padre_id")
     private Rollo rolloPadre;
 
+    @Column(name = "ordeDeTrabajoAsociadaID")
+    private Long ordeDeTrabajoAsociadaID;
+
     @Column(name = "asociadoAOrdenDeTrabajo", nullable = false)
     @NotNull(message = "El campo asociadoAOrdenDeTrabajo es obligatorio")
     @ColumnDefault("false")
-    private Boolean asociadoAOrdenDeTrabajo = false;
+    private Boolean asociadaAOrdenDeTrabajo = false;
 
     @OneToMany(mappedBy = "rolloPadre", fetch = FetchType.LAZY)
     private List<Rollo> hijos = new ArrayList<>();

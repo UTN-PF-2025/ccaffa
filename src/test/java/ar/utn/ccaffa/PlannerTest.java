@@ -190,10 +190,6 @@ public class PlannerTest {
                     totalDisponible++;
                     pesoDisponible += roll.getPesoKG();
                 }
-                if (roll.getEstado() == EstadoRollo.DIVIDIDO){
-                    totalDividido++;
-                    pesoDividido += roll.getPesoKG();
-                }
             }
 
             System.out.printf("DESPERDICIO - Total %d | Weight %f.2 %n",

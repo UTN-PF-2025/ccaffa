@@ -9,7 +9,6 @@ import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajoMaquina;
 import ar.utn.ccaffa.enums.EstadoOrdenTrabajoEnum;
 import ar.utn.ccaffa.enums.EstadoRollo;
-import ar.utn.ccaffa.mapper.interfaces.OrdenDeTrabajoResponseMapper;
 import ar.utn.ccaffa.mapper.interfaces.RolloMapper;
 import ar.utn.ccaffa.model.dto.CancelacionSimulacionDto;
 import ar.utn.ccaffa.model.dto.OrdenVentaSimpleDto;
@@ -125,7 +124,8 @@ public class OrdenDeTrabajoServiceImpl implements OrdenDeTrabajoService {
             } else {
                 rolloPadre.setEstado(EstadoRollo.PLANIFICADO);
             }
-            rolloPadre.setAsociadoAOrdenDeTrabajo(false);
+            rolloPadre.setOrdeDeTrabajoAsociadaID(null);
+            rolloPadre.setAsociadaAOrdenDeTrabajo(false);
             rolloRepository.save(rolloPadre);
         }
 

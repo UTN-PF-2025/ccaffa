@@ -25,4 +25,6 @@ public interface OrdenDeTrabajoMaquinaRepository extends JpaRepository<OrdenDeTr
     Page<OrdenDeTrabajoMaquina> findByMaquinaIdAndEstadoInOrderByFechaInicioAsc(Long maquinaId, List<EstadoOrdenTrabajoMaquinaEnum> estados, Pageable pageable);
 
     OrdenDeTrabajoMaquina findTopByMaquina_IdAndEstadoOrderByFechaInicioAsc(Long maquinaId, EstadoOrdenTrabajoMaquinaEnum estado);
+
+    Boolean existsByMaquinaIsAndEstadoIs(Maquina maquina, EstadoOrdenTrabajoMaquinaEnum estadoOrdenTrabajoMaquinaEnum);
 }
