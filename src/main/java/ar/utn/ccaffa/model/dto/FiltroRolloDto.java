@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -25,6 +26,7 @@ public class FiltroRolloDto {
     private Float espesorMax;
     private TipoMaterial tipoMaterial;
     private EstadoRollo estado;
+    private List<EstadoRollo> estados;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "DEFAULT_TIMEZONE")
     private LocalDateTime fechaIngresoDesde;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "DEFAULT_TIMEZONE")

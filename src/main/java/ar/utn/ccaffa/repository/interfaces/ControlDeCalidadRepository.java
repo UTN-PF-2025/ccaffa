@@ -12,8 +12,5 @@ import java.util.Optional;
 public interface ControlDeCalidadRepository extends JpaRepository<ControlDeCalidad, Long> {
     @Query("SELECT c FROM ControlDeCalidad c LEFT JOIN FETCH c.medidasDeCalidad WHERE c.id = :id")
     Optional<ControlDeCalidad> findByIdWithMedidas(@Param("id") Long id);
-
-    @Query("SELECT c FROM ControlDeCalidad c LEFT JOIN FETCH c.medidasDeCalidad WHERE c.ordenDeTrabajoId = :ordenDeTrabajoId")
-    List<ControlDeCalidad> findByOrdenDeTrabajoId(Long ordenDeTrabajoId);
-
+    ControlDeCalidad findByOrdenDeTrabajoMaquinaId(Long id);
 }

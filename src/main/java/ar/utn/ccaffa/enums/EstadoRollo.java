@@ -6,6 +6,5 @@ public enum EstadoRollo {
     AGOTADO,
     DIVIDIDO,
     CANCELADO,
-    DESPERDICIO,
-    VERIFICAR
+    DESPERDICIO
 }

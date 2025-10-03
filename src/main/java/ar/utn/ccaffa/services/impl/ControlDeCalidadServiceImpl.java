@@ -29,30 +29,35 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
     private final OrdenVentaRepository ordenVentaRepository;
     private final OrdenDeTrabajoMaquinaRepository ordenDeTrabajoMaquinaRepository;
     private final RolloRepository rolloRepository;
+    private final RolloProductoRepository rolloProductoRepository;
 
     @Override
     public ControlDeCalidad createControlDeCalidad(CreateControlDeCalidadRequest request) {
+        //TODO: FALTA VALIDACIÓN DE DEPENDENCIA Y DE EN CURSO
         Usuario usuario = usuarioRepository.findById(request.getEmpleadoId())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + request.getEmpleadoId()));
 
-        OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoRepository.findById(request.getOrdenDeTrabajoId())
-                .orElseThrow(() -> new RuntimeException("Orden de Trabajo no encontrada con ID: " + request.getOrdenDeTrabajoId()));
+        if (!ordenDeTrabajoMaquinaRepository.existsById(request.getOrdenDeTrabajoMaquinaId())){
+            new RuntimeException("Orden de Trabajo Maquina no encontrada con ID: " + request.getOrdenDeTrabajoMaquinaId());
+        }
 
+        ControlDeCalidad control = getNewControlDeCalidad(usuario, request.getOrdenDeTrabajoMaquinaId());
+        controlDeCalidadRepository.save(control);
+
+        return control;
+    }
+
+    private static ControlDeCalidad getNewControlDeCalidad(Usuario usuario, Long ordenTrabajoMaquinaId) {
         ControlDeCalidad control = new ControlDeCalidad();
         control.setUsuario(usuario);
-        control.setOrdenDeTrabajoId(ordenDeTrabajo.getId().toString());
+        control.setOrdenDeTrabajoMaquinaId(ordenTrabajoMaquinaId);
         control.setEstado(EstadoControlDeCalidadEnum.PENDIENTE);
 
-        control.setAnchoMedido(0.0f); // Valor por defecto
-        control.setEspesorMedido(0.0f); // Valor por defecto
+        control.setAnchoMedio(0.0f); // Valor por defecto
+        control.setEspesorMedio(0.0f); // Valor por defecto
         control.setRebabaMedio(0.0f); // Valor por defecto
         control.setMedidasDeCalidad(Collections.emptyList());
         control.setDefectos(Collections.emptyList());
-
-        ordenDeTrabajo.setControlDeCalidad(control);
-        controlDeCalidadRepository.save(control);
-        ordenDeTrabajoRepository.save(ordenDeTrabajo);
-
         return control;
     }
 
@@ -75,8 +80,8 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
         double avgAncho = control.getMedidasDeCalidad().stream().mapToDouble(MedidaDeCalidad::getAnchoMedido).average().orElse(0.0);
         double avgRebaba = control.getMedidasDeCalidad().stream().mapToDouble(MedidaDeCalidad::getRebabaMedio).average().orElse(0.0);
 
-        control.setEspesorMedido((float) avgEspesor);
-        control.setAnchoMedido((float) avgAncho);
+        control.setEspesorMedio((float) avgEspesor);
+        control.setAnchoMedio((float) avgAncho);
         control.setRebabaMedio((float) avgRebaba);
 
         return controlDeCalidadRepository.save(control);
@@ -88,13 +93,14 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
         ControlDeCalidad control = controlDeCalidadRepository.findByIdWithMedidas(controlDeCalidadId)
                 .orElseThrow(() -> new RuntimeException("Control de Calidad no encontrado con ID: " + controlDeCalidadId));
 
-        OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoRepository.findByIdFetchRollo(Long.parseLong(control.getOrdenDeTrabajoId()))
-                .orElseThrow(() -> new RuntimeException("Orden de Trabajo no encontrada con ID: " + control.getOrdenDeTrabajoId()));
+        OrdenDeTrabajoMaquina ordenDeTrabajoMaquina = ordenDeTrabajoMaquinaRepository.findById(control.getOrdenDeTrabajoMaquinaId())
+                .orElseThrow(() -> new RuntimeException("Orden de Trabajo no encontrada con ID: " + control.getOrdenDeTrabajoMaquinaId()));
 
-        return createControlDeProcesoDto(ordenDeTrabajo, control);
+        return createControlDeProcesoDto(ordenDeTrabajoMaquina, control);
     }
 
-    private ControlDeProcesoDto createControlDeProcesoDto(OrdenDeTrabajo ordenDeTrabajo, ControlDeCalidad control) {
+    private ControlDeProcesoDto createControlDeProcesoDto(OrdenDeTrabajoMaquina ordenDeTrabajoMaquina, ControlDeCalidad control) {
+        OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoMaquina.getOrdenDeTrabajo();
         Rollo rollo = ordenDeTrabajo.getRollo();
         Proveedor proveedor = null;
         if (rollo != null && rollo.getProveedorId() != null) {
@@ -108,7 +114,6 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
             cliente = ordenDeVenta.getCliente();
             especificacion = ordenDeVenta.getEspecificacion();
         }
-        OrdenDeTrabajoMaquina maquinaAsignada = ordenDeTrabajoMaquinaRepository.findTopByOrdenDeTrabajo_IdOrderByFechaInicioDesc(ordenDeTrabajo.getId());
 
         return ControlDeProcesoDto.builder()
                 .idControl(control.getId())
@@ -117,8 +122,8 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
                 .idOrden(ordenDeTrabajo.getId())
                 .fechaInicio(control.getFechaControl())
                 .fechaFin(control.getFechaFinalizacion())
-                .idMaquina(maquinaAsignada != null ? maquinaAsignada.getMaquina().getId() : null)
-                .nombreMaquina(maquinaAsignada != null ? maquinaAsignada.getMaquina().getNombre() : null)
+                .idMaquina(ordenDeTrabajoMaquina.getMaquina().getId())
+                .nombreMaquina(ordenDeTrabajoMaquina.getMaquina().getNombre())
                 .idOperario(control.getUsuario().getId())
                 .nombreOperario(control.getUsuario().getNombre())
                 .cantidad(rollo != null ? rollo.getPesoKG().doubleValue() : null)
@@ -138,7 +143,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
                 .build();
     }
 
-    @Override
+  /*  @Override
     @Transactional(readOnly = true)
     public ControlDeProcesoDto getControlDeProcesoByOrdenTrabajo(Long ordenTrabajoId) {
         OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoRepository.findByIdFetchRollo(ordenTrabajoId)
@@ -147,7 +152,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
         ControlDeCalidad control = controlCalidad.isEmpty() ? null : controlCalidad.getFirst();
 
         return createControlDeProcesoDto(ordenDeTrabajo, control);
-    }
+    }*/
 
     @Override
     public List<ControlDeCalidad> getAllControlesCalidad() {
@@ -164,34 +169,78 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
     @Override
     public ControlDeCalidad finalizarControl(Long id) {
 
-        // TODO: EL CONTROL DE CALIDAD DEBE TENER REFERENCIA UNA OTM, NO A UNA OT
         ControlDeCalidad control = controlDeCalidadRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Control de Calidad no encontrado con ID: " + id));
 
-        OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoRepository.findById(Long.parseLong(control.getOrdenDeTrabajoId())).orElseThrow(
-            () -> new RuntimeException("Orden de Trabajo no encontrada con ID: " + control.getOrdenDeTrabajoId()));
+        OrdenDeTrabajoMaquina ordenDeTrabajoMaquina = ordenDeTrabajoMaquinaRepository.findById(control.getOrdenDeTrabajoMaquinaId()).orElseThrow(
+            () -> new RuntimeException("Orden de Trabajo no encontrada con ID: " + control.getOrdenDeTrabajoMaquinaId()));
+
+        OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoMaquina.getOrdenDeTrabajo();
         OrdenVenta ordenVenta = ordenDeTrabajo.getOrdenDeVenta();
 
-        Rollo rolloDeOrdenDeTrabajo = ordenDeTrabajo.getRollo();
+        control.setFechaFinalizacion(LocalDateTime.now());
+        ordenDeTrabajoMaquina.setFechaFin(LocalDateTime.now());
+
+        // Si Termino la primera OTM
+        if (ordenDeTrabajo.esPrimeraOTM(ordenDeTrabajoMaquina)) {
+            Rollo rolloDeOrdenDeTrabajo = ordenDeTrabajo.getRollo();
+            List<Rollo> rollosHijos = rolloDeOrdenDeTrabajo.getHijos();
+            for (Rollo rh : rollosHijos) {
+                rh.setEstado(EstadoRollo.DISPONIBLE);
+                rh.setFechaIngreso(LocalDateTime.now());
+            }
+            rolloRepository.saveAll(rollosHijos);
+        }
 
         if (!control.getDefectos().isEmpty() || control.getEstado().equals(EstadoControlDeCalidadEnum.A_CORREGIR)) {
             control.setEstado(EstadoControlDeCalidadEnum.DEFECTUOSO);
+            ordenDeTrabajoMaquina.setEstado(EstadoOrdenTrabajoMaquinaEnum.DEFECTUOSO);
+
             ordenDeTrabajo.setEstado(EstadoOrdenTrabajoEnum.DEFECTUOSO);
+            ordenDeTrabajo.setFechaFin(LocalDateTime.now());
+
+            ordenDeTrabajo.getOrdenDeTrabajoMaquinas().forEach(otm -> { if(otm != ordenDeTrabajoMaquina) otm.anular();});
+
             ordenVenta.setEstado(EstadoOrdenVentaEnum.REPLANIFICAR);
-            rolloDeOrdenDeTrabajo.setEstado(EstadoRollo.VERIFICAR);
+
+            RolloProducto rolloProducto = this.generarRolloProducto(control, ordenDeTrabajo, EstadoRolloProducto.DEFECTUOSO);
+
+            rolloProductoRepository.save(rolloProducto);
+
+
         } else {
-            // TODO: SE FINALIZA EL OT, SOLO SI FINALIZO LA ULTIMA OTM RELACIONADA
             control.setEstado(EstadoControlDeCalidadEnum.FINALIZADO);
-            ordenDeTrabajo.setEstado(EstadoOrdenTrabajoEnum.FINALIZADA);
-            ordenVenta.setEstado(EstadoOrdenVentaEnum.TRABAJO_FINALIZADO);
-            // TODO: SI FINALIZO LA PRIMERA OTM, LOS ROLLOS HIJOS DEBE PASAR A ESTADO DISPONIBLE
+            ordenDeTrabajoMaquina.setEstado(EstadoOrdenTrabajoMaquinaEnum.FINALIZADA);
+
+            if (ordenDeTrabajo.todosLosProcesosEstanFinalizados()){
+                // Finalizó la última OTM
+                ordenDeTrabajo.setEstado(EstadoOrdenTrabajoEnum.FINALIZADA);
+                ordenDeTrabajo.setFechaFin(LocalDateTime.now());
+                ordenVenta.setEstado(EstadoOrdenVentaEnum.TRABAJO_FINALIZADO);
+
+                RolloProducto rolloProducto = this.generarRolloProducto(control, ordenDeTrabajo, EstadoRolloProducto.ELABORADO);
+                rolloProductoRepository.save(rolloProducto);
+            }
 
         }
-        rolloRepository.save(rolloDeOrdenDeTrabajo);
-        control.setFechaFinalizacion(LocalDateTime.now());
-        ordenDeTrabajo.setFechaFin(LocalDateTime.now());
+
+
+        ordenDeTrabajoMaquinaRepository.save(ordenDeTrabajoMaquina);
         ordenDeTrabajoRepository.save(ordenDeTrabajo);
+
         return controlDeCalidadRepository.save(control);
+    }
+
+    public RolloProducto generarRolloProducto(ControlDeCalidad controlDeCalidad, OrdenDeTrabajo ordenDeTrabajo, EstadoRolloProducto estado){
+        return RolloProducto.builder().
+                rolloPadre(ordenDeTrabajo.getRollo())
+                .tipoMaterial(ordenDeTrabajo.getRollo().getTipoMaterial())
+                .estado(estado)
+                .ordenDeTrabajo(ordenDeTrabajo)
+                .fechaIngreso(LocalDateTime.now())
+                .anchoMM(controlDeCalidad.getAnchoMedio())
+                .espesorMM(controlDeCalidad.getEspesorMedio())
+                .pesoKG(ordenDeTrabajo.getRollo().getPesoKG()).build();
     }
 
     @Override
@@ -201,10 +250,15 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
                 .orElseThrow(() -> new RuntimeException("Orden de Trabajo Maquina no encontrada con ID: " + id));
         
         ordenTrabajoMaquina.setEstado(EstadoOrdenTrabajoMaquinaEnum.EN_CURSO);
+
         OrdenDeTrabajo ordenDeTrabajo = ordenTrabajoMaquina.getOrdenDeTrabajo();
         ordenDeTrabajo.setEstado(EstadoOrdenTrabajoEnum.EN_CURSO);
-    
-        ControlDeCalidad control = ordenDeTrabajo.getControlDeCalidad();
+        if (ordenDeTrabajo.esPrimeraOTM(ordenTrabajoMaquina)){
+            ordenDeTrabajo.setFechaInicio(LocalDateTime.now());
+        }
+
+        ControlDeCalidad control = controlDeCalidadRepository.findByOrdenDeTrabajoMaquinaId(id);
+
         control.setEstado(EstadoControlDeCalidadEnum.EN_PROCESO);
         control.setFechaControl(LocalDateTime.now());
 

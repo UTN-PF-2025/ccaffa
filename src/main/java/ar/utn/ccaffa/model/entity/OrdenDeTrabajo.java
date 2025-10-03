@@ -1,6 +1,7 @@
 package ar.utn.ccaffa.model.entity;
 
 import ar.utn.ccaffa.enums.EstadoOrdenTrabajoEnum;
+import ar.utn.ccaffa.enums.EstadoOrdenTrabajoMaquinaEnum;
 import ar.utn.ccaffa.enums.EstadoRollo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDateTime;
@@ -59,16 +60,16 @@ public class OrdenDeTrabajo {
     @JoinColumn(name = "rollo_id", referencedColumnName = "id")
     private Rollo rollo;
 
-    @ManyToOne
-    @JoinColumn(name = "control_calidad_id")
-    private ControlDeCalidad controlDeCalidad;
-
     public boolean yaComenzo() {
         return !EstadoOrdenTrabajoEnum.is(this.estado, EstadoOrdenTrabajoEnum.PROGRAMADA);
     }
 
-    public boolean tieneMaquinaAsociada(Maquina maquina){
-        return this.getOrdenDeTrabajoMaquinas().stream().anyMatch(m -> m.getMaquina() == maquina);
+    public boolean todosLosProcesosEstanFinalizados(){
+        return this.getOrdenDeTrabajoMaquinas().stream().allMatch(otm -> otm.getEstado() == EstadoOrdenTrabajoMaquinaEnum.FINALIZADA);
+    }
+
+    public boolean esPrimeraOTM(OrdenDeTrabajoMaquina ordenDeTrabajoMaquina){
+        return this.getOrdenDeTrabajoMaquinas().getFirst() == ordenDeTrabajoMaquina;
     }
 
 
@@ -110,6 +111,8 @@ public class OrdenDeTrabajo {
         if (!rolloHijos.isEmpty()){
             this.getRollo().setEstado(EstadoRollo.DIVIDIDO);
         }
+
+        this.getRollo().setAsociadoAOrdenDeTrabajo(true);
 
         return rolloHijos;
 
@@ -158,6 +161,7 @@ public class OrdenDeTrabajo {
                 .estado(EstadoRollo.PLANIFICADO)
                 .fechaIngreso(fechaFinalizacionPrimeraMaquina())
                 .rolloPadre(this.getRollo())
+                .asociadoAOrdenDeTrabajo(false)
                 .build();
     }
 

@@ -61,7 +61,6 @@ public class OrdenDeTrabajoResponseMapperImpl implements OrdenDeTrabajoResponseM
                 .ordenDeVenta(mapOrdenVentaSimple(ordenDeTrabajo.getOrdenDeVenta()))
                 .ordenDeTrabajoMaquinas(mapOrdenDeTrabajoMaquinas(ordenDeTrabajo.getOrdenDeTrabajoMaquinas()))
                 .rollo(rolloMapper.toDtoOnlyWithRolloPadreID(ordenDeTrabajo.getRollo()))
-                .controlDeCalidad(mapControlDeCalidad(ordenDeTrabajo.getControlDeCalidad()))
                 .build();
     }
     
@@ -95,7 +94,6 @@ public class OrdenDeTrabajoResponseMapperImpl implements OrdenDeTrabajoResponseM
                 .ordenDeVenta(this.ordenVentaRepository.getReferenceById(ordenDeTrabajo.getOrdenDeVenta().getOrderId()))
 
                 .rollo(this.rolloRepository.getReferenceById(ordenDeTrabajo.getRollo().getId()))
-                .controlDeCalidad(null)
                 .build();
 
         ordenDeTrabajoEntity.setOrdenDeTrabajoMaquinas(this.ordenDeTrabajoMaquinaResponseMapper.toEntityList(ordenDeTrabajo.getOrdenDeTrabajoMaquinas(), ordenDeTrabajoEntity));
@@ -170,8 +168,8 @@ public class OrdenDeTrabajoResponseMapperImpl implements OrdenDeTrabajoResponseM
                         .nombre(controlDeCalidad.getUsuario().getNombre())
                         .build() : null)
                 .fechaControl(controlDeCalidad.getFechaControl().toLocalDate())
-                .espesorMedido(controlDeCalidad.getEspesorMedido())
-                .anchoMedido(controlDeCalidad.getAnchoMedido())
+                .espesorMedio(controlDeCalidad.getEspesorMedio())
+                .anchoMedio(controlDeCalidad.getAnchoMedio())
                 .rebabaMedio(controlDeCalidad.getRebabaMedio())
                 .estado(controlDeCalidad.getEstado())
                 .build();

@@ -68,6 +68,7 @@ public class RolloController {
         log.info("Creando nuevo rollo: {}", rollo);
         rollo.setId(null);
         rollo.setEstado(EstadoRollo.DISPONIBLE);
+        rollo.setAsociadoAOrdenDeTrabajo(false);
         rollo.setFechaIngreso(LocalDateTime.now());
         if (rolloService.existsRolloByProveedorIdAndCodigoProveedor(rollo.getProveedorId(), rollo.getCodigoProveedor())){
             ErrorResponse error = ErrorResponse.builder()

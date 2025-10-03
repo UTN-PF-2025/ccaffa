@@ -125,6 +125,7 @@ public class OrdenDeTrabajoServiceImpl implements OrdenDeTrabajoService {
             } else {
                 rolloPadre.setEstado(EstadoRollo.PLANIFICADO);
             }
+            rolloPadre.setAsociadoAOrdenDeTrabajo(false);
             rolloRepository.save(rolloPadre);
         }
 
@@ -238,6 +239,8 @@ public class OrdenDeTrabajoServiceImpl implements OrdenDeTrabajoService {
 
     private void cancelarOrden(OrdenDeTrabajo orden) {
         orden.setEstado(EstadoOrdenTrabajoEnum.ANULADA);
+        orden.getOrdenDeTrabajoMaquinas().forEach( otm ->
+                otm.setEstado(EstadoOrdenTrabajoMaquinaEnum.ANULADA));
         orden.setActiva(false);
     }
 

@@ -30,5 +30,6 @@ public class RolloDto {
     private RolloDto rolloPadre;
     private Long rolloPadreId;
     private List<RolloDto> hijos;
+    private Boolean asociadoAOrdenDeTrabajo;
 }
 

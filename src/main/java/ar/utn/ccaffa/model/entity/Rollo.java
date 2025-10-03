@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -69,6 +70,11 @@ public class Rollo implements Cloneable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rollo_padre_id")
     private Rollo rolloPadre;
+
+    @Column(name = "asociadoAOrdenDeTrabajo", nullable = false)
+    @NotNull(message = "El campo asociadoAOrdenDeTrabajo es obligatorio")
+    @ColumnDefault("false")
+    private Boolean asociadoAOrdenDeTrabajo = false;
 
     @OneToMany(mappedBy = "rolloPadre", fetch = FetchType.LAZY)
     private List<Rollo> hijos = new ArrayList<>();

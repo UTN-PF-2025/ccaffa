@@ -17,7 +17,7 @@ public interface ControlDeCalidadService {
 
     ControlDeProcesoDto getControlDeProceso(Long controlDeCalidadId);
 
-    ControlDeProcesoDto getControlDeProcesoByOrdenTrabajo(Long ordenTrabajoId);
+   // ControlDeProcesoDto getControlDeProcesoByOrdenTrabajo(Long ordenTrabajoId);
 
     List<ControlDeCalidad> getAllControlesCalidad();
 

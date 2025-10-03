@@ -17,8 +17,8 @@ public class ControlDeCalidadDto {
     private Long id;
     private EmpleadoDto empleado;
     private LocalDate fechaControl;
-    private Float espesorMedido;
-    private Float anchoMedido;
+    private Float espesorMedio;
+    private Float anchoMedio;
     private Float rebabaMedio;
     private EstadoControlDeCalidadEnum estado;
     private List<MedidaDeCalidadDto> medidasDeCalidad;

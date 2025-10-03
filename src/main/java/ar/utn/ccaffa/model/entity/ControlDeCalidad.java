@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.hibernate.annotations.BatchSize;
@@ -35,11 +34,11 @@ public class ControlDeCalidad {
     @Column(name = "fecha_finalizacion")
     private LocalDateTime fechaFinalizacion;
 
-    @Column(name = "espesor_medido")
-    private Float espesorMedido;
+    @Column(name = "espesor_medio")
+    private Float espesorMedio;
 
-    @Column(name = "ancho_medido")
-    private Float anchoMedido;
+    @Column(name = "ancho_medio")
+    private Float anchoMedio;
 
     @Column(name = "rebaba_medio")
     private Float rebabaMedio;
@@ -63,6 +62,6 @@ public class ControlDeCalidad {
     @JsonManagedReference("control-defecto")
     private List<Defecto> defectos;
 
-    @Column(name = "orden_de_trabajo_id")
-    private String ordenDeTrabajoId;
+    @Column(name = "orden_de_trabajo_maquina_id", unique = true)
+    private Long ordenDeTrabajoMaquinaId;
 } 

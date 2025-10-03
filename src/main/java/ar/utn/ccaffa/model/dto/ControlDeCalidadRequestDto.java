@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ControlDeCalidadRequestDto {
-    private Long ordenTrabajoId;
+    private Long ordenTrabajoMaquinaId;
     private List<MedidaDeCalidadDto> medidas;
 }

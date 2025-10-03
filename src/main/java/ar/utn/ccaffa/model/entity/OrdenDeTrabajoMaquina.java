@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "ordenes_trabajo_maquinas")
@@ -43,4 +44,13 @@ public class OrdenDeTrabajoMaquina {
     
     @Column(name = "observaciones")
     private String observaciones;
-} 
+
+    public void anular() {
+        List<EstadoOrdenTrabajoMaquinaEnum> estadosPreviosNecesarios = List.of(EstadoOrdenTrabajoMaquinaEnum.EN_CURSO, EstadoOrdenTrabajoMaquinaEnum.PROGRAMADA);
+        if (estadosPreviosNecesarios.contains(this.estado)){
+            this.setEstado(EstadoOrdenTrabajoMaquinaEnum.ANULADA);
+        }
+
+    }
+}
+
