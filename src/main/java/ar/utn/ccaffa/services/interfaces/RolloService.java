@@ -16,7 +16,7 @@ public interface RolloService {
     RolloDto obtenerArbolCompletoDeRollosHijos(Long rolloId);
     List<RolloDto> obtenerRollosDisponiblesParaOrdenVenta(Long ordenVentaId);
 
-    List<Rollo> findEntitiesByEstados(List<EstadoRollo> estadosRollo);
+    List<Rollo> findEntitiesByEstadosAndAsociado(List<EstadoRollo> estadosRollo, Boolean asociado);
 
     List<Rollo> findEntitiesByIdIn(List<Long> ids);
 

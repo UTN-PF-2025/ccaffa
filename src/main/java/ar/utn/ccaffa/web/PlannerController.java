@@ -107,7 +107,7 @@ public class PlannerController {
         plannerGA.setMaquinas(maquinas);
 
         if (plannerInfo.usarTodosLosRollosDisponibles){
-            rollos = this.rolloService.findEntitiesByEstados(List.of(EstadoRollo.DISPONIBLE, EstadoRollo.PLANIFICADO));
+            rollos = this.rolloService.findEntitiesByEstadosAndAsociado(List.of(EstadoRollo.DISPONIBLE, EstadoRollo.PLANIFICADO), false);
             rollosIDs.addAll(rollos.stream().map(r -> r.getId()).toList());
         }else {
             rollos = this.rolloService.findEntitiesByIdIn(rollosIDs);
@@ -146,6 +146,8 @@ public class PlannerController {
         for (RolloDto rolloHijo : rollosHijos){
             Long temporalID = rolloHijo.getId();
             rolloHijo.setId(null);
+            rolloHijo.setAsociadaAOrdenDeTrabajo(false);
+            rolloHijo.setOrdeDeTrabajoAsociadaID(null);
             RolloDto rolloCreado = this.rolloService.save(rolloHijo);
 
             rolloHijo.setId(rolloCreado.getId());
@@ -167,8 +169,20 @@ public class PlannerController {
 
         List<OrdenDeTrabajo> ordenesDeTrabajoCreadas = this.ordenDeTrabajoService.saveAllDtos(ordenesDeTrabajo);
 
-        List<Long> ordenesDeVentaIDs = ordenesDeTrabajo.stream().map(ot -> ot.getOrdenDeVenta().getOrderId()).distinct().toList();
+        List<Rollo> rollosOrdenes = new ArrayList<>();
+        for (OrdenDeTrabajo orden : ordenesDeTrabajoCreadas){
+            Rollo rolloOrden = orden.getRollo();
+            rolloOrden.setAsociadaAOrdenDeTrabajo(true);
+            rolloOrden.setOrdeDeTrabajoAsociadaID(orden.getId());
+            rollosOrdenes.add(rolloOrden);
+        }
 
+        List<RolloDto> rollosOrdenAGuardar = this.rolloMapper.toDtoListOnlyWithRolloPadreID(rollosOrdenes);
+        rollosOrdenAGuardar.forEach(this.rolloService::save);
+
+
+
+        List<Long> ordenesDeVentaIDs = ordenesDeTrabajo.stream().map(ot -> ot.getOrdenDeVenta().getOrderId()).distinct().toList();
         this.ordenVentaService.setToProgamada(ordenesDeVentaIDs);
 
         List<OrdenDeTrabajoResponseDto> ordenesDeTrabajoDto = ordenDeTrabajoResponseMapper.toDtoList(ordenesDeTrabajoCreadas);

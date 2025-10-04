@@ -691,7 +691,7 @@ public class PlannerGA {
     private List<Rollo> childrenCandidatesOfRoll(Map<Integer, List<Rollo>> childrenMap, int rollId, OrdenVenta sale){
         // returns the children of a roll in the map and orders them by volume
        return childrenMap.get(rollId).stream()
-                .filter(c -> EstadoRollo.PLANIFICADO.equals(c.getEstado()) && checkRollCharacteristics(sale, c ))
+                .filter(c -> EstadoRollo.PLANIFICADO.equals(c.getEstado()) && checkRollCharacteristics(sale, c ) && !c.getAsociadaAOrdenDeTrabajo())
                 .sorted(Comparator.comparingDouble(c -> c.getAnchoMM() * c.getLargo()))
                 .toList();
 

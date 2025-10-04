@@ -222,8 +222,8 @@ public class RolloServiceImpl implements RolloService {
     }
 
     @Override
-    public List<Rollo> findEntitiesByEstados(List<EstadoRollo> estadosRollo){
-        return rolloRepository.findByEstadoIn(estadosRollo);
+    public List<Rollo> findEntitiesByEstadosAndAsociado(List<EstadoRollo> estadosRollo, Boolean asociado){
+        return rolloRepository.findByEstadoInAndAsociadaAOrdenDeTrabajoIs(estadosRollo, asociado);
     }
     @Override
     public List<Rollo> findEntitiesByIdIn(List<Long> ids){
