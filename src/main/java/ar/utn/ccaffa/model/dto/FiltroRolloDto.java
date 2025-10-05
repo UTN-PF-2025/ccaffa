@@ -2,6 +2,7 @@ package ar.utn.ccaffa.model.dto;
 
 import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.enums.TipoMaterial;
+import ar.utn.ccaffa.enums.TipoRollo;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +26,7 @@ public class FiltroRolloDto {
     private Float espesorMin;
     private Float espesorMax;
     private TipoMaterial tipoMaterial;
+    private TipoRollo tipoRollo;
     private EstadoRollo estado;
     private List<EstadoRollo> estados;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "DEFAULT_TIMEZONE")

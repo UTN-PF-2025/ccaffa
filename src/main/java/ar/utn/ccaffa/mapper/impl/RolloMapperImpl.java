@@ -31,6 +31,7 @@ public class RolloMapperImpl implements RolloMapper {
                 .rolloPadreId(rollo.getRolloPadreId())
                 .ordeDeTrabajoAsociadaID(rollo.getOrdeDeTrabajoAsociadaID())
                 .asociadaAOrdenDeTrabajo(rollo.getAsociadaAOrdenDeTrabajo())
+                .tipoRollo(rollo.getTipoRollo())
                 .build();
     }
 
@@ -53,6 +54,7 @@ public class RolloMapperImpl implements RolloMapper {
                 .rolloPadreId(rollo.getRolloPadreId())
                 .ordeDeTrabajoAsociadaID(rollo.getOrdeDeTrabajoAsociadaID())
                 .asociadaAOrdenDeTrabajo(rollo.getAsociadaAOrdenDeTrabajo())
+                .tipoRollo(rollo.getTipoRollo())
                 .build();
     }
 
@@ -75,6 +77,7 @@ public class RolloMapperImpl implements RolloMapper {
                         .rolloPadreId(rollo.getRolloPadreId())
                         .ordeDeTrabajoAsociadaID(rollo.getOrdeDeTrabajoAsociadaID())
                         .asociadaAOrdenDeTrabajo(rollo.getAsociadaAOrdenDeTrabajo())
+                        .tipoRollo(rollo.getTipoRollo())
                         .build();
 
         if (rollo.getHijos() != null && !rollo.getHijos().isEmpty()) {
@@ -106,6 +109,7 @@ public class RolloMapperImpl implements RolloMapper {
                 .rolloPadre(this.toEntity(rolloDto.getRolloPadre()))
                 .ordeDeTrabajoAsociadaID(rolloDto.getOrdeDeTrabajoAsociadaID())
                 .asociadaAOrdenDeTrabajo(rolloDto.getAsociadaAOrdenDeTrabajo())
+                .tipoRollo(rolloDto.getTipoRollo())
                 .build();
 
     }

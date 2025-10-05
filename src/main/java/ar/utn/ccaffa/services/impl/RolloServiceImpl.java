@@ -150,6 +150,10 @@ public class RolloServiceImpl implements RolloService {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("tipoMaterial"), filtros.getTipoMaterial()));
         }
 
+        if (filtros.getTipoRollo() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("tipoRollo"), filtros.getTipoRollo()));
+        }
+
         if (filtros.getEstado() != null) {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("estado"), filtros.getEstado()));
         }

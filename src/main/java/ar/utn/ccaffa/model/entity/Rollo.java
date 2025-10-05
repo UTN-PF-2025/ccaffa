@@ -2,6 +2,7 @@ package ar.utn.ccaffa.model.entity;
 
 import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.enums.TipoMaterial;
+import ar.utn.ccaffa.enums.TipoRollo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -52,6 +53,11 @@ public class Rollo implements Cloneable {
     @Column(name = "tipo_material", nullable = false)
     @NotNull(message = "El tipo de material es obligatorio")
     private TipoMaterial tipoMaterial;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_rollo", nullable = false)
+    @NotNull(message = "El tipo de rollo es obligatorio")
+    private TipoRollo tipoRollo = TipoRollo.MATERIA_PRIMA;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false)

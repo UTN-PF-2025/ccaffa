@@ -1,9 +1,6 @@
 package ar.utn.ccaffa.planner;
 
-import ar.utn.ccaffa.enums.EstadoOrdenTrabajoEnum;
-import ar.utn.ccaffa.enums.EstadoOrdenTrabajoMaquinaEnum;
-import ar.utn.ccaffa.enums.EstadoRollo;
-import ar.utn.ccaffa.enums.MaquinaTipoEnum;
+import ar.utn.ccaffa.enums.*;
 import ar.utn.ccaffa.model.entity.*;
 import io.jenetics.*;
 import io.jenetics.engine.*;
@@ -691,7 +688,10 @@ public class PlannerGA {
     private List<Rollo> childrenCandidatesOfRoll(Map<Integer, List<Rollo>> childrenMap, int rollId, OrdenVenta sale){
         // returns the children of a roll in the map and orders them by volume
        return childrenMap.get(rollId).stream()
-                .filter(c -> EstadoRollo.PLANIFICADO.equals(c.getEstado()) && checkRollCharacteristics(sale, c ) && !c.getAsociadaAOrdenDeTrabajo())
+                .filter(c -> EstadoRollo.PLANIFICADO.equals(c.getEstado())
+                        && checkRollCharacteristics(sale, c )
+                        && !c.getAsociadaAOrdenDeTrabajo()
+                        && c.getTipoRollo() == TipoRollo.MATERIA_PRIMA)
                 .sorted(Comparator.comparingDouble(c -> c.getAnchoMM() * c.getLargo()))
                 .toList();
 

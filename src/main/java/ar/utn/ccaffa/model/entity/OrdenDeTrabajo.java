@@ -3,6 +3,7 @@ package ar.utn.ccaffa.model.entity;
 import ar.utn.ccaffa.enums.EstadoOrdenTrabajoEnum;
 import ar.utn.ccaffa.enums.EstadoOrdenTrabajoMaquinaEnum;
 import ar.utn.ccaffa.enums.EstadoRollo;
+import ar.utn.ccaffa.enums.TipoRollo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -129,15 +130,19 @@ public class OrdenDeTrabajo {
     private void crearHijoPorAncho(List<Rollo> rolloHijos){
         if (!equalsD(this.getRollo().getAnchoMM(), this.neededWidth())){
             Float anchoSobrante = this.getRollo().getAnchoMM() - this.neededWidth();
-            rolloHijos.add(crearHijo(anchoSobrante, this.neededLengthFromOriginalRoll()));
+            rolloHijos.add(crearHijo(anchoSobrante, this.neededLengthFromOriginalRoll(), TipoRollo.MATERIA_PRIMA));
         } ;
     }
 
     private void crearHijoPorLargo(List<Rollo> rolloHijos){
         if (!equalsD(this.getRollo().getLargo(), this.neededLengthFromOriginalRoll())){
             Float largoSobrante = this.getRollo().getLargo() - this.neededLengthFromOriginalRoll();
-            rolloHijos.add(crearHijo(this.getRollo().getAnchoMM(), largoSobrante));
+            rolloHijos.add(crearHijo(this.getRollo().getAnchoMM(), largoSobrante, TipoRollo.MATERIA_PRIMA));
         } ;
+    }
+
+    private void crearHijoProducto(List<Rollo> rolloHijos){
+        rolloHijos.add(crearHijo(this.getRollo().getAnchoMM(), this.neededLengthFromOriginalRoll(), TipoRollo.PRODUCTO));
     }
 
     private void validarDimensiones(){
@@ -146,7 +151,7 @@ public class OrdenDeTrabajo {
         }
     }
 
-    private Rollo crearHijo(Float ancho, Float largo){
+    private Rollo crearHijo(Float ancho, Float largo, TipoRollo tipoRollo){
         Float pesoCalculado = Rollo.calcularPeso(ancho, this.getRollo().getEspesorMM(), largo);
         return Rollo.builder()
                 .proveedorId(this.getRollo().getProveedorId())
@@ -155,6 +160,7 @@ public class OrdenDeTrabajo {
                 .pesoKG(pesoCalculado)
                 .espesorMM(this.getRollo().getEspesorMM())
                 .tipoMaterial(this.getRollo().getTipoMaterial())
+                .tipoRollo(tipoRollo)
                 .estado(EstadoRollo.PLANIFICADO)
                 .fechaIngreso(fechaFinalizacionPrimeraMaquina())
                 .rolloPadre(this.getRollo())

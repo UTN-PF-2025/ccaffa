@@ -3,6 +3,7 @@ package ar.utn.ccaffa.model.dto;
 import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.enums.MaquinaTipoEnum;
 import ar.utn.ccaffa.enums.TipoMaterial;
+import ar.utn.ccaffa.enums.TipoRollo;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +26,7 @@ public class RolloDto {
     private Float anchoMM;
     private Float espesorMM;
     private TipoMaterial tipoMaterial;
+    private TipoRollo tipoRollo = TipoRollo.MATERIA_PRIMA;
     private EstadoRollo estado;
     private LocalDateTime fechaIngreso;
     private RolloDto rolloPadre;

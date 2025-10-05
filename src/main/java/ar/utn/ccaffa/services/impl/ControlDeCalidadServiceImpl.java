@@ -182,11 +182,13 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
         // Si Termino la primera OTM
         if (ordenDeTrabajo.esPrimeraOTM(ordenDeTrabajoMaquina)) {
             Rollo rolloDeOrdenDeTrabajo = ordenDeTrabajo.getRollo();
-            List<Rollo> rollosHijos = rolloDeOrdenDeTrabajo.getHijos();
+            List<Rollo> rollosHijos = rolloDeOrdenDeTrabajo.getHijos().stream().filter(rh -> rh.getTipoRollo() == TipoRollo.MATERIA_PRIMA).toList();
             for (Rollo rh : rollosHijos) {
                 rh.setEstado(EstadoRollo.DISPONIBLE);
                 rh.setFechaIngreso(LocalDateTime.now());
             }
+            rolloDeOrdenDeTrabajo.setEstado(EstadoRollo.DIVIDIDO);
+            rolloRepository.save(rolloDeOrdenDeTrabajo);
             rolloRepository.saveAll(rollosHijos);
             control.setRollosHijos(rollosHijos);
         }
@@ -257,14 +259,22 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
             ordenDeTrabajo.setFechaInicio(LocalDateTime.now());
         }
 
+        OrdenVenta ordenVenta = ordenDeTrabajo.getOrdenDeVenta();
+        ordenVenta.setEstado(EstadoOrdenVentaEnum.EN_CURSO);
+
+        Rollo rolloPadre = ordenDeTrabajo.getRollo();
+        Rollo rolloProducto = rolloPadre.getHijos().stream().filter(rh -> rh.getTipoRollo() == TipoRollo.PRODUCTO).toList().getFirst();
+
+        rolloPadre.setEstado(EstadoRollo.EN_PROCESAMIENTO);
+        rolloProducto.setEstado(EstadoRollo.EN_PROCESAMIENTO);
+
         ControlDeCalidad control = controlDeCalidadRepository.findByOrdenDeTrabajoMaquinaId(id);
 
         control.setEstado(EstadoControlDeCalidadEnum.EN_PROCESO);
         control.setFechaControl(LocalDateTime.now());
 
-       OrdenVenta ordenVenta = ordenDeTrabajo.getOrdenDeVenta();
-       ordenVenta.setEstado(EstadoOrdenVentaEnum.EN_CURSO);
-
+        rolloRepository.save(rolloPadre);
+        rolloRepository.save(rolloProducto);
         ordenVentaRepository.save(ordenVenta);
         ordenDeTrabajoRepository.save(ordenDeTrabajo);
         ordenDeTrabajoMaquinaRepository.save(ordenTrabajoMaquina);
