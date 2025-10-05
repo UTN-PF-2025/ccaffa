@@ -20,6 +20,7 @@ public class ControlDeProcesoDto {
     private LocalDateTime fechaFin;
     private Long idMaquina;
     private String nombreMaquina;
+    private String tipoMaquina;
     private Long idOperario;
     private String nombreOperario;
     private Long idProveedor;

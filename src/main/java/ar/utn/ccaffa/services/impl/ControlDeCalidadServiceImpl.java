@@ -114,6 +114,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
                 .fechaFin(control.getFechaFinalizacion())
                 .idMaquina(ordenDeTrabajoMaquina.getMaquina().getId())
                 .nombreMaquina(ordenDeTrabajoMaquina.getMaquina().getNombre())
+                .tipoMaquina(ordenDeTrabajoMaquina.getMaquina().getTipo().name())
                 .idOperario(control.getUsuario().getId())
                 .idProveedor(rolloAUsar.getId())
                 .nombreProveedor(proveedor.getNombre())
@@ -179,7 +180,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
         // Si Termino la primera OTM
         if (ordenDeTrabajo.esPrimeraOTM(ordenDeTrabajoMaquina)) {
             Rollo rolloDeOrdenDeTrabajo = ordenDeTrabajo.getRollo();
-            List<Rollo> rollosHijos = rolloDeOrdenDeTrabajo.getHijos().stream().filter(rh -> rh.getTipoRollo() == TipoRollo.MATERIA_PRIMA).toList();
+            List<Rollo> rollosHijos = rolloDeOrdenDeTrabajo.getHijos().stream().toList();
             for (Rollo rh : rollosHijos) {
                 rh.setEstado(EstadoRollo.DISPONIBLE);
                 rh.setFechaIngreso(LocalDateTime.now());
