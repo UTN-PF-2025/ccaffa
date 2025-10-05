@@ -6,5 +6,5 @@ import lombok.Data;
 public class AddMedidaRequest {
     private Float espesorMedido;
     private Float anchoMedido;
-    private Float rebabaMedio;
+    private Float rebabaMedido;
 }

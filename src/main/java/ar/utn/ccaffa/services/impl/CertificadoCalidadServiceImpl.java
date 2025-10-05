@@ -341,13 +341,14 @@ public class CertificadoCalidadServiceImpl implements CertificadoCalidadService 
     }
 
     private PdfPTable crearTablaDatosControlados(CertificadoRequestDTO dto, ControlDeProcesoDto controlProceso) {
+        // TODO: MODIFICAR POR LOS EL ANCHO MEDIO Y ESPESO MEDIO
         PdfPTable table = new PdfPTable(3);
         table.addCell(new Phrase(ANCHO_MM));
-        table.addCell(new Phrase(controlProceso.getAncho()));
+        table.addCell(new Phrase(controlProceso.getAnchoOriginal()));
         table.addCell(new Phrase(MAS_MENOS + controlProceso.getToleranciaAncho()));
 
         table.addCell(new Phrase(ESPESOR_MM));
-        table.addCell(new Phrase(controlProceso.getEspesor()));
+        table.addCell(new Phrase(controlProceso.getEspesorOriginal()));
         table.addCell(new Phrase(MAS_MENOS + controlProceso.getToleranciaEspesor()));
 
         table.addCell(new Phrase(DUREZA_RB));

@@ -175,6 +175,7 @@ public class OrdenDeTrabajoResponseMapperImpl implements OrdenDeTrabajoResponseM
                 .anchoMedio(controlDeCalidad.getAnchoMedio())
                 .rebabaMedio(controlDeCalidad.getRebabaMedio())
                 .estado(controlDeCalidad.getEstado())
+                .ordenDeTrabajoMaquinaId(controlDeCalidad.getOrdenDeTrabajoMaquinaId())
                 .build();
     }
 } 

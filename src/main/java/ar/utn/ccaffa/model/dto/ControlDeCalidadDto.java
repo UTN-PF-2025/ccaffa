@@ -15,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ControlDeCalidadDto {
     private Long id;
+    private Long ordenDeTrabajoMaquinaId;
     private EmpleadoDto empleado;
     private LocalDate fechaControl;
     private Float espesorMedio;

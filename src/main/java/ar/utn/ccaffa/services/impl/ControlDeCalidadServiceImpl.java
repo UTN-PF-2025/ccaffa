@@ -1,8 +1,8 @@
 package ar.utn.ccaffa.services.impl;
 
 import ar.utn.ccaffa.enums.*;
-import ar.utn.ccaffa.exceptions.ErrorResponse;
 import ar.utn.ccaffa.model.dto.CreateControlDeCalidadRequest;
+import ar.utn.ccaffa.model.dto.ProveedorDto;
 import ar.utn.ccaffa.model.entity.ControlDeCalidad;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import ar.utn.ccaffa.repository.interfaces.*;
@@ -10,7 +10,7 @@ import ar.utn.ccaffa.model.dto.AddMedidaRequest;
 import ar.utn.ccaffa.model.dto.ControlDeProcesoDto;
 import ar.utn.ccaffa.model.entity.*;
 import ar.utn.ccaffa.services.interfaces.ControlDeCalidadService;
-import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoMaquinaService;
+import ar.utn.ccaffa.services.interfaces.ProveedorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +27,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
     private final UsuarioRepository usuarioRepository;
     private final OrdenDeTrabajoRepository ordenDeTrabajoRepository;
     private final MedidaDeCalidadRepository medidaDeCalidadRepository;
-    private final ProveedorRepository proveedorRepository;
+    private final ProveedorService proveedorService;
     private final OrdenVentaRepository ordenVentaRepository;
     private final OrdenDeTrabajoMaquinaRepository ordenDeTrabajoMaquinaRepository;
     private final RolloRepository rolloRepository;
@@ -66,7 +65,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
         MedidaDeCalidad nuevaMedida = new MedidaDeCalidad();
         nuevaMedida.setEspesorMedido(request.getEspesorMedido());
         nuevaMedida.setAnchoMedido(request.getAnchoMedido());
-        nuevaMedida.setRebabaMedio(request.getRebabaMedio());
+        nuevaMedida.setRebabaMedido(request.getRebabaMedido());
         medidaDeCalidadRepository.save(nuevaMedida);
 
         // Añadir la nueva medida a la lista existente
@@ -75,7 +74,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
         // Recalcular promedios
         double avgEspesor = control.getMedidasDeCalidad().stream().mapToDouble(MedidaDeCalidad::getEspesorMedido).average().orElse(0.0);
         double avgAncho = control.getMedidasDeCalidad().stream().mapToDouble(MedidaDeCalidad::getAnchoMedido).average().orElse(0.0);
-        double avgRebaba = control.getMedidasDeCalidad().stream().mapToDouble(MedidaDeCalidad::getRebabaMedio).average().orElse(0.0);
+        double avgRebaba = control.getMedidasDeCalidad().stream().mapToDouble(MedidaDeCalidad::getRebabaMedido).average().orElse(0.0);
 
         control.setEspesorMedio((float) avgEspesor);
         control.setAnchoMedio((float) avgAncho);
@@ -98,42 +97,41 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
 
     private ControlDeProcesoDto createControlDeProcesoDto(OrdenDeTrabajoMaquina ordenDeTrabajoMaquina, ControlDeCalidad control) {
         OrdenDeTrabajo ordenDeTrabajo = ordenDeTrabajoMaquina.getOrdenDeTrabajo();
-        Rollo rollo = ordenDeTrabajo.getRollo();
-        Proveedor proveedor = null;
-        if (rollo != null && rollo.getProveedorId() != null) {
-            proveedor = proveedorRepository.findById(rollo.getProveedorId()).orElse(null);
-        }
+        Rollo rolloAUsar = ordenDeTrabajoMaquina.getRolloAUsar();
+
+        ProveedorDto proveedor = this.proveedorService.findById(rolloAUsar.getProveedorId());
 
         OrdenVenta ordenDeVenta = ordenDeTrabajo.getOrdenDeVenta();
-        Cliente cliente = null;
-        Especificacion especificacion = null;
-        if (ordenDeVenta != null) {
-            cliente = ordenDeVenta.getCliente();
-            especificacion = ordenDeVenta.getEspecificacion();
-        }
+        Cliente cliente = ordenDeVenta.getCliente();
+        Especificacion especificacion = ordenDeVenta.getEspecificacion();
 
         return ControlDeProcesoDto.builder()
                 .idControl(control.getId())
-                .idCliente(cliente != null ? cliente.getId() : null)
-                .nombreCliente(cliente != null ? cliente.getName() : null)
+                .idCliente(cliente.getId())
+                .nombreCliente(cliente.getName())
                 .idOrden(ordenDeTrabajo.getId())
                 .fechaInicio(control.getFechaControl())
                 .fechaFin(control.getFechaFinalizacion())
                 .idMaquina(ordenDeTrabajoMaquina.getMaquina().getId())
                 .nombreMaquina(ordenDeTrabajoMaquina.getMaquina().getNombre())
                 .idOperario(control.getUsuario().getId())
+                .idProveedor(rolloAUsar.getId())
+                .nombreProveedor(proveedor.getNombre())
+                .codigoProveedor(rolloAUsar.getCodigoProveedor())
                 .nombreOperario(control.getUsuario().getNombre())
-                .cantidad(rollo != null ? rollo.getPesoKG().doubleValue() : null)
-                .tipoMaterial(rollo != null ? rollo.getTipoMaterial().name() : null)
-                .ancho(rollo != null ? rollo.getAnchoMM() : null)
-                .toleranciaAncho(especificacion != null ? especificacion.getToleranciaAncho() : null)
-                .espesor(rollo != null ? rollo.getEspesorMM() : null)
-                .toleranciaEspesor(especificacion != null ? especificacion.getToleranciaEspesor() : null)
-                .dureza(null) // Campo no disponible en el modelo actual
-                .tamanoRebaba(control.getRebabaMedio())
-                .idProveedor(proveedor != null ? proveedor.getId() : null)
-                .nombreProveedor(proveedor != null ? proveedor.getNombre() : null)
-                .codigoEtiquetaMp(rollo != null ? rollo.getCodigoProveedor() : null)
+                .idRolloAUsar(rolloAUsar.getId())
+                .tipoMaterial(rolloAUsar.getTipoMaterial().name())
+                .pesoOriginal(rolloAUsar.getPesoKG())
+                .anchoOriginal(rolloAUsar.getAnchoMM())
+                .espesorOriginal(rolloAUsar.getEspesorMM())
+                .toleranciaAncho(especificacion.getToleranciaAncho())
+                .toleranciaEspesor(especificacion.getToleranciaEspesor())
+                .pesoDeseado(especificacion.getCantidad())
+                .anchoDeseado(especificacion.getAncho())
+                .espesorDeseado(especificacion.getEspesor())
+                .rebabaMedio(control.getRebabaMedio())
+                .anchoMedio(control.getAnchoMedio())
+                .espesorMedio(control.getEspesorMedio())
                 .medidas(control.getMedidasDeCalidad())
                 .defectos(control.getDefectos())
                 .estado(control.getEstado())

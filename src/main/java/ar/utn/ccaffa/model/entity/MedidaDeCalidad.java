@@ -14,6 +14,6 @@ public class MedidaDeCalidad {
     private Float espesorMedido;
     @Column(name = "ancho_medido")
     private Float anchoMedido;
-    @Column(name = "rebaba_medio")
-    private Float rebabaMedio;
+    @Column(name = "rebaba_medido")
+    private Float rebabaMedido;
 }
