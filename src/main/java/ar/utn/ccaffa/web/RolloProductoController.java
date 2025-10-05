@@ -1,6 +1,9 @@
 package ar.utn.ccaffa.web;
 
+import ar.utn.ccaffa.exceptions.ErrorResponse;
 import ar.utn.ccaffa.model.dto.*;
+import ar.utn.ccaffa.model.entity.OrdenVenta;
+import ar.utn.ccaffa.services.interfaces.OrdenVentaService;
 import ar.utn.ccaffa.services.interfaces.RolloProductoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -8,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/rollos_productos")
@@ -15,9 +19,11 @@ import java.util.List;
 public class RolloProductoController {
 
     private final RolloProductoService rolloService;
+    private final OrdenVentaService ordenService;
 
-    public RolloProductoController(RolloProductoService rolloService) {
+    public RolloProductoController(RolloProductoService rolloService, OrdenVentaService ordenService) {
         this.rolloService = rolloService;
+        this.ordenService = ordenService;
     }
 
     @GetMapping("/{id}")
@@ -65,9 +71,32 @@ public class RolloProductoController {
     }
 
     @GetMapping("/obtenerProductosGeneradosPorOrdenDeTrabajo/{id}")
-    public ResponseEntity<List<RolloProductoDto>> obtenerProductosGeneradosPorOrdenDeTrabajoID(@PathVariable Long id) {
-        List<RolloProductoDto> rollos = rolloService.findByOrdenDeTrabajoId(id);
-        return ResponseEntity.ok(rollos);
+    public ResponseEntity<?> obtenerProductoGeneradoPorOrdenDeTrabajoID(@PathVariable Long id) {
+        RolloProductoDto rollo = rolloService.findByOrdenDeTrabajoId(id);
+        if (rollo == null) {
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("ROLLO_PRODUCTO_NO_DISPONIBLE")
+                    .message("El rollo todavía no esta producido")
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+        return ResponseEntity.ok(rollo);
+
+    }
+
+    @GetMapping("/obtenerUltimoProductoParaOrdenDeVenta/{id}")
+    public ResponseEntity<?> obtenerUltimoProductoParaOrdenDeVentaId(@PathVariable Long id) {
+
+        if (this.ordenService.trabajoFinalizado(id)){
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("ROLLO_PRODUCTO_NO_DISPONIBLE")
+                    .message("El rollo todavía no esta producido")
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+
+        Optional<RolloProductoDto> rollo = rolloService.findLastByOrdenDeVentaId(id);
+        return ResponseEntity.ok(rollo);
 
     }
 

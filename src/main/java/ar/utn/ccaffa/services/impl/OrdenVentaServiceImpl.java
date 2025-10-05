@@ -86,6 +86,14 @@ public class OrdenVentaServiceImpl implements OrdenVentaService {
     }
 
     @Override
+    public Boolean trabajoFinalizado(Long id) {
+        OrdenVentaDto ordenVentaDto = this.findById(id);
+        if (ordenVentaDto == null) return false;
+
+        return ordenVentaDto.getEstado() == EstadoOrdenVentaEnum.TRABAJO_FINALIZADO;
+    }
+
+    @Override
     public List<OrdenVentaDto> searchByFiltros(FiltroOrdenVentaDTO filtros) {
         Specification<OrdenVenta> spec = Specification.where(null);
         if (filtros.getFechaCreacion() != null) {

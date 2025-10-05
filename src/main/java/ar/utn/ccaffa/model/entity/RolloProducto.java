@@ -62,7 +62,7 @@ public class RolloProducto {
     @Column(name = "orden_de_trabajo_id", insertable = false, updatable = false)
     private Long ordenDeTrabajoId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "orden_de_trabajo_id", nullable = false)
     @NotNull(message = "La orden de trabajo es obligatoria")
     private OrdenDeTrabajo ordenDeTrabajo;

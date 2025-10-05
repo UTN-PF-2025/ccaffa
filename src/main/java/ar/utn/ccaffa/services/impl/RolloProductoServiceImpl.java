@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -92,10 +93,16 @@ public class RolloProductoServiceImpl implements RolloProductoService {
     };
 
     @Override
-    public List<RolloProductoDto> findByOrdenDeTrabajoId(Long ordenId){
-        return this.rolloMapper.toDtoList(rolloRepository.findByOrdenDeTrabajoId(ordenId));
+    public RolloProductoDto findByOrdenDeTrabajoId(Long ordenId){
+        return this.rolloMapper.toDto(rolloRepository.findByOrdenDeTrabajoId(ordenId));
     };
 
+    @Override
+    public Optional<RolloProductoDto> findLastByOrdenDeVentaId(Long ordenId){
+        Optional<RolloProducto> rolloProducto = rolloRepository.findLastByOrdenDeVentaId(ordenId);
+        return rolloProducto.map(this.rolloMapper::toDto);
+
+    }
 
     @Override
     public List<RolloProductoDto> filtrarRollosProducto(FiltroRolloProductoDto filtros) {

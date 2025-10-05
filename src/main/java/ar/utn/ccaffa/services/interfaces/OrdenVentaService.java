@@ -28,4 +28,6 @@ public interface OrdenVentaService {
     void finalizar(Long ordenVentaId);
 
     List<OrdenVenta> findByIdIn(List<Long> ids);
+
+    Boolean trabajoFinalizado(Long id);
 }

@@ -14,7 +14,7 @@ public class EspecificacionDto {
     private Long id;
     private Float ancho;
     private Float espesor;
-    private Integer cantidad;
+    private Float cantidad;
     private TipoMaterial tipoMaterial;
     private Float pesoMaximoPorRollo;
     private String tipoDeEmbalaje;

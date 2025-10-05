@@ -27,7 +27,7 @@ public class Especificacion {
     private Float espesor;
 
     @Column(name = "cantidad")
-    private Integer cantidad;
+    private Float cantidad;
 
     @Column(name = "tipo_material")
     private TipoMaterial tipoMaterial;

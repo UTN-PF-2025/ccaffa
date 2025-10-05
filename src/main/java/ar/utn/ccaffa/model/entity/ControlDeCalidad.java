@@ -64,4 +64,6 @@ public class ControlDeCalidad {
 
     @Column(name = "orden_de_trabajo_maquina_id", unique = true)
     private Long ordenDeTrabajoMaquinaId;
+
+    private List<Rollo> rollosHijos;
 } 

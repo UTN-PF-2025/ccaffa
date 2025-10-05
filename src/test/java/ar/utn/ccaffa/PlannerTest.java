@@ -25,7 +25,7 @@ public class PlannerTest {
                         .id(i)
                         .ancho(10F + RANDOM.nextFloat() * 100) // 10–110
                         .espesor(1F + RANDOM.nextFloat() * 1) // 1–11
-                        .cantidad(RANDOM.nextInt(1000)) // 0–999
+                        .cantidad(RANDOM.nextFloat(1000)) // 0–999
                         .tipoMaterial(TipoMaterial.LAMINADO_EN_FRIO)
                         .pesoMaximoPorRollo(10F)
                         .tipoDeEmbalaje("TEST")

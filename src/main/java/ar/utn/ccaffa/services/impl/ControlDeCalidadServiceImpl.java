@@ -188,6 +188,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
                 rh.setFechaIngreso(LocalDateTime.now());
             }
             rolloRepository.saveAll(rollosHijos);
+            control.setRollosHijos(rollosHijos);
         }
 
         if (!control.getDefectos().isEmpty() || control.getEstado().equals(EstadoControlDeCalidadEnum.A_CORREGIR)) {
@@ -200,6 +201,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
             ordenDeTrabajo.getOrdenDeTrabajoMaquinas().forEach(otm -> { if(otm != ordenDeTrabajoMaquina) otm.anular();});
 
             ordenVenta.setEstado(EstadoOrdenVentaEnum.REPLANIFICAR);
+            ordenVenta.setRazonReplanifiaciom("El rollo producido no cumple con los estandares de calidad. Está defectuoso");
 
             RolloProducto rolloProducto = this.generarRolloProducto(control, ordenDeTrabajo, EstadoRolloProducto.DEFECTUOSO);
 
@@ -238,7 +240,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
                 .fechaIngreso(LocalDateTime.now())
                 .anchoMM(controlDeCalidad.getAnchoMedio())
                 .espesorMM(controlDeCalidad.getEspesorMedio())
-                .pesoKG(ordenDeTrabajo.getRollo().getPesoKG()).build();
+                .pesoKG(ordenDeTrabajo.getOrdenDeVenta().getEspecificacion().getCantidad()).build();
     }
 
     @Override

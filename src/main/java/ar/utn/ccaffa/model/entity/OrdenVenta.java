@@ -50,6 +50,9 @@ public class OrdenVenta {
     @Column(name = "observaciones")
     private String observaciones;
 
+    @Column(name = "razon_replanifiaciom")
+    private String razonReplanifiaciom;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "especificacion_id")
     private Especificacion especificacion;

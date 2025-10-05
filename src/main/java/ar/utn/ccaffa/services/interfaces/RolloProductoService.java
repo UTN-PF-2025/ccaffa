@@ -6,6 +6,7 @@ import ar.utn.ccaffa.model.dto.RolloProductoDto;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface RolloProductoService {
     List<RolloProductoDto> findAll();
@@ -18,6 +19,7 @@ public interface RolloProductoService {
     boolean deleteById(Long id);
 
     List<RolloProductoDto> findByRolloPadreId(Long rolloId);
-    List<RolloProductoDto> findByOrdenDeTrabajoId(Long ordenId);
+    RolloProductoDto findByOrdenDeTrabajoId(Long ordenId);
+    Optional<RolloProductoDto> findLastByOrdenDeVentaId(Long ordenId);
 
 } 
