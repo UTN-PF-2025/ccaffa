@@ -1,4 +1,4 @@
-package ar.utn.ccaffa.model.entity;
+/*package ar.utn.ccaffa.model.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,3 +20,4 @@ public class Empleado {
     private Long id;
     private String nombre;
 }
+*/

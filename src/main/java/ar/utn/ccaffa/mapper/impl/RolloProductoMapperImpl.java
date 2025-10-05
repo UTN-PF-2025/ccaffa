@@ -1,4 +1,4 @@
-package ar.utn.ccaffa.mapper.impl;
+/*package ar.utn.ccaffa.mapper.impl;
 
 import ar.utn.ccaffa.mapper.interfaces.*;
 import ar.utn.ccaffa.model.dto.RolloDto;
@@ -71,4 +71,4 @@ public class RolloProductoMapperImpl implements RolloProductoMapper {
                 .collect(Collectors.toList());
     }
 
-}
+}*/

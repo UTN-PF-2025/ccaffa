@@ -1,6 +1,7 @@
 package ar.utn.ccaffa.mapper.impl;
 
 import ar.utn.ccaffa.mapper.interfaces.OrdenDeTrabajoMaquinaResponseMapper;
+import ar.utn.ccaffa.mapper.interfaces.RolloMapper;
 import ar.utn.ccaffa.model.dto.OrdenDeTrabajoMaquinaResponseDto;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajoMaquina;
@@ -14,9 +15,11 @@ import java.util.stream.Collectors;
 @Component
 public class OrdenDeTrabajoMaquinaResponseMapperImpl implements OrdenDeTrabajoMaquinaResponseMapper {
     private final MaquinaRepository maquinaRepository;
+    private final RolloMapper rolloMapper;
 
-    public OrdenDeTrabajoMaquinaResponseMapperImpl(MaquinaRepository maquinaRepository) {
+    public OrdenDeTrabajoMaquinaResponseMapperImpl(MaquinaRepository maquinaRepository, RolloMapper rolloMapper) {
         this.maquinaRepository = maquinaRepository;
+        this.rolloMapper = rolloMapper;
     }
 
 
@@ -29,6 +32,7 @@ public class OrdenDeTrabajoMaquinaResponseMapperImpl implements OrdenDeTrabajoMa
                 .fechaFin(ordenDeTrabajoMaquina.getFechaFin())
                 .estado(ordenDeTrabajoMaquina.getEstado())
                 .observaciones(ordenDeTrabajoMaquina.getObservaciones())
+                .rolloAUsar(this.rolloMapper.toEntity(ordenDeTrabajoMaquina.getRolloAUsar()))
                 .build();
     }
 

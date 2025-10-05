@@ -21,4 +21,5 @@ public class OrdenDeTrabajoMaquinaResponseDto {
     private LocalDateTime fechaFin;
     private EstadoOrdenTrabajoMaquinaEnum estado;
     private String observaciones;
+    private RolloDto rolloAUsar;
 } 

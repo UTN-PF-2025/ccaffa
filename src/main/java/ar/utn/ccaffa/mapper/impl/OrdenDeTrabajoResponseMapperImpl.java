@@ -6,6 +6,7 @@ import ar.utn.ccaffa.model.entity.ControlDeCalidad;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajoMaquina;
 import ar.utn.ccaffa.model.entity.OrdenVenta;
+import ar.utn.ccaffa.model.entity.Rollo;
 import ar.utn.ccaffa.repository.interfaces.OrdenVentaRepository;
 import ar.utn.ccaffa.repository.interfaces.RolloRepository;
 import org.springframework.stereotype.Service;
@@ -61,6 +62,7 @@ public class OrdenDeTrabajoResponseMapperImpl implements OrdenDeTrabajoResponseM
                 .ordenDeVenta(mapOrdenVentaSimple(ordenDeTrabajo.getOrdenDeVenta()))
                 .ordenDeTrabajoMaquinas(mapOrdenDeTrabajoMaquinas(ordenDeTrabajo.getOrdenDeTrabajoMaquinas()))
                 .rollo(rolloMapper.toDtoOnlyWithRolloPadreID(ordenDeTrabajo.getRollo()))
+                .rolloProducto(rolloMapper.toDtoOnlyWithRolloPadreID(ordenDeTrabajo.getRolloProducto()))
                 .build();
     }
     
@@ -92,8 +94,8 @@ public class OrdenDeTrabajoResponseMapperImpl implements OrdenDeTrabajoResponseM
                 .fechaEstimadaDeFin(ordenDeTrabajo.getFechaEstimadaDeFin())
                 .activa(ordenDeTrabajo.getActiva())
                 .ordenDeVenta(this.ordenVentaRepository.getReferenceById(ordenDeTrabajo.getOrdenDeVenta().getOrderId()))
-
                 .rollo(this.rolloRepository.getReferenceById(ordenDeTrabajo.getRollo().getId()))
+                .rolloProducto(this.rolloRepository.getReferenceById(ordenDeTrabajo.getRolloProducto().getId()))
                 .build();
 
         ordenDeTrabajoEntity.setOrdenDeTrabajoMaquinas(this.ordenDeTrabajoMaquinaResponseMapper.toEntityList(ordenDeTrabajo.getOrdenDeTrabajoMaquinas(), ordenDeTrabajoEntity));
@@ -152,6 +154,7 @@ public class OrdenDeTrabajoResponseMapperImpl implements OrdenDeTrabajoResponseM
                 .fechaFin(otm.getFechaFin())
                 .estado(otm.getEstado())
                 .observaciones(otm.getObservaciones())
+                .rolloAUsar(this.rolloMapper.toDtoOnlyWithRolloPadreID(otm.getRolloAUsar()))
                 .build();
     }
     

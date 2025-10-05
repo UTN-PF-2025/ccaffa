@@ -22,17 +22,15 @@ public class OrdenDeTrabajoMaquinaMapperImpl implements OrdenDeTrabajoMaquinaMap
 
     @Override
     public OrdenDeTrabajoMaquinaDto toDto(OrdenDeTrabajoMaquina entity) {
-        RolloDto rollo = entity.getOrdenDeTrabajo().getRollo() != null ? this.rolloMapper.toDtoOnlyWithRolloPadreID(entity.getOrdenDeTrabajo().getRollo())
-                                                                        : null;
         return OrdenDeTrabajoMaquinaDto.builder()
                 .id(entity.getId())
-                .ordenDeTrabajoId(entity.getOrdenDeTrabajo() != null ? entity.getOrdenDeTrabajo().getId() : null)
-                .maquinaId(entity.getMaquina() != null ? entity.getMaquina().getId() : null)
+                .ordenDeTrabajoId(entity.getOrdenDeTrabajo().getId())
+                .maquinaId(entity.getMaquina().getId())
                 .fechaInicio(entity.getFechaInicio())
                 .fechaFin(entity.getFechaFin())
                 .estado(entity.getEstado())
                 .observaciones(entity.getObservaciones())
-                .rolloAUsar(rollo)
+                .rolloAUsar(this.rolloMapper.toDtoOnlyWithRolloPadreID(entity.getRolloAUsar()))
                 .build();
     }
 

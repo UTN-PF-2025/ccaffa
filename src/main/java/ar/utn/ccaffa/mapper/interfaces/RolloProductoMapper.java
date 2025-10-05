@@ -1,4 +1,4 @@
-package ar.utn.ccaffa.mapper.interfaces;
+/*package ar.utn.ccaffa.mapper.interfaces;
 
 
 import ar.utn.ccaffa.model.dto.RolloProductoDto;
@@ -16,3 +16,4 @@ public interface RolloProductoMapper {
     List<RolloProducto> toEntityList(List<RolloProductoDto> rolloDtos);
 
 }
+*/

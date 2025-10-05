@@ -245,7 +245,7 @@ public class PlannerGA {
 
     private double calcPenaltyForWastedRolls(List<Rollo> rollosHijos) {
         double p = 0;
-        for (Rollo c : rollosHijos) if (c.getEstado() == EstadoRollo.DESPERDICIO) p += (double) c.getPesoKG() * this.MULTIPLIER_OF_WASTE; return p;
+        for (Rollo c : rollosHijos) if (c.getTipoRollo() == TipoRollo.DESPERDICIO) p += (double) c.getPesoKG() * this.MULTIPLIER_OF_WASTE; return p;
     }
 
     private double calcPenaltyForAvailableChildrenRolls(List<Rollo> rollosHijos){
@@ -582,20 +582,6 @@ public class PlannerGA {
 
                 possibleStart = ordenMaquina.getFechaFin();
 
-                List<Rollo> childrenRolls = ordenDeTrabajo.procesarRollo();
-                for (Rollo cr : childrenRolls) {
-                    cr.setId(generateUniqueRandomId());
-                    cr.setRolloPadreId(usingRoll.getId());
-                    if (cr.getAnchoMM() < this.MIN_WIDTH || cr.getLargo() < this.MIN_LENGTH){
-                        cr.setEstado(EstadoRollo.DESPERDICIO);
-                    }
-                }
-
-                children.addAll(childrenRolls);
-                List<Rollo> existingRolls = childrenMap.putIfAbsent(rollId, childrenRolls);
-                if (existingRolls != null){
-                    existingRolls.addAll(childrenRolls);
-                }
             }
 
             if (m2 != 0) {
@@ -657,6 +643,21 @@ public class PlannerGA {
 
                 ordenDeTrabajo.getOrdenDeTrabajoMaquinas().add(ordenMaquina);
                 ordenesMaquina.add(ordenMaquina);
+            }
+
+            List<Rollo> childrenRolls = ordenDeTrabajo.procesarRollo();
+            for (Rollo cr : childrenRolls) {
+                cr.setId(generateUniqueRandomId());
+                cr.setRolloPadreId(usingRoll.getId());
+                if (cr.getAnchoMM() < this.MIN_WIDTH || cr.getLargo() < this.MIN_LENGTH){
+                    cr.setTipoRollo(TipoRollo.DESPERDICIO);
+                }
+            }
+
+            children.addAll(childrenRolls);
+            List<Rollo> existingRolls = childrenMap.putIfAbsent(rollId, childrenRolls);
+            if (existingRolls != null){
+                existingRolls.addAll(childrenRolls);
             }
 
             // ALL OKAY, ADD ORDEN DE TRABAJO

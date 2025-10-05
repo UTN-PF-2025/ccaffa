@@ -1,6 +1,7 @@
 package ar.utn.ccaffa.web;
 
 import ar.utn.ccaffa.enums.*;
+import ar.utn.ccaffa.exceptions.ErrorResponse;
 import ar.utn.ccaffa.mapper.interfaces.OrdenDeTrabajoMaquinaMapper;
 import ar.utn.ccaffa.mapper.interfaces.OrdenDeTrabajoResponseMapper;
 import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoMaquinaService;
@@ -14,6 +15,7 @@ import ar.utn.ccaffa.model.dto.OrdenDeTrabajoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -37,28 +39,42 @@ public class OrdenDeTrabajoController {
     private final OrdenDeTrabajoMaquinaMapper ordenDeTrabajoMaquinaMapper;
 
     @PostMapping
-    public ResponseEntity<OrdenDeTrabajoResponseDto> crearOrdenDeTrabajo(@RequestBody OrdenDeTrabajoDto request) {
+    public ResponseEntity<?> crearOrdenDeTrabajo(@RequestBody OrdenDeTrabajoDto request) {
         try {
-            // 1. Crear y guardar la orden de trabajo básica para obtener un ID
-            OrdenDeTrabajo orden = crearOrdenBasica(request);
-            ordenDeTrabajoService.save(orden); // Guardado inicial
-
-            // 2. Procesar y asociar la orden de venta
-            OrdenVenta ordenVenta = procesarOrdenVenta(request, orden);
-            if (ordenVenta != null) {
-                ordenDeVentaRepository.save(ordenVenta);
+            // 1. Procesar orden de venta
+            OrdenVenta ordenVenta = procesarOrdenVenta(request);
+            if (ordenVenta == null){
+                ErrorResponse error = ErrorResponse.builder()
+                        .status("ORDEN_DE_VENTA_NOT_FOUND")
+                        .message("No se encontró la orden de venta")
+                        .build();
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
             }
+
+            // 2. Crear y guardar la orden de trabajo básica para obtener un ID
+            OrdenDeTrabajo orden = crearOrdenBasica(request);
+            orden.setOrdenDeVenta(ordenVenta);
 
             // 3. Procesar y asociar máquinas
             procesarMaquinas(request, orden);
 
             // 4. Procesar y asociar el rollo y sus hijos
-            procesarRollo(request, orden, ordenVenta);
+            List<Rollo> rolloHijos = procesarRollo(request, orden, ordenVenta);
+            if (rolloHijos == null){
+                ErrorResponse error = ErrorResponse.builder()
+                        .status("ROLLO_ID_NOT_FOUND")
+                        .message("No se encontró el rollo")
+                        .build();
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+            }
+
 
             // 5. Configurar los datos finales de la orden
             configurarOrdenFinal(orden, request);
 
             // 6. Guardar la orden de trabajo completa con todas sus asociaciones
+            rolloRepository.saveAll(rolloHijos);
+            ordenDeVentaRepository.save(ordenVenta);
             OrdenDeTrabajo guardada = ordenDeTrabajoService.save(orden);
             return ResponseEntity.ok(ordenDeTrabajoResponseMapper.toDto(guardada));
 
@@ -160,19 +176,18 @@ public class OrdenDeTrabajoController {
         return orden;
     }
 
-    private OrdenVenta procesarOrdenVenta(OrdenDeTrabajoDto request, OrdenDeTrabajo orden) {
+    private OrdenVenta procesarOrdenVenta(OrdenDeTrabajoDto request) {
         if (request.getOrdenDeVentaId() == null) {
             return null;
         }
 
         Optional<OrdenVenta> ordenVentaOpt = ordenDeVentaRepository.findById(request.getOrdenDeVentaId());
         if (ordenVentaOpt.isEmpty()) {
-            throw new IllegalArgumentException("Orden de venta no encontrada");
+            return null;
         }
 
         OrdenVenta ordenVenta = ordenVentaOpt.get();
         ordenVenta.setEstado(EstadoOrdenVentaEnum.PROGRAMADA);
-        orden.setOrdenDeVenta(ordenVenta);
         return ordenVenta;
     }
 
@@ -207,9 +222,9 @@ public class OrdenDeTrabajoController {
                 .build();
     }
 
-    private void procesarRollo(OrdenDeTrabajoDto request, OrdenDeTrabajo orden, OrdenVenta ordenVenta) {
+    private List<Rollo> procesarRollo(OrdenDeTrabajoDto request, OrdenDeTrabajo orden, OrdenVenta ordenVenta) {
         if (request.getRolloId() == null) {
-            return;
+            return null;
         }
 
         Optional<Rollo> rolloOpt = rolloRepository.findById(request.getRolloId());
@@ -220,10 +235,14 @@ public class OrdenDeTrabajoController {
         Rollo rollo = rolloOpt.get();
         orden.setRollo(rollo);
 
+        List<Rollo> rolloHijos = new ArrayList<>();
+
         if (ordenVenta != null && ordenVenta.getEspecificacion() != null) {
-            List<Rollo> rolloHijos = orden.procesarRollo();
-            rolloRepository.saveAll(rolloHijos);
+            rolloHijos.addAll(orden.procesarRollo());
         }
+        return rolloHijos;
+
+
     }
 
     private void configurarOrdenFinal(OrdenDeTrabajo orden, OrdenDeTrabajoDto request) {

@@ -1,6 +1,7 @@
 package ar.utn.ccaffa.model.entity;
 
 import ar.utn.ccaffa.enums.EstadoOrdenTrabajoMaquinaEnum;
+import ar.utn.ccaffa.model.entity.Rollo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -44,6 +45,10 @@ public class OrdenDeTrabajoMaquina {
     
     @Column(name = "observaciones")
     private String observaciones;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rolloAUsar", referencedColumnName = "id")
+    private Rollo rolloAUsar;
 
     public void anular() {
         List<EstadoOrdenTrabajoMaquinaEnum> estadosPreviosNecesarios = List.of(EstadoOrdenTrabajoMaquinaEnum.EN_CURSO, EstadoOrdenTrabajoMaquinaEnum.PROGRAMADA);

@@ -61,6 +61,10 @@ public class OrdenDeTrabajo {
     @JoinColumn(name = "rollo_id", referencedColumnName = "id")
     private Rollo rollo;
 
+    @ManyToOne
+    @JoinColumn(name = "rollo_producto_id")
+    private Rollo rolloProducto;
+
     public boolean yaComenzo() {
         return !EstadoOrdenTrabajoEnum.is(this.estado, EstadoOrdenTrabajoEnum.PROGRAMADA);
     }
@@ -108,9 +112,15 @@ public class OrdenDeTrabajo {
         validarDimensiones();
         crearHijoPorAncho(rolloHijos);
         crearHijoPorLargo(rolloHijos);
+        crearHijoProducto(rolloHijos);
 
         this.getRollo().setOrdeDeTrabajoAsociadaID(this.getId());
         this.getRollo().setAsociadaAOrdenDeTrabajo(true);
+
+        this.getOrdenDeTrabajoMaquinas().getFirst().setRolloAUsar(this.getRollo());
+        if (this.getOrdenDeTrabajoMaquinas().size() == 2){
+            this.getOrdenDeTrabajoMaquinas().get(1).setRolloAUsar(this.getRolloProducto());
+        }
 
         return rolloHijos;
 
@@ -142,7 +152,13 @@ public class OrdenDeTrabajo {
     }
 
     private void crearHijoProducto(List<Rollo> rolloHijos){
-        rolloHijos.add(crearHijo(this.getRollo().getAnchoMM(), this.neededLengthFromOriginalRoll(), TipoRollo.PRODUCTO));
+        Rollo hijoProducto = crearHijo(this.getRollo().getAnchoMM(), 10f, TipoRollo.PRODUCTO);
+        this.setRolloProducto(hijoProducto);
+        hijoProducto.setAsociadaAOrdenDeTrabajo(true);
+        hijoProducto.setOrdeDeTrabajoAsociadaID(this.getId());
+        hijoProducto.setPesoKG(this.getOrdenDeVenta().getEspecificacion().getCantidad());
+        hijoProducto.setEspesorMM(this.getOrdenDeVenta().getEspecificacion().getEspesor());
+        rolloHijos.add(hijoProducto);
     }
 
     private void validarDimensiones(){

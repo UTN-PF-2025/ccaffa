@@ -28,5 +28,6 @@ public class OrdenDeTrabajoResponseDto {
     private OrdenVentaSimpleDto ordenDeVenta;
     private List<OrdenDeTrabajoMaquinaResponseDto> ordenDeTrabajoMaquinas;
     private RolloDto rollo;
+    private RolloDto rolloProducto;
     private ControlDeCalidadDto controlDeCalidad;
 } 

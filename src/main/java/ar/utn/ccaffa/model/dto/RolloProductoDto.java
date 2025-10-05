@@ -1,4 +1,4 @@
-package ar.utn.ccaffa.model.dto;
+/*package ar.utn.ccaffa.model.dto;
 
 import ar.utn.ccaffa.enums.EstadoRolloProducto;
 import ar.utn.ccaffa.enums.TipoMaterial;
@@ -27,3 +27,4 @@ public class RolloProductoDto {
     private Long ordenDeTrabajoId;
 }
 
+*/

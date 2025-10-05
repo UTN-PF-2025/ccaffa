@@ -1,10 +1,11 @@
-package ar.utn.ccaffa.web;
+/*package ar.utn.ccaffa.web;
 
 import ar.utn.ccaffa.exceptions.ErrorResponse;
 import ar.utn.ccaffa.model.dto.*;
 import ar.utn.ccaffa.model.entity.OrdenVenta;
 import ar.utn.ccaffa.services.interfaces.OrdenVentaService;
 import ar.utn.ccaffa.services.interfaces.RolloProductoService;
+import ar.utn.ccaffa.services.interfaces.RolloService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +19,10 @@ import java.util.Optional;
 @Slf4j
 public class RolloProductoController {
 
-    private final RolloProductoService rolloService;
+    private final RolloService rolloService;
     private final OrdenVentaService ordenService;
 
-    public RolloProductoController(RolloProductoService rolloService, OrdenVentaService ordenService) {
+    public RolloProductoController(RolloService rolloService, OrdenVentaService ordenService) {
         this.rolloService = rolloService;
         this.ordenService = ordenService;
     }
@@ -63,6 +64,7 @@ public class RolloProductoController {
         return ResponseEntity.notFound().build();
     }
 
+
     @GetMapping("/obtenerProductosGeneradosDeRollo/{id}")
     public ResponseEntity<List<RolloProductoDto>> obtenerProductosGeneradosDeRolloID(@PathVariable Long id) {
         List<RolloProductoDto> rollos = rolloService.findByRolloPadreId(id);
@@ -101,3 +103,5 @@ public class RolloProductoController {
     }
 
 }
+
+ */

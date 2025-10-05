@@ -2,6 +2,7 @@ package ar.utn.ccaffa.services.impl;
 
 import ar.utn.ccaffa.enums.EstadoOrdenTrabajoEnum;
 import ar.utn.ccaffa.enums.EstadoOrdenVentaEnum;
+import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.exceptions.ResourceNotFoundException;
 import ar.utn.ccaffa.exceptions.UnprocessableContentException;
 import ar.utn.ccaffa.mapper.interfaces.OrdenVentaMapper;
@@ -9,8 +10,10 @@ import ar.utn.ccaffa.model.dto.FiltroOrdenVentaDTO;
 import ar.utn.ccaffa.model.dto.OrdenVentaDto;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import ar.utn.ccaffa.model.entity.OrdenVenta;
+import ar.utn.ccaffa.model.entity.Rollo;
 import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoRepository;
 import ar.utn.ccaffa.repository.interfaces.OrdenVentaRepository;
+import ar.utn.ccaffa.repository.interfaces.RolloRepository;
 import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoService;
 import ar.utn.ccaffa.services.interfaces.OrdenVentaService;
 
@@ -18,6 +21,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -27,11 +31,14 @@ public class OrdenVentaServiceImpl implements OrdenVentaService {
     private final OrdenDeTrabajoRepository ordenDeTrabajoRepository;
     private final OrdenDeTrabajoService ordenDeTrabajoService;
 
-    public OrdenVentaServiceImpl(OrdenVentaRepository ordenVentaRepository, OrdenVentaMapper ordenVentaMapper, OrdenDeTrabajoRepository ordenDeTrabajoRepository, OrdenDeTrabajoService ordenDeTrabajoService) {
+    private final RolloRepository rolloRepository;
+
+    public OrdenVentaServiceImpl(OrdenVentaRepository ordenVentaRepository, OrdenVentaMapper ordenVentaMapper, OrdenDeTrabajoRepository ordenDeTrabajoRepository, OrdenDeTrabajoService ordenDeTrabajoService, RolloRepository rolloRepository) {
         this.ordenVentaRepository = ordenVentaRepository;
         this.ordenVentaMapper = ordenVentaMapper;
         this.ordenDeTrabajoRepository = ordenDeTrabajoRepository;
         this.ordenDeTrabajoService = ordenDeTrabajoService;
+        this.rolloRepository = rolloRepository;
     }
 
     @Override
@@ -64,16 +71,16 @@ public class OrdenVentaServiceImpl implements OrdenVentaService {
     @Override
     public void anular(Long ordenVentaId) {
         OrdenVentaDto ordenVentaAAnular = this.findById(ordenVentaId);
-        List<OrdenDeTrabajo> ordenesDeTrabajo = this.ordenDeTrabajoRepository.findByOrdenDeVenta_Id(ordenVentaAAnular.getOrderId());
+        Optional<OrdenDeTrabajo> ordenesDeTrabajo = this.ordenDeTrabajoRepository.findTopByOrdenDeVenta_IdOrderByFechaFinDesc(ordenVentaAAnular.getOrderId());
         if(ordenesDeTrabajo.isEmpty()){
             ordenVentaAAnular.setEstado(EstadoOrdenVentaEnum.ANULADA);
             this.save(ordenVentaAAnular);
         } else {
-            OrdenDeTrabajo ordenDeTrabajo1 = ordenesDeTrabajo.getFirst();
-            if(ordenDeTrabajo1.yaComenzo()){
+            OrdenDeTrabajo ordenDeTrabajo = ordenesDeTrabajo.get();
+            if(ordenDeTrabajo.yaComenzo()){
                 throw new UnprocessableContentException("Orden de Venta - Anulación");
             } else {
-                this.ordenDeTrabajoService.cancelarOrdenDeTrabajo(ordenDeTrabajo1.getId());
+                this.ordenDeTrabajoService.cancelarOrdenDeTrabajo(ordenDeTrabajo.getId());
                 ordenVentaAAnular.setEstado(EstadoOrdenVentaEnum.ANULADA);
                 this.save(ordenVentaAAnular);
             }
@@ -125,18 +132,13 @@ public class OrdenVentaServiceImpl implements OrdenVentaService {
     }
 
     @Override
-    public void finalizar(Long ordenVentaId) {
-        OrdenVentaDto ordenVentaDto =this.ordenVentaMapper.toDto(this.ordenVentaRepository.findById(ordenVentaId).orElseThrow(() -> new ResourceNotFoundException("Orden de venta", "id", ordenVentaId)));
-        if(EstadoOrdenVentaEnum.is(ordenVentaDto.getEstado(), EstadoOrdenVentaEnum.FINALIZADA)){
-            throw new UnprocessableContentException("Orden de Venta - Finalizar");
-        }
-        List<OrdenDeTrabajo> ordenesDeTrabajo = this.ordenDeTrabajoRepository.findByOrdenDeVenta_Id(ordenVentaId);
-        
-        if(EstadoOrdenTrabajoEnum.is(ordenesDeTrabajo.getFirst().getEstado(), EstadoOrdenTrabajoEnum.FINALIZADA)){
-            this.ordenVentaRepository.updateOrdenDeVentaEstado(ordenVentaId, EstadoOrdenVentaEnum.FINALIZADA);
-        } else {
-            throw new UnprocessableContentException("Orden de Venta - Finalizar");
-        }
+    public void finalizar(Long ordenVentaId, OrdenDeTrabajo ordenDeTrabajo) {
+
+        Rollo rolloProducto = ordenDeTrabajo.getRolloProducto();
+        rolloProducto.setEstado(EstadoRollo.ENTREGADO);
+        this.rolloRepository.save(rolloProducto);
+
+        this.ordenVentaRepository.updateOrdenDeVentaEstado(ordenVentaId, EstadoOrdenVentaEnum.FINALIZADA);
     }
 
 }

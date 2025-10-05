@@ -5,13 +5,15 @@ import ar.utn.ccaffa.model.dto.CertificadoDeCalidadDto;
 import ar.utn.ccaffa.model.dto.EmpleadoDto;
 import ar.utn.ccaffa.model.entity.CertificadoDeCalidad;
 import ar.utn.ccaffa.model.entity.ControlDeCalidad;
-import ar.utn.ccaffa.model.entity.Empleado;
+import ar.utn.ccaffa.model.entity.Usuario;
+import ar.utn.ccaffa.repository.interfaces.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
 public class CertificadoDeCalidadMapperImpl implements CertificadoDeCalidadMapper {
+    private UsuarioRepository usuarioRepository;
     @Override
     public CertificadoDeCalidad toEntity(CertificadoDeCalidadDto certificado) {
         if (certificado == null) {
@@ -22,8 +24,8 @@ public class CertificadoDeCalidadMapperImpl implements CertificadoDeCalidadMappe
                 .id(certificado.getId())
                 .numeroDeCertificado(certificado.getNumeroDeCertificado())
                 .fechaDeEmision(certificado.getFechaDeEmision())
-                .aprobador(certificado.getAprobador() != null
-                        ? Empleado.builder().id(certificado.getAprobador().getId()).build()
+                .aprobadorId(certificado.getAprobador() != null
+                        ? certificado.getAprobador().getId()
                         : null)
                 .controlDeCalidad(ControlDeCalidad.builder().id(certificado.getControlDeCalidadId()).build())
                 .nombreArchivo(certificado.getNombreArchivo())
@@ -37,15 +39,21 @@ public class CertificadoDeCalidadMapperImpl implements CertificadoDeCalidadMappe
         }
 
         CertificadoDeCalidad certificado = byId.get();
+        String nombre = "";
+        if (certificado.getAprobadorId() != null){
+            Optional<Usuario> usuario = this.usuarioRepository.findById(certificado.getAprobadorId());
+            if (usuario.isPresent()) { nombre = usuario.get().getNombre();}
+        }
+
 
         return CertificadoDeCalidadDto.builder()
                 .id(certificado.getId())
                 .numeroDeCertificado(certificado.getNumeroDeCertificado())
                 .fechaDeEmision(certificado.getFechaDeEmision())
-                .aprobador(certificado.getAprobador() != null
+                .aprobador(certificado.getAprobadorId() != null
                         ? EmpleadoDto.builder()
-                        .id(certificado.getAprobador().getId())
-                        .nombre(certificado.getAprobador().getNombre())
+                        .id(certificado.getAprobadorId())
+                        .nombre(nombre)
                         .build()
                         : null)
                 .controlDeCalidadId(certificado.getControlDeCalidad() != null

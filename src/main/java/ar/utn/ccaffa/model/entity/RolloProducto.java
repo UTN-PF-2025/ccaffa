@@ -1,4 +1,4 @@
-package ar.utn.ccaffa.model.entity;
+/*package ar.utn.ccaffa.model.entity;
 
 import ar.utn.ccaffa.enums.EstadoRolloProducto;
 import ar.utn.ccaffa.enums.TipoMaterial;
@@ -69,4 +69,4 @@ public class RolloProducto {
 
 
 
-}
+}*/

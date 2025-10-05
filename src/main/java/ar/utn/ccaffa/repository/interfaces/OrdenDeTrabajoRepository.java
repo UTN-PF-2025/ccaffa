@@ -16,7 +16,9 @@ public interface OrdenDeTrabajoRepository extends JpaRepository<OrdenDeTrabajo, 
     List<OrdenDeTrabajo> findByRolloId(Long rolloId);
     @EntityGraph(attributePaths = {"ordenDeTrabajoMaquinas.maquina", "rollo", "ordenDeVenta.especificacion", "ordenDeVenta.cliente"})
     OrdenDeTrabajo findByOrdenDeTrabajoMaquinas_Id(Long ordenDeTrabajoMaquinaId);
-    List<OrdenDeTrabajo> findByOrdenDeVenta_Id(Long ordenDeVentaId);
+    Optional<OrdenDeTrabajo> findTopByOrdenDeVenta_IdOrderByFechaFinDesc(Long ordenDeVentaId);
+
+
 
     @Override
     @EntityGraph(attributePaths = {"ordenDeTrabajoMaquinas.maquina", "rollo", "ordenDeVenta.especificacion", "ordenDeVenta.cliente"})

@@ -182,7 +182,7 @@ public class PlannerTest {
                         parentRollHash,
                         roll.getEstado(),
                         roll.getPesoKG());
-                if (roll.getEstado() == EstadoRollo.DESPERDICIO){
+                if (roll.getTipoRollo() == TipoRollo.DESPERDICIO){
                     totalDesperdicio++;
                     pesoDesperdicio += roll.getPesoKG();
                 }

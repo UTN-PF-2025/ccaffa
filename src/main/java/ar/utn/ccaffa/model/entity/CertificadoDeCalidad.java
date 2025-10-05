@@ -25,9 +25,8 @@ public class CertificadoDeCalidad {
     @Column(name = "fecha_de_emision")
     private LocalDate fechaDeEmision;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "aprobador_id")
-    private Empleado aprobador;
+    @Column(name = "aprobador")
+    private Long aprobadorId;
 
     @Column(name = "nombre_archivo")
     private String nombreArchivo;

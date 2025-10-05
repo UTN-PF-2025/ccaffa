@@ -7,6 +7,7 @@ import ar.utn.ccaffa.model.dto.ModificarRolloRequestDto;
 import ar.utn.ccaffa.model.entity.Rollo;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface RolloService {
     List<RolloDto> findAll();
@@ -28,4 +29,6 @@ public interface RolloService {
 
     boolean estaDisponible(Rollo rollo);
     List<Long> simularAnularRollo(Long id);
+
+    Optional<RolloDto> findLastProductForOrdenDeVentaId(Long id);
 }

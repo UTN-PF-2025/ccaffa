@@ -1,4 +1,4 @@
-package ar.utn.ccaffa.services.interfaces;
+/*package ar.utn.ccaffa.services.interfaces;
 
 import ar.utn.ccaffa.model.dto.FiltroRolloProductoDto;
 import ar.utn.ccaffa.model.dto.RolloDto;
@@ -22,4 +22,4 @@ public interface RolloProductoService {
     RolloProductoDto findByOrdenDeTrabajoId(Long ordenId);
     Optional<RolloProductoDto> findLastByOrdenDeVentaId(Long ordenId);
 
-} 
+} */

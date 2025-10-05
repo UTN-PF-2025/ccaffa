@@ -32,7 +32,6 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
     private final OrdenVentaRepository ordenVentaRepository;
     private final OrdenDeTrabajoMaquinaRepository ordenDeTrabajoMaquinaRepository;
     private final RolloRepository rolloRepository;
-    private final RolloProductoRepository rolloProductoRepository;
 
     @Override
     public ControlDeCalidad createControlDeCalidad(CreateControlDeCalidadRequest request) {
@@ -190,7 +189,6 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
             rolloDeOrdenDeTrabajo.setEstado(EstadoRollo.DIVIDIDO);
             rolloRepository.save(rolloDeOrdenDeTrabajo);
             rolloRepository.saveAll(rollosHijos);
-            control.setRollosHijos(rollosHijos);
         }
 
         if (!control.getDefectos().isEmpty() || control.getEstado().equals(EstadoControlDeCalidadEnum.A_CORREGIR)) {
@@ -205,9 +203,10 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
             ordenVenta.setEstado(EstadoOrdenVentaEnum.REPLANIFICAR);
             ordenVenta.setRazonReplanifiaciom("El rollo producido no cumple con los estandares de calidad. Está defectuoso");
 
-            RolloProducto rolloProducto = this.generarRolloProducto(control, ordenDeTrabajo, EstadoRolloProducto.DEFECTUOSO);
-
-            rolloProductoRepository.save(rolloProducto);
+            Rollo rolloProducto = ordenDeTrabajo.getRolloProducto();
+            rolloProducto.setEstado(EstadoRollo.DEFECTUOSO);
+            this.actualizarRolloProducto(control, ordenDeTrabajo, rolloProducto);
+            rolloRepository.save(rolloProducto);
 
 
         } else {
@@ -220,8 +219,10 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
                 ordenDeTrabajo.setFechaFin(LocalDateTime.now());
                 ordenVenta.setEstado(EstadoOrdenVentaEnum.TRABAJO_FINALIZADO);
 
-                RolloProducto rolloProducto = this.generarRolloProducto(control, ordenDeTrabajo, EstadoRolloProducto.ELABORADO);
-                rolloProductoRepository.save(rolloProducto);
+                Rollo rolloProducto = ordenDeTrabajo.getRolloProducto();
+                rolloProducto.setEstado(EstadoRollo.ELABORADO);
+                this.actualizarRolloProducto(control, ordenDeTrabajo, rolloProducto);
+                rolloRepository.save(rolloProducto);
             }
 
         }
@@ -233,16 +234,10 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
         return controlDeCalidadRepository.save(control);
     }
 
-    public RolloProducto generarRolloProducto(ControlDeCalidad controlDeCalidad, OrdenDeTrabajo ordenDeTrabajo, EstadoRolloProducto estado){
-        return RolloProducto.builder().
-                rolloPadre(ordenDeTrabajo.getRollo())
-                .tipoMaterial(ordenDeTrabajo.getRollo().getTipoMaterial())
-                .estado(estado)
-                .ordenDeTrabajo(ordenDeTrabajo)
-                .fechaIngreso(LocalDateTime.now())
-                .anchoMM(controlDeCalidad.getAnchoMedio())
-                .espesorMM(controlDeCalidad.getEspesorMedio())
-                .pesoKG(ordenDeTrabajo.getOrdenDeVenta().getEspecificacion().getCantidad()).build();
+    public void actualizarRolloProducto(ControlDeCalidad controlDeCalidad, OrdenDeTrabajo ordenDeTrabajo, Rollo rolloProducto){
+        rolloProducto.setAnchoMM(controlDeCalidad.getAnchoMedio());
+        rolloProducto.setEspesorMM(controlDeCalidad.getEspesorMedio());
+        rolloProducto.setPesoKG(ordenDeTrabajo.getOrdenDeVenta().getEspecificacion().getCantidad());
     }
 
     @Override

@@ -48,8 +48,7 @@ public class ControlDeCalidadController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
 
-        Rollo rollo = ordenDeTrabajoMaquina.get().getOrdenDeTrabajo().getRollo();
-        if (!rolloService.estaDisponible(rollo)){
+        if (!rolloService.estaDisponible(ordenDeTrabajoMaquina.get().getRolloAUsar())){
             ErrorResponse error = ErrorResponse.builder()
                     .status("ROLLO_NO_DISPONIBLE")
                     .message("El control de calidad no puede ser iniciado porque su rollo todavía no esta disponible")

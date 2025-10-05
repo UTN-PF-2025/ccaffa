@@ -3,6 +3,7 @@ package ar.utn.ccaffa.services.interfaces;
 import ar.utn.ccaffa.model.dto.FiltroOrdenVentaDTO;
 import ar.utn.ccaffa.model.dto.OrdenVentaDto;
 import ar.utn.ccaffa.model.entity.Defecto;
+import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import ar.utn.ccaffa.model.entity.OrdenVenta;
 import org.apache.coyote.BadRequestException;
 
@@ -25,7 +26,7 @@ public interface OrdenVentaService {
 
     void anular(Long ordenVentaId) throws BadRequestException;
 
-    void finalizar(Long ordenVentaId);
+    void finalizar(Long ordenVentaId, OrdenDeTrabajo ordenDeTrabajo);
 
     List<OrdenVenta> findByIdIn(List<Long> ids);
 

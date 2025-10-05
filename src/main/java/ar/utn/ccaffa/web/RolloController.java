@@ -6,6 +6,7 @@ import ar.utn.ccaffa.exceptions.ErrorResponse;
 import ar.utn.ccaffa.model.dto.FiltroRolloDto;
 import ar.utn.ccaffa.model.dto.RolloDto;
 import ar.utn.ccaffa.model.dto.SimulacionAnulacionRolloResponse;
+import ar.utn.ccaffa.services.interfaces.OrdenVentaService;
 import ar.utn.ccaffa.services.interfaces.RolloService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/rollos")
@@ -22,9 +24,11 @@ import java.util.List;
 public class RolloController {
 
     private final RolloService rolloService;
+    private final OrdenVentaService ordenService;
 
-    public RolloController(RolloService rolloService) {
+    public RolloController(RolloService rolloService, OrdenVentaService ordenService) {
         this.rolloService = rolloService;
+        this.ordenService = ordenService;
     }
 
     @GetMapping
@@ -113,5 +117,21 @@ public class RolloController {
         log.info("Se simula Anulacion de rollo con ID: {}", id);
         SimulacionAnulacionRolloResponse response = new SimulacionAnulacionRolloResponse(rolloService.simularAnularRollo(id));
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/obtenerUltimoProductoParaOrdenDeVenta/{id}")
+    public ResponseEntity<?> obtenerUltimoProductoParaOrdenDeVentaId(@PathVariable Long id) {
+
+        if (this.ordenService.trabajoFinalizado(id)){
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("ROLLO_PRODUCTO_NO_DISPONIBLE")
+                    .message("El rollo todavía no esta producido")
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+
+        Optional<RolloDto> rollo = rolloService.findLastProductForOrdenDeVentaId(id);
+        return ResponseEntity.ok(rollo);
+
     }
 }

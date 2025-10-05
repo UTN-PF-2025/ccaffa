@@ -146,8 +146,6 @@ public class PlannerController {
         for (RolloDto rolloHijo : rollosHijos){
             Long temporalID = rolloHijo.getId();
             rolloHijo.setId(null);
-            rolloHijo.setAsociadaAOrdenDeTrabajo(false);
-            rolloHijo.setOrdeDeTrabajoAsociadaID(null);
             RolloDto rolloCreado = this.rolloService.save(rolloHijo);
 
             rolloHijo.setId(rolloCreado.getId());
@@ -159,6 +157,14 @@ public class PlannerController {
             ordenesDeTrabajo.stream()
                     .filter(obj -> obj.getRollo().getId().equals(temporalID))
                     .forEach(obj -> obj.getRollo().setId(rolloCreado.getId()));
+
+            ordenesDeTrabajo.stream()
+                    .filter(obj -> obj.getRolloProducto().getId().equals(temporalID))
+                    .forEach(obj -> obj.getRolloProducto().setId(rolloCreado.getId()));
+
+            ordenesDeTrabajo.stream().flatMap(ot -> ot.getOrdenDeTrabajoMaquinas().stream())
+                    .filter(obj -> obj.getRolloAUsar().getId().equals(temporalID))
+                    .forEach(obj -> obj.getRolloAUsar().setId(rolloCreado.getId()));
 
         }
 

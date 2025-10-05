@@ -1,9 +1,13 @@
 package ar.utn.ccaffa.web;
 
+import ar.utn.ccaffa.enums.EstadoOrdenVentaEnum;
 import ar.utn.ccaffa.exceptions.ErrorResponse;
 import ar.utn.ccaffa.model.dto.EspecificacionDto;
 import ar.utn.ccaffa.model.dto.FiltroOrdenVentaDTO;
 import ar.utn.ccaffa.model.dto.OrdenVentaDto;
+import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
+import ar.utn.ccaffa.model.entity.OrdenVenta;
+import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoRepository;
 import ar.utn.ccaffa.services.interfaces.OrdenVentaService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
@@ -14,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/ordenes-venta")
@@ -21,6 +26,7 @@ import java.util.List;
 public class OrdenVentaController {
 
     private final OrdenVentaService ordenVentaService;
+    private final OrdenDeTrabajoRepository ordenDeTrabajoRepository;
 
     @GetMapping
     public ResponseEntity<List<OrdenVentaDto>> obtenerTodasLasOrdenes(FiltroOrdenVentaDTO filtroOrdenVentaDTO) {
@@ -109,8 +115,25 @@ public class OrdenVentaController {
     }
 
     @PostMapping("/finalizar/{id}")
-    public ResponseEntity<Object> finalizar(@PathVariable Long id) throws BadRequestException {
-        this.ordenVentaService.finalizar(id);
+    public ResponseEntity<?> finalizar(@PathVariable Long id) throws BadRequestException {
+        OrdenVentaDto ordenVenta = this.ordenVentaService.findById(id);
+        if (ordenVenta.getEstado() != EstadoOrdenVentaEnum.TRABAJO_FINALIZADO){
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("TRABAJO_NO_TERMINADO")
+                    .message("El trabajo no está terminado")
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+
+        Optional<OrdenDeTrabajo> ordenesDeTrabajo = this.ordenDeTrabajoRepository.findTopByOrdenDeVenta_IdOrderByFechaFinDesc(id);
+        if (ordenesDeTrabajo.isEmpty()){
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("ORDEN_DE_TRABAJO_NO_EXISTE")
+                    .message("No tiene una órden de trabajo asignada")
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+        this.ordenVentaService.finalizar(id, ordenesDeTrabajo.get());
         return ResponseEntity.ok("Orden de Venta finalizada correctamente");
     }
 }

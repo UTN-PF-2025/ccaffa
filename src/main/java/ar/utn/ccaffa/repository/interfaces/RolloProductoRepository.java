@@ -1,4 +1,4 @@
-package ar.utn.ccaffa.repository.interfaces;
+/*package ar.utn.ccaffa.repository.interfaces;
 
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import ar.utn.ccaffa.model.entity.OrdenVenta;
@@ -26,4 +26,4 @@ public interface RolloProductoRepository extends JpaRepository<RolloProducto, Lo
             "LIMIT 1")
     Optional<RolloProducto> findLastByOrdenDeVentaId(@Param("ordenDeVentaId") Long ordenDeVentaId);
 
-}
+}*/

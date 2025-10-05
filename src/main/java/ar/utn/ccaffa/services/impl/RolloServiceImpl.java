@@ -1,8 +1,6 @@
 package ar.utn.ccaffa.services.impl;
 
-import ar.utn.ccaffa.enums.EstadoOrdenTrabajoEnum;
-import ar.utn.ccaffa.enums.EstadoOrdenTrabajoMaquinaEnum;
-import ar.utn.ccaffa.enums.EstadoOrdenVentaEnum;
+import ar.utn.ccaffa.enums.*;
 import ar.utn.ccaffa.exceptions.ResourceNotFoundException;
 import ar.utn.ccaffa.mapper.interfaces.RolloMapper;
 import ar.utn.ccaffa.model.dto.FiltroRolloDto;
@@ -10,7 +8,6 @@ import ar.utn.ccaffa.model.dto.RolloDto;
 import ar.utn.ccaffa.model.entity.Rollo;
 import ar.utn.ccaffa.model.entity.OrdenVenta;
 import ar.utn.ccaffa.model.entity.Especificacion;
-import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoRepository;
 import ar.utn.ccaffa.repository.interfaces.RolloRepository;
 import ar.utn.ccaffa.repository.interfaces.OrdenVentaRepository;
@@ -24,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import ar.utn.ccaffa.model.dto.ModificarRolloRequestDto;
 import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoService;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
@@ -200,8 +199,8 @@ public class RolloServiceImpl implements RolloService {
         Specification<Rollo> spec = Specification.where(null);
         
         spec = spec.and((root, query, cb) -> cb.equal(root.get("estado"), EstadoRollo.DISPONIBLE));
-
         spec = spec.and((root, query, cb) -> cb.equal(root.get("asociadaAOrdenDeTrabajo"), false));
+        spec = spec.and((root, query, cb) -> cb.equal(root.get("tipoRollo"), TipoRollo.MATERIA_PRIMA));
 
         if (especificacion.getTipoMaterial() != null) {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("tipoMaterial"), especificacion.getTipoMaterial()));
@@ -351,5 +350,11 @@ public class RolloServiceImpl implements RolloService {
             }
         }
         return ordenesVentaAAnular;
+    }
+
+    @Override
+    public Optional<RolloDto> findLastProductForOrdenDeVentaId(Long id){
+        Optional<Rollo> rolloProducto = rolloRepository.findLastProductForOrdenDeVentaId(id);
+        return rolloProducto.map(this.rolloMapper::toDto);
     }
 }

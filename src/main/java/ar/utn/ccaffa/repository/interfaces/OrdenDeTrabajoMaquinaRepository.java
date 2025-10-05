@@ -22,7 +22,7 @@ public interface OrdenDeTrabajoMaquinaRepository extends JpaRepository<OrdenDeTr
 
     List<OrdenDeTrabajoMaquina> findByMaquinaId(Long maquinaId);
 
-    @EntityGraph(attributePaths = {"ordenDeTrabajo.rollo"})
+    @EntityGraph(attributePaths = {"maquina", "rolloAUsar"})
     Page<OrdenDeTrabajoMaquina> findByMaquinaIdAndEstadoInOrderByFechaInicioAsc(Long maquinaId, List<EstadoOrdenTrabajoMaquinaEnum> estados, Pageable pageable);
 
     OrdenDeTrabajoMaquina findTopByMaquina_IdAndEstadoOrderByFechaInicioAsc(Long maquinaId, EstadoOrdenTrabajoMaquinaEnum estado);

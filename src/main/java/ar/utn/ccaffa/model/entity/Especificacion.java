@@ -53,5 +53,8 @@ public class Especificacion {
     public float neededLengthOfRoll(Rollo rollo){
         return (float) (this.getCantidad() /(0.008 * this.getAncho() * rollo.getEspesorMM()));
     }
+    public float lenghtOfRoll(){
+        return (float) (this.getCantidad() /(0.008 * this.getAncho() * this.getEspesor()));
+    }
 
 } 
