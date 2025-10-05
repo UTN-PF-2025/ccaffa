@@ -2,18 +2,16 @@ package ar.utn.ccaffa.services.interfaces;
 
 import java.util.List;
 
-import ar.utn.ccaffa.model.dto.AddMedidaRequest;
-import ar.utn.ccaffa.model.dto.ControlDeProcesoDto;
-import ar.utn.ccaffa.model.dto.CreateControlDeCalidadRequest;
-import ar.utn.ccaffa.model.dto.MedidaDeCalidadDto;
+import ar.utn.ccaffa.model.dto.*;
 import ar.utn.ccaffa.model.entity.ControlDeCalidad;
+import ar.utn.ccaffa.model.entity.Rollo;
 
 public interface ControlDeCalidadService {
     ControlDeCalidad createControlDeCalidad(CreateControlDeCalidadRequest request);
 
     ControlDeCalidad addMedida(Long controlDeCalidadId, AddMedidaRequest request);
 
-    ControlDeCalidad finalizarControl(Long id);
+    List<RolloDto> finalizarControl(Long id);
 
     ControlDeProcesoDto getControlDeProceso(Long controlDeCalidadId);
 

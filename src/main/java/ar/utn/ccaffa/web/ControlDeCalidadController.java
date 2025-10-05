@@ -4,6 +4,7 @@ import ar.utn.ccaffa.exceptions.ErrorResponse;
 import ar.utn.ccaffa.model.dto.AddMedidaRequest;
 import ar.utn.ccaffa.model.dto.ControlDeProcesoDto;
 import ar.utn.ccaffa.model.dto.CreateControlDeCalidadRequest;
+import ar.utn.ccaffa.model.dto.RolloDto;
 import ar.utn.ccaffa.model.entity.ControlDeCalidad;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajoMaquina;
 import ar.utn.ccaffa.model.entity.Rollo;
@@ -96,9 +97,9 @@ public class ControlDeCalidadController {
     }
 
     @PutMapping("/{id}/finalizar")
-    public ResponseEntity<ControlDeCalidad> finalizarControl(@PathVariable Long id) {
-        ControlDeCalidad controlDeCalidad = controlDeCalidadService.finalizarControl(id);
-        return ResponseEntity.ok(controlDeCalidad);
+    public ResponseEntity<List<RolloDto>> finalizarControl(@PathVariable Long id) {
+        List<RolloDto> rollosAEtiquetar = controlDeCalidadService.finalizarControl(id);
+        return ResponseEntity.ok(rollosAEtiquetar);
     }
 
     @PutMapping("/{id}/iniciar")

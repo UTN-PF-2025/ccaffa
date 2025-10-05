@@ -152,7 +152,7 @@ public class OrdenDeTrabajo {
     }
 
     private void crearHijoProducto(List<Rollo> rolloHijos){
-        Rollo hijoProducto = crearHijo(this.getRollo().getAnchoMM(), 10f, TipoRollo.PRODUCTO);
+        Rollo hijoProducto = crearHijo(this.getOrdenDeVenta().getEspecificacion().getAncho(), 10f, TipoRollo.PRODUCTO);
         this.setRolloProducto(hijoProducto);
         hijoProducto.setAsociadaAOrdenDeTrabajo(true);
         hijoProducto.setOrdeDeTrabajoAsociadaID(this.getId());

@@ -1,13 +1,11 @@
 package ar.utn.ccaffa.services.impl;
 
 import ar.utn.ccaffa.enums.*;
-import ar.utn.ccaffa.model.dto.CreateControlDeCalidadRequest;
-import ar.utn.ccaffa.model.dto.ProveedorDto;
+import ar.utn.ccaffa.mapper.interfaces.RolloMapper;
+import ar.utn.ccaffa.model.dto.*;
 import ar.utn.ccaffa.model.entity.ControlDeCalidad;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import ar.utn.ccaffa.repository.interfaces.*;
-import ar.utn.ccaffa.model.dto.AddMedidaRequest;
-import ar.utn.ccaffa.model.dto.ControlDeProcesoDto;
 import ar.utn.ccaffa.model.entity.*;
 import ar.utn.ccaffa.services.interfaces.ControlDeCalidadService;
 import ar.utn.ccaffa.services.interfaces.ProveedorService;
@@ -16,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,6 +30,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
     private final OrdenVentaRepository ordenVentaRepository;
     private final OrdenDeTrabajoMaquinaRepository ordenDeTrabajoMaquinaRepository;
     private final RolloRepository rolloRepository;
+    private final RolloMapper rolloMapper;
 
     @Override
     public ControlDeCalidad createControlDeCalidad(CreateControlDeCalidadRequest request) {
@@ -163,7 +163,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
     }
 
     @Override
-    public ControlDeCalidad finalizarControl(Long id) {
+    public List<RolloDto> finalizarControl(Long id) {
 
         ControlDeCalidad control = controlDeCalidadRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Control de Calidad no encontrado con ID: " + id));
@@ -177,6 +177,8 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
         control.setFechaFinalizacion(LocalDateTime.now());
         ordenDeTrabajoMaquina.setFechaFin(LocalDateTime.now());
 
+        List<Rollo> rollosAEtiquetar = new ArrayList<Rollo>();
+
         // Si Termino la primera OTM
         if (ordenDeTrabajo.esPrimeraOTM(ordenDeTrabajoMaquina)) {
             Rollo rolloDeOrdenDeTrabajo = ordenDeTrabajo.getRollo();
@@ -188,6 +190,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
             rolloDeOrdenDeTrabajo.setEstado(EstadoRollo.DIVIDIDO);
             rolloRepository.save(rolloDeOrdenDeTrabajo);
             rolloRepository.saveAll(rollosHijos);
+            rollosAEtiquetar.addAll(rollosHijos);
         }
 
         if (!control.getDefectos().isEmpty() || control.getEstado().equals(EstadoControlDeCalidadEnum.A_CORREGIR)) {
@@ -230,7 +233,8 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
         ordenDeTrabajoMaquinaRepository.save(ordenDeTrabajoMaquina);
         ordenDeTrabajoRepository.save(ordenDeTrabajo);
 
-        return controlDeCalidadRepository.save(control);
+        controlDeCalidadRepository.save(control);
+        return this.rolloMapper.toDtoListOnlyWithRolloPadreID(rollosAEtiquetar);
     }
 
     public void actualizarRolloProducto(ControlDeCalidad controlDeCalidad, OrdenDeTrabajo ordenDeTrabajo, Rollo rolloProducto){
