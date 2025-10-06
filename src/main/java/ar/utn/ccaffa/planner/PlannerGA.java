@@ -533,6 +533,10 @@ public class PlannerGA {
                 long minutosDeProcesamiento = machine1.minutosParaProcesarEspecifiacion(sale.getEspecificacion(),usingRoll);
                 possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
 
+                if (possibleStart.getHour() <= this.horaDeInicioLaboral){
+                    possibleStart = possibleStart.withHour(this.horaDeInicioLaboral).withMinute(0).withSecond(0);
+                }
+
                 if (possibleEnd.getHour() >= this.horaDeFinLaboral){
                     possibleStart = possibleStart.plusDays(1).withHour(this.horaDeInicioLaboral).withMinute(0).withSecond(0);
                     possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
@@ -599,6 +603,10 @@ public class PlannerGA {
 
                 long minutosDeProcesamiento = machine2.minutosParaProcesarEspecifiacion(sale.getEspecificacion(),usingRoll);
                 possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
+
+                if (possibleStart.getHour() <= this.horaDeInicioLaboral){
+                    possibleStart = possibleStart.withHour(this.horaDeInicioLaboral).withMinute(0).withSecond(0);
+                }
 
                 if (possibleEnd.getHour() >= this.horaDeFinLaboral){
                     possibleStart = possibleStart.plusDays(1).withHour(this.horaDeInicioLaboral).withMinute(0).withSecond(0);
