@@ -1,10 +1,7 @@
 package ar.utn.ccaffa.web;
 
 import ar.utn.ccaffa.exceptions.ErrorResponse;
-import ar.utn.ccaffa.model.dto.AddMedidaRequest;
-import ar.utn.ccaffa.model.dto.ControlDeProcesoDto;
-import ar.utn.ccaffa.model.dto.CreateControlDeCalidadRequest;
-import ar.utn.ccaffa.model.dto.RolloDto;
+import ar.utn.ccaffa.model.dto.*;
 import ar.utn.ccaffa.model.entity.ControlDeCalidad;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajoMaquina;
 import ar.utn.ccaffa.model.entity.Rollo;
@@ -85,8 +82,8 @@ public class ControlDeCalidadController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<ControlDeCalidad>> getAllControlesCalidad() {
-        List<ControlDeCalidad> controlesCalidad = controlDeCalidadService.getAllControlesCalidad();
+    public ResponseEntity<List<ControlDeCalidad>> getAllControlesCalidad(FiltroControlDeCalidad filtros) {
+        List<ControlDeCalidad> controlesCalidad = controlDeCalidadService.filtrarControlesCalidad(filtros);
         return ResponseEntity.ok(controlesCalidad);
     }
 

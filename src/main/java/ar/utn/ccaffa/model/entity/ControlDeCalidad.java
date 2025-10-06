@@ -47,13 +47,13 @@ public class ControlDeCalidad {
     @Column(name = "estado")
     private EstadoControlDeCalidadEnum estado;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @BatchSize(size = 32)
     @JoinColumn(name = "control_de_calidad_id")
     @JsonManagedReference("control-medida")
     private List<MedidaDeCalidad> medidasDeCalidad;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "certificado_de_calidad_id")
     private CertificadoDeCalidad certificadoDeCalidad;
 

@@ -4,7 +4,6 @@ import java.util.List;
 
 import ar.utn.ccaffa.model.dto.*;
 import ar.utn.ccaffa.model.entity.ControlDeCalidad;
-import ar.utn.ccaffa.model.entity.Rollo;
 
 public interface ControlDeCalidadService {
     ControlDeCalidad createControlDeCalidad(CreateControlDeCalidadRequest request);
@@ -18,6 +17,8 @@ public interface ControlDeCalidadService {
    // ControlDeProcesoDto getControlDeProcesoByOrdenTrabajo(Long ordenTrabajoId);
 
     List<ControlDeCalidad> getAllControlesCalidad();
+
+    List<ControlDeCalidad> filtrarControlesCalidad(FiltroControlDeCalidad filtros);
 
     ControlDeCalidad getControlDeCalidadById(Long id);
 

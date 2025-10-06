@@ -10,6 +10,7 @@ import ar.utn.ccaffa.model.entity.*;
 import ar.utn.ccaffa.services.interfaces.ControlDeCalidadService;
 import ar.utn.ccaffa.services.interfaces.ProveedorService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -154,6 +155,25 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
     public List<ControlDeCalidad> getAllControlesCalidad() {
         // Evita N+1 cargando usuario, medidas y defectos en menos consultas (override con @EntityGraph)
         return controlDeCalidadRepository.findAll();
+    }
+
+    @Override
+    public List<ControlDeCalidad> filtrarControlesCalidad(FiltroControlDeCalidad filtros) {
+        Specification<ControlDeCalidad> spec = Specification.where(null);
+
+        if (filtros.getUsuarioId()!= null) {
+                spec = spec.and((root, query, cb) -> cb.equal(root.get("usuario").get("id"), filtros.getUsuarioId()));
+        }
+
+        if (filtros.getEstados() != null) {
+            spec = spec.and((root, query, cb) -> cb.in(root.get("estado")).value(filtros.getEstados()));
+        }
+
+        if (filtros.getOrdenDeTrabajoMaquinaId() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("ordenDeTrabajoMaquinaId"), filtros.getOrdenDeTrabajoMaquinaId()));
+        }
+
+        return controlDeCalidadRepository.findAll(spec);
     }
 
     @Override
