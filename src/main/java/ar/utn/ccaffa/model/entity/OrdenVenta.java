@@ -8,9 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.EqualsAndHashCode;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -50,8 +48,8 @@ public class OrdenVenta {
     @Column(name = "observaciones")
     private String observaciones;
 
-    @Column(name = "razon_replanifiaciom")
-    private String razonReplanifiaciom;
+    @Column(name = "razon_replanifiacion")
+    private String razonReplanifiacion;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "especificacion_id")

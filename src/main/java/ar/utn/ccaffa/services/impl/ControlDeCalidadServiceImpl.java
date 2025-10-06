@@ -223,7 +223,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
             ordenDeTrabajo.getOrdenDeTrabajoMaquinas().forEach(otm -> { if(otm != ordenDeTrabajoMaquina) otm.anular();});
 
             ordenVenta.setEstado(EstadoOrdenVentaEnum.REPLANIFICAR);
-            ordenVenta.setRazonReplanifiaciom("El rollo producido no cumple con los estandares de calidad. Está defectuoso");
+            ordenVenta.setRazonReplanifiacion("El rollo producido no cumple con los estandares de calidad. Está defectuoso");
 
             Rollo rolloProducto = ordenDeTrabajo.getRolloProducto();
             rolloProducto.setEstado(EstadoRollo.DEFECTUOSO);

@@ -22,7 +22,7 @@ public class OrdenVentaDto {
     private LocalDateTime fechaEntregaEstimada;
     private EstadoOrdenVentaEnum estado;
     private String observaciones;
-    private String razonReplanifiaciom;
+    private String razonReplanifiacion;
     private ClienteDto cliente;
     private EspecificacionDto especificacion;
 }

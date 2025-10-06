@@ -132,7 +132,7 @@ public class OrdenDeTrabajoServiceImpl implements OrdenDeTrabajoService {
         // 4. Replanificar todas las órdenes de venta afectadas
         afectados.getOrdenesVentaAReplanificar().forEach(ordenVenta -> {
             ordenVenta.setEstado(EstadoOrdenVentaEnum.REPLANIFICAR);
-            ordenVenta.setRazonReplanifiaciom("Se canceló la órden de trabajo asociada");
+            ordenVenta.setRazonReplanifiacion("Se canceló la órden de trabajo asociada");
             this.ordenVentaRepository.save(ordenVenta);
         });
 
