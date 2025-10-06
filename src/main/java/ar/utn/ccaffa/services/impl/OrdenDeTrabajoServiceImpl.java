@@ -310,41 +310,42 @@ public class OrdenDeTrabajoServiceImpl implements OrdenDeTrabajoService {
     public List<OrdenDeTrabajo> filtrarOrdenes(FiltroOrdenDeTrabajoDto filtros) {
         Specification<OrdenDeTrabajo> spec = Specification.where(null);
 
-        if (filtros.getRolloId() != null) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("rolloId"), filtros.getRolloId()));
+        if (filtros.getId() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("id"), filtros.getId()));
         }
 
-        if (filtros.getMaquinaId() != null) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("maquinaId"), filtros.getMaquinaId()));
+        if (filtros.getRolloId() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("rollo").get("id"), filtros.getRolloId()));
+        }
+
+        if (filtros.getRolloProductoId() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("rolloProducto").get("id"), filtros.getRolloProductoId()));
         }
 
         if (filtros.getOrdenDeVentaId() != null) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("ordenDeVentaId"), filtros.getOrdenDeVentaId()));
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("ordenDeVenta").get("id"), filtros.getOrdenDeVentaId()));
         }
 
-        if (filtros.getEstado() != null) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("estado"), filtros.getEstado()));
+        if (filtros.getEstados() != null) {
+            spec = spec.and((root, query, cb) -> cb.in(root.get("estado")).value(filtros.getEstados()));
         }
 
-        if (filtros.getFechaIngresoDesde() != null) {
-            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("fechaIngreso"), filtros.getFechaIngresoDesde()));
+        if (filtros.getFechaInicioDesde() != null) {
+            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("fechaInicio"), filtros.getFechaInicioDesde()));
         }
 
-        if (filtros.getFechaIngresoHasta() != null) {
-            spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("fechaIngreso"), filtros.getFechaIngresoHasta()));
+        if (filtros.getFechaInicioHasta() != null) {
+            spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("fechaInicio"), filtros.getFechaInicioHasta()));
         }
 
         if (filtros.getFechaFinalizacionDesde() != null) {
-            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("fechaFinalizacion"), filtros.getFechaFinalizacionDesde()));
+            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("fechaFin"), filtros.getFechaFinalizacionDesde()));
         }
 
         if (filtros.getFechaFinalizacionHasta() != null) {
-            spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("fechaFinalizacion"), filtros.getFechaFinalizacionHasta()));
+            spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("fechaFin"), filtros.getFechaFinalizacionHasta()));
         }
 
-        if (filtros.getMaquinaTipo() != null) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("maquinaTipo"), filtros.getMaquinaTipo()));
-        }
 
         return repository.findAll(spec);
     }
