@@ -17,7 +17,7 @@ public interface RolloRepository extends JpaRepository<Rollo, Long>, JpaSpecific
     List<Rollo> findByIdIn(List<Long> ids);
     boolean existsRolloByProveedorIdAndCodigoProveedor(Long proovedorId, String codigoProveedor);
 
-    @Query("SELECT rp FROM Rollo rp JOIN OrdenDeTrabajo  ot ON ot.id = rp.ordeDeTrabajoAsociadaID JOIN OrdenVenta ov ON ov.id = ot.ordenDeVenta.id WHERE ov.id = :ordenDeVentaId AND rp.tipoRollo = 'PRODUCTO' ORDER BY rp.id DESC LIMIT 1")
+    @Query("SELECT rp FROM Rollo rp LEFT JOIN OrdenDeTrabajo  ot ON ot.id = rp.ordeDeTrabajoAsociadaID  WHERE ot.ordenDeVenta.id = :ordenDeVentaId AND rp.tipoRollo = 'PRODUCTO' ORDER BY rp.id DESC LIMIT 1")
     Optional<Rollo> findLastProductForOrdenDeVentaId(@Param("ordenDeVentaId") Long ordenDeVentaId);
 
 }

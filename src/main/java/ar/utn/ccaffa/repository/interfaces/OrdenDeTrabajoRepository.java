@@ -28,11 +28,11 @@ public interface OrdenDeTrabajoRepository extends JpaRepository<OrdenDeTrabajo, 
     Optional<OrdenDeTrabajo> findByIdFetchRollo(@Param("id") Long id);
 
     @Override
-    @EntityGraph(attributePaths = {"ordenDeTrabajoMaquinas.maquina", "rollo", "ordenDeVenta.especificacion", "ordenDeVenta.cliente"})
+    @EntityGraph(attributePaths = {"ordenDeTrabajoMaquinas.maquina", "rollo", "rolloProducto", "ordenDeVenta.especificacion", "ordenDeVenta.cliente"})
     Optional<OrdenDeTrabajo> findById(Long id);
 
     @Override
-    @EntityGraph(attributePaths = {"ordenDeTrabajoMaquinas.maquina", "rollo", "ordenDeVenta.especificacion", "ordenDeVenta.cliente"})
+    @EntityGraph(attributePaths = {"ordenDeTrabajoMaquinas.maquina", "rollo", "rolloProducto", "ordenDeVenta.especificacion", "ordenDeVenta.cliente"})
     List<OrdenDeTrabajo> findAll();
 
 }
