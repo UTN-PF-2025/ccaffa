@@ -1,0 +1,1620 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+class AddMedidaRequest {
+  + equals(Object): boolean
+  # canEqual(Object): boolean
+  + hashCode(): int
+  + toString(): String
+   anchoMedido: Float
+   espesorMedido: Float
+   rebabaMedido: Float
+}
+class AnalysisResponse {
+  # canEqual(Object): boolean
+  + hashCode(): int
+  + toString(): String
+  + equals(Object): boolean
+   defect: boolean
+   details: String
+   id: Long
+   imageId: String
+   cameraId: String
+}
+interface AnalysisService << interface >> {
+  + analyzeAndNotifyMock(MultipartFile): void
+  + analyzeAndNotify(MultipartFile, String, String): void
+  + processAnalysis(byte[], String, String, String, String): void
+}
+class AnalysisServiceImpl {
+  + analyzeAndNotify(MultipartFile, String, String): void
+  + analyzeAndNotifyMock(MultipartFile): void
+  + processAnalysis(byte[], String, String, String, String): void
+}
+class AuthController {
+  + login(LoginRequest): ResponseEntity<LoginResponseDto>
+}
+class Bloque {
+  + toString(): String
+  # canEqual(Object): boolean
+  + equals(Object): boolean
+  + hashCode(): int
+   ancho: Float
+   x: Float
+   largo: Float
+   y: Float
+}
+class CamaraController {
+  + uploadImage(String, MultipartFile, String, String): ResponseEntity<String>
+}
+class CancelacionSimulacionDto {
+  # canEqual(Object): boolean
+  + builder(): CancelacionSimulacionDtoBuilder
+  + equals(Object): boolean
+  + hashCode(): int
+  + toString(): String
+   ordenesTrabajoACancelar: List<OrdenDeTrabajoResponseDto>
+   rollosACancelar: List<RolloDto>
+   ordenesVentaAReplanificar: List<OrdenVentaSimpleDto>
+}
+class CcaffaApplication {
+  + main(String[]): void
+}
+interface CertificadoCalidadService << interface >> {
+  + generarCertificado(CertificadoRequestDTO): void
+  + findById(Long): CertificadoDeCalidadDto
+  + obtenerPdf(Long): byte[]
+}
+class CertificadoCalidadServiceImpl {
+  + findById(Long): CertificadoDeCalidadDto
+  - agregarEncabezado(ControlDeProcesoDto, LocalDate, OrdenDeTrabajo): void
+  - agregarSeccionSolicitado(CertificadoRequestDTO, OrdenVentaDto): void
+  - miniTabla(): PdfPTable
+  - definirTitulo(int, String): void
+  + generarCertificado(CertificadoRequestDTO): void
+  - agregarSeccionControlado(CertificadoRequestDTO, ControlDeProcesoDto): void
+  - nuevaPhrase(String): PdfPCell
+  - construirNumeroCertificado(CertificadoRequestDTO): String
+  - inicializarDocumento(String): void
+  - guardarCertificado(CertificadoRequestDTO, LocalDate, ControlDeProcesoDto, String): void
+  - crearTablaDatosSolicitados(CertificadoRequestDTO, OrdenVentaDto): PdfPTable
+  - agregarSeccionPartidas(CertificadoRequestDTO): void
+  + obtenerPdf(Long): byte[]
+  - armarTablaComposicion(CertificadoRequestDTO): void
+  - construirNombreArchivo(ControlDeProcesoDto, OrdenDeTrabajo): String
+  - cerrarDocumento(): void
+  - agregarDatoComposicion(PdfPTable, CertificadoRequestDTO): void
+  - crearSubTabla(String, String, String, String): PdfPTable
+  - agregarEspacio(): void
+  - agregarCampo(ElementListener, int, String): void
+  - crearTablaPartidas(CertificadoRequestDTO): PdfPTable
+  - crearTablaDatosControlados(CertificadoRequestDTO, ControlDeProcesoDto): PdfPTable
+  - agregarSeccionCalidad(): void
+  - agregarHeaderComposicion(PdfPTable): void
+}
+class CertificadoController {
+  + generar(CertificadoRequestDTO): ResponseEntity<String>
+  + getCertificado(Long): ResponseEntity<CertificadoDeCalidadDto>
+  + obtenerPDF(Long): ResponseEntity<byte[]>
+}
+class CertificadoDeCalidad {
+  + toString(): String
+  + equals(Object): boolean
+  + builder(): CertificadoDeCalidadBuilder
+  # canEqual(Object): boolean
+  + hashCode(): int
+   aprobadorId: Long
+   fechaDeEmision: LocalDate
+   controlDeCalidad: ControlDeCalidad
+   id: Long
+   nombreArchivo: String
+   numeroDeCertificado: String
+}
+class CertificadoDeCalidadDto {
+  + toString(): String
+  + equals(Object): boolean
+  # canEqual(Object): boolean
+  + hashCode(): int
+  + builder(): CertificadoDeCalidadDtoBuilder
+   aprobador: EmpleadoDto
+   fechaDeEmision: LocalDate
+   id: Long
+   nombreArchivo: String
+   controlDeCalidadId: Long
+   numeroDeCertificado: String
+}
+interface CertificadoDeCalidadMapper << interface >> {
+  + toDto(Optional<CertificadoDeCalidad>): CertificadoDeCalidadDto
+  + toEntity(CertificadoDeCalidadDto): CertificadoDeCalidad
+}
+class CertificadoDeCalidadMapperImpl {
+  + toEntity(CertificadoDeCalidadDto): CertificadoDeCalidad
+  + toDto(Optional<CertificadoDeCalidad>): CertificadoDeCalidadDto
+}
+interface CertificadoDeCalidadRepository << interface >>
+class CertificadoRequestDTO {
+  + equals(Object): boolean
+  # canEqual(Object): boolean
+  + toString(): String
+  + hashCode(): int
+   errorDurezaOriginal: String
+   partida1: String
+   durezaOriginal: String
+   partida2: String
+   partida3: String
+   partida4: String
+   cantidadOriginal: String
+   controlDeCalidadId: Long
+}
+class Cliente {
+  # canEqual(Object): boolean
+  + toString(): String
+  + hashCode(): int
+  + builder(): ClienteBuilder
+  + equals(Object): boolean
+   name: String
+   active: boolean
+   id: Long
+   email: String
+}
+class ClienteController {
+  + createCliente(ClienteDto): ResponseEntity<Cliente>
+  + deleteCliente(Long): ResponseEntity<Void>
+  + updateCliente(Long, ClienteDto): ResponseEntity<Cliente>
+  + getClienteById(Long): ResponseEntity<ClienteDto>
+   allClientes: ResponseEntity<List<ClienteDto>>
+}
+class ClienteDto {
+  + hashCode(): int
+  # canEqual(Object): boolean
+  + equals(Object): boolean
+  + toString(): String
+  + builder(): ClienteDtoBuilder
+   name: String
+   active: boolean
+   id: Long
+   email: String
+}
+interface ClienteMapper << interface >> {
+  + toEntityList(List<ClienteDto>): List<Cliente>
+  + toEntity(ClienteDto): Cliente
+  + toDtoList(List<Cliente>): List<ClienteDto>
+  + toDto(Cliente): ClienteDto
+}
+class ClienteMapperImpl {
+  + toDto(Cliente): ClienteDto
+  + toDtoList(List<Cliente>): List<ClienteDto>
+  + toEntityList(List<ClienteDto>): List<Cliente>
+  + toEntity(ClienteDto): Cliente
+}
+interface ClienteRepository << interface >>
+interface ClienteService << interface >> {
+  + findAll(): List<ClienteDto>
+  + deleteById(Long): void
+  + findById(Long): ClienteDto
+  + save(ClienteDto): Cliente
+}
+class ClienteServiceImpl {
+  + findAll(): List<ClienteDto>
+  + deleteById(Long): void
+  + findById(Long): ClienteDto
+  + save(ClienteDto): Cliente
+}
+class ControlDeCalidad {
+  + builder(): ControlDeCalidadBuilder
+  + toString(): String
+  + equals(Object): boolean
+  + hashCode(): int
+  # canEqual(Object): boolean
+   fechaControl: LocalDateTime
+   espesorMedio: Float
+   id: Long
+   ordenDeTrabajoMaquinaId: Long
+   medidasDeCalidad: List<MedidaDeCalidad>
+   usuario: Usuario
+   estado: EstadoControlDeCalidadEnum
+   rebabaMedio: Float
+   anchoMedio: Float
+   fechaFinalizacion: LocalDateTime
+   defectos: List<Defecto>
+   certificadoDeCalidad: CertificadoDeCalidad
+}
+class ControlDeCalidadController {
+  + addMedida(Long, AddMedidaRequest): ResponseEntity<ControlDeCalidad>
+  + getAllControlesCalidad(FiltroControlDeCalidad): ResponseEntity<List<ControlDeCalidad>>
+  + createControlDeCalidad(CreateControlDeCalidadRequest): ResponseEntity<?>
+  + finalizarControl(Long): ResponseEntity<List<RolloDto>>
+  + iniciarControl(Long): ResponseEntity<ControlDeCalidad>
+  + marcarComoACorregir(Long): ResponseEntity<ControlDeCalidad>
+  + getControlDeCalidadById(Long): ResponseEntity<ControlDeCalidad>
+  + getControlDeProceso(Long): ResponseEntity<ControlDeProcesoDto>
+}
+class ControlDeCalidadDto {
+  + equals(Object): boolean
+  # canEqual(Object): boolean
+  + toString(): String
+  + hashCode(): int
+  + builder(): ControlDeCalidadDtoBuilder
+   empleado: EmpleadoDto
+   espesorMedio: Float
+   id: Long
+   ordenDeTrabajoMaquinaId: Long
+   medidasDeCalidad: List<MedidaDeCalidadDto>
+   estado: EstadoControlDeCalidadEnum
+   rebabaMedio: Float
+   certificadoDeCalidad: CertificadoDeCalidadDto
+   anchoMedio: Float
+   fechaControl: LocalDate
+}
+interface ControlDeCalidadRepository << interface >> {
+  + findByIdWithMedidas(Long): Optional<ControlDeCalidad>
+  + findAll(Specification<ControlDeCalidad>): List<ControlDeCalidad>
+  + findByOrdenDeTrabajoMaquinaId(Long): ControlDeCalidad
+}
+class ControlDeCalidadRequestDto {
+  + equals(Object): boolean
+  # canEqual(Object): boolean
+  + hashCode(): int
+  + toString(): String
+  + builder(): ControlDeCalidadRequestDtoBuilder
+   medidas: List<MedidaDeCalidadDto>
+   ordenTrabajoMaquinaId: Long
+}
+interface ControlDeCalidadService << interface >> {
+  + createControlDeCalidad(CreateControlDeCalidadRequest): ControlDeCalidad
+  + getControlDeProceso(Long): ControlDeProcesoDto
+  + filtrarControlesCalidad(FiltroControlDeCalidad): List<ControlDeCalidad>
+  + addMedida(Long, AddMedidaRequest): ControlDeCalidad
+  + getControlDeCalidadById(Long): ControlDeCalidad
+  + iniciarControl(Long): ControlDeCalidad
+  + marcarComoACorregir(Long): ControlDeCalidad
+  + finalizarControl(Long): List<RolloDto>
+   allControlesCalidad: List<ControlDeCalidad>
+}
+class ControlDeCalidadServiceImpl {
+  + finalizarControl(Long): List<RolloDto>
+  + filtrarControlesCalidad(FiltroControlDeCalidad): List<ControlDeCalidad>
+  + getControlDeProceso(Long): ControlDeProcesoDto
+  + marcarComoACorregir(Long): ControlDeCalidad
+  + actualizarRolloProducto(ControlDeCalidad, OrdenDeTrabajo, Rollo): void
+  - createControlDeProcesoDto(OrdenDeTrabajoMaquina, ControlDeCalidad): ControlDeProcesoDto
+  + addMedida(Long, AddMedidaRequest): ControlDeCalidad
+  + createControlDeCalidad(CreateControlDeCalidadRequest): ControlDeCalidad
+  + getControlDeCalidadById(Long): ControlDeCalidad
+  + iniciarControl(Long): ControlDeCalidad
+  - getNewControlDeCalidad(Usuario, Long): ControlDeCalidad
+   allControlesCalidad: List<ControlDeCalidad>
+}
+class ControlDeProcesoDto {
+  + equals(Object): boolean
+  + toString(): String
+  + builder(): ControlDeProcesoDtoBuilder
+  # canEqual(Object): boolean
+  + hashCode(): int
+   espesorDeseado: Float
+   nombreProveedor: String
+   anchoOriginal: Float
+   nombreMaquina: String
+   idOperario: Long
+   idControl: Long
+   espesorOriginal: Float
+   idMaquina: Long
+   nombreCliente: String
+   rebabaMedio: Float
+   codigoProveedor: String
+   toleranciaAncho: Float
+   pesoDeseado: Float
+   tipoMaquina: String
+   pesoOriginal: Float
+   fechaFin: LocalDateTime
+   pesoMaximo: Float
+   idCliente: Long
+   espesorMedio: Float
+   fechaInicio: LocalDateTime
+   idProveedor: Long
+   estado: EstadoControlDeCalidadEnum
+   anchoMedio: Float
+   medidas: List<MedidaDeCalidad>
+   toleranciaEspesor: Float
+   tipoMaterial: String
+   nombreOperario: String
+   anchoDeseado: Float
+   idRolloAUsar: Long
+   defectos: List<Defecto>
+   idOrden: Long
+}
+class CreateControlDeCalidadRequest {
+  + equals(Object): boolean
+  # canEqual(Object): boolean
+  + hashCode(): int
+  + toString(): String
+   empleadoId: Long
+   ordenDeTrabajoMaquinaId: Long
+}
+class CustomUserDetailsService {
+  + loadUserByUsername(String): UserDetails
+}
+class Defecto {
+  # canEqual(Object): boolean
+  + hashCode(): int
+  + builder(): DefectoBuilder
+  + equals(Object): boolean
+  + toString(): String
+   descripcion: String
+   tipo: String
+   id: Long
+   esRechazado: Boolean
+   fecha: LocalDate
+   controlDeCalidad: ControlDeCalidad
+   imagen: String
+}
+class DefectoController {
+  + aceptarDefecto(String, String): ResponseEntity<DefectoDto>
+  + getDefectoById(Long): ResponseEntity<DefectoDto>
+  + rechazarDefecto(String, String): ResponseEntity<DefectoDto>
+  + serveFile(String): ResponseEntity<Resource>
+}
+class DefectoDto {
+  + equals(Object): boolean
+  + toString(): String
+  + hashCode(): int
+  # canEqual(Object): boolean
+   descripcion: String
+   tipo: String
+   id: Long
+   esRechazado: Boolean
+   fecha: LocalDate
+   controlDeCalidadId: Long
+   imagen: String
+}
+interface DefectoRepository << interface >> {
+  + findByImagen(String): Optional<Defecto>
+}
+interface DefectoService << interface >> {
+  + actualizarEstadoRechazo(Long, boolean): DefectoDto
+  + findById(Long): DefectoDto
+  + actualizarEstadoRechazoPorImagen(String, boolean, String): DefectoDto
+}
+class DefectoServiceImpl {
+  + actualizarEstadoRechazo(Long, boolean): DefectoDto
+  + findById(Long): DefectoDto
+  + actualizarEstadoRechazoPorImagen(String, boolean, String): DefectoDto
+  - toDto(Defecto): DefectoDto
+}
+class EmpleadoDto {
+  + hashCode(): int
+  + equals(Object): boolean
+  # canEqual(Object): boolean
+  + toString(): String
+  + builder(): EmpleadoDtoBuilder
+   id: Long
+   nombre: String
+}
+class ErrorResponse {
+  + toString(): String
+  # canEqual(Object): boolean
+  + equals(Object): boolean
+  + hashCode(): int
+  + builder(): ErrorResponseBuilder
+   message: String
+   status: String
+   path: String
+}
+class Especificacion {
+  # canEqual(Object): boolean
+  + equals(Object): boolean
+  + toString(): String
+  + neededLengthOfRoll(Rollo): float
+  + builder(): EspecificacionBuilder
+  + hashCode(): int
+  + lenghtOfRoll(): float
+   ancho: Float
+   tipoMaterial: TipoMaterial
+   pesoMaximoPorRollo: Float
+   toleranciaEspesor: Float
+   id: Long
+   cantidad: Float
+   diametroInterno: Float
+   toleranciaAncho: Float
+   espesor: Float
+   tipoDeEmbalaje: String
+   diametroExterno: Float
+}
+class EspecificacionDto {
+  + toString(): String
+  + builder(): EspecificacionDtoBuilder
+  # canEqual(Object): boolean
+  + hashCode(): int
+  + equals(Object): boolean
+   ancho: Float
+   tipoMaterial: TipoMaterial
+   pesoMaximoPorRollo: Float
+   toleranciaEspesor: Float
+   id: Long
+   cantidad: Float
+   diametroInterno: Float
+   ordenVentaId: Long
+   toleranciaAncho: Float
+   espesor: Float
+   tipoDeEmbalaje: String
+   diametroExterno: Float
+}
+interface EspecificacionMapper << interface >> {
+  + toDtoList(List<Especificacion>): List<EspecificacionDto>
+  + toEntity(EspecificacionDto): Especificacion
+  + toDto(Especificacion): EspecificacionDto
+  + toEntityList(List<EspecificacionDto>): List<Especificacion>
+}
+class EspecificacionMapperImpl {
+  + toDtoList(List<Especificacion>): List<EspecificacionDto>
+  + toEntityList(List<EspecificacionDto>): List<Especificacion>
+  + toDto(Especificacion): EspecificacionDto
+  + toEntity(EspecificacionDto): Especificacion
+}
+enum EstadoControlDeCalidadEnum << enumeration >> {
+  + values(): EstadoControlDeCalidadEnum[]
+  + valueOf(String): EstadoControlDeCalidadEnum
+}
+enum EstadoOrdenTrabajoEnum << enumeration >> {
+  + is(EstadoOrdenTrabajoEnum, EstadoOrdenTrabajoEnum): boolean
+  + in(EstadoOrdenTrabajoEnum, EstadoOrdenTrabajoEnum[]): boolean
+  + valueOf(String): EstadoOrdenTrabajoEnum
+  + values(): EstadoOrdenTrabajoEnum[]
+}
+enum EstadoOrdenTrabajoMaquinaEnum << enumeration >> {
+  + values(): EstadoOrdenTrabajoMaquinaEnum[]
+  + valueOf(String): EstadoOrdenTrabajoMaquinaEnum
+}
+enum EstadoOrdenVentaEnum << enumeration >> {
+  + is(EstadoOrdenVentaEnum, EstadoOrdenVentaEnum): boolean
+  + valueOf(String): EstadoOrdenVentaEnum
+  + values(): EstadoOrdenVentaEnum[]
+}
+enum EstadoRollo << enumeration >> {
+  + values(): EstadoRollo[]
+  + valueOf(String): EstadoRollo
+}
+enum EstadoRolloProducto << enumeration >> {
+  + values(): EstadoRolloProducto[]
+  + valueOf(String): EstadoRolloProducto
+}
+interface FileStorageService << interface >> {
+  + save(byte[], String): String
+  + save(byte[], String, String): String
+  + loadAsResource(String): Resource
+}
+class FileStorageServiceImpl {
+  + save(byte[], String): String
+  + save(byte[], String, String): String
+  + init(): void
+  + loadAsResource(String): Resource
+}
+class FiltroControlDeCalidad {
+  + toString(): String
+  + equals(Object): boolean
+  # canEqual(Object): boolean
+  + hashCode(): int
+   ordenDeTrabajoMaquinaId: Long
+   estados: List<EstadoControlDeCalidadEnum>
+   usuarioId: Long
+}
+class FiltroOrdenDeTrabajoDto {
+  + equals(Object): boolean
+  + hashCode(): int
+  # canEqual(Object): boolean
+  + toString(): String
+   rolloId: Long
+   id: Long
+   ordenDeVentaId: Long
+   fechaInicioHasta: LocalDateTime
+   rolloProductoId: Long
+   fechaFinalizacionDesde: LocalDateTime
+   fechaFinalizacionHasta: LocalDateTime
+   fechaInicioDesde: LocalDateTime
+   estados: List<EstadoOrdenTrabajoEnum>
+}
+class FiltroOrdenVentaDTO {
+  + equals(Object): boolean
+  + hashCode(): int
+  # canEqual(Object): boolean
+  + toString(): String
+  + builder(): FiltroOrdenVentaDTOBuilder
+   fechaFin: LocalDateTime
+   fechaInicio: LocalDateTime
+   clienteId: Long
+   orderId: Long
+   estado: EstadoOrdenVentaEnum
+   observaciones: String
+   fechaCreacion: LocalDateTime
+   estados: List<EstadoOrdenVentaEnum>
+}
+class FiltroRolloDto {
+  + equals(Object): boolean
+  + builder(): FiltroRolloDtoBuilder
+  + toString(): String
+  # canEqual(Object): boolean
+  + hashCode(): int
+   tipoMaterial: TipoMaterial
+   espesorMax: Float
+   asociadaAOrdenDeTrabajo: Boolean
+   anchoMax: Float
+   pesoMax: Float
+   estados: List<EstadoRollo>
+   estado: EstadoRollo
+   espesorMin: Float
+   fechaIngresoDesde: LocalDateTime
+   rolloPadreId: Long
+   tipoRollo: TipoRollo
+   anchoMin: Float
+   proveedorId: Long
+   codigoProveedor: String
+   fechaIngresoHasta: LocalDateTime
+   pesoMin: Float
+}
+class FiltroRolloProductoDto {
+  + hashCode(): int
+  # canEqual(Object): boolean
+  + toString(): String
+  + equals(Object): boolean
+  + builder(): FiltroRolloProductoDtoBuilder
+   tipoMaterial: TipoMaterial
+   ordenDeTrabajoId: Long
+   espesorMin: Float
+   fechaIngresoDesde: LocalDateTime
+   espesorMax: Float
+   rolloPadreId: Long
+   anchoMin: Float
+   estado: EstadoRolloProducto
+   anchoMax: Float
+   pesoMax: Float
+   fechaIngresoHasta: LocalDateTime
+   pesoMin: Float
+}
+class GlobalExceptionHandler {
+  + handleProductoNotFound(ResourceNotFoundException): ResponseEntity<ErrorResponse>
+  + handleProductoNotFound(UnprocessableContentException): ResponseEntity<ErrorResponse>
+}
+class ImageClassifierGrpc {
+  + newStub(Channel): ImageClassifierStub
+  + newFutureStub(Channel): ImageClassifierFutureStub
+  + newBlockingStub(Channel): ImageClassifierBlockingStub
+  + bindService(AsyncService): ServerServiceDefinition
+   classifyImageMethod: MethodDescriptor<ImageRequest, ImageResponses>
+   serviceDescriptor: ServiceDescriptor
+}
+class ImageClassifierOuterClass {
+  + registerAllExtensions(ExtensionRegistry): void
+  + registerAllExtensions(ExtensionRegistryLite): void
+   descriptor: FileDescriptor
+}
+class ImageController {
+  + serveFile(String, String, HttpServletRequest): ResponseEntity<Resource>
+}
+class ImageRequest {
+  + newBuilderForType(): Builder
+  # newInstance(UnusedPrivateParameter): Object
+  + equals(Object): boolean
+  + hashCode(): int
+  + parseFrom(ByteBuffer, ExtensionRegistryLite): ImageRequest
+  + parseFrom(ByteString): ImageRequest
+  + toBuilder(): Builder
+  + parseFrom(byte[]): ImageRequest
+  + parseDelimitedFrom(InputStream, ExtensionRegistryLite): ImageRequest
+  + parseFrom(InputStream, ExtensionRegistryLite): ImageRequest
+  + parseFrom(byte[], ExtensionRegistryLite): ImageRequest
+  + parseFrom(ByteBuffer): ImageRequest
+  + parseFrom(CodedInputStream, ExtensionRegistryLite): ImageRequest
+  + parseFrom(ByteString, ExtensionRegistryLite): ImageRequest
+  # newBuilderForType(BuilderParent): Builder
+  # internalGetFieldAccessorTable(): FieldAccessorTable
+  + parser(): Parser<ImageRequest>
+  + writeTo(CodedOutputStream): void
+  + parseFrom(InputStream): ImageRequest
+  + newBuilder(ImageRequest): Builder
+  + parseFrom(CodedInputStream): ImageRequest
+  + parseDelimitedFrom(InputStream): ImageRequest
+  + newBuilder(): Builder
+   image: ByteString
+   parserForType: Parser<ImageRequest>
+   serializedSize: int
+   defaultInstanceForType: ImageRequest
+   descriptor: Descriptor
+   initialized: boolean
+   DEFAULT_INSTANCE: ImageRequest
+}
+interface ImageRequestOrBuilder << interface >> {
+   image: ByteString
+}
+class ImageResponse {
+  + parseFrom(byte[]): ImageResponse
+  # newInstance(UnusedPrivateParameter): Object
+  + parseDelimitedFrom(InputStream): ImageResponse
+  + equals(Object): boolean
+  + parseFrom(ByteString): ImageResponse
+  # internalGetFieldAccessorTable(): FieldAccessorTable
+  + newBuilderForType(): Builder
+  + writeTo(CodedOutputStream): void
+  + hashCode(): int
+  + toBuilder(): Builder
+  + parseFrom(InputStream, ExtensionRegistryLite): ImageResponse
+  + newBuilder(ImageResponse): Builder
+  + parseFrom(CodedInputStream, ExtensionRegistryLite): ImageResponse
+  + parseFrom(ByteString, ExtensionRegistryLite): ImageResponse
+  + parseFrom(byte[], ExtensionRegistryLite): ImageResponse
+  # newBuilderForType(BuilderParent): Builder
+  + parseFrom(ByteBuffer, ExtensionRegistryLite): ImageResponse
+  + newBuilder(): Builder
+  + parser(): Parser<ImageResponse>
+  + parseFrom(InputStream): ImageResponse
+  + parseDelimitedFrom(InputStream, ExtensionRegistryLite): ImageResponse
+  + parseFrom(CodedInputStream): ImageResponse
+  + parseFrom(ByteBuffer): ImageResponse
+   parserForType: Parser<ImageResponse>
+   serializedSize: int
+   className: String
+   DEFAULT_INSTANCE: ImageResponse
+   classNameBytes: ByteString
+   probability: float
+   descriptor: Descriptor
+   initialized: boolean
+   defaultInstanceForType: ImageResponse
+}
+interface ImageResponseOrBuilder << interface >> {
+   classNameBytes: ByteString
+   probability: float
+   className: String
+}
+class ImageResponses {
+  + newBuilderForType(): Builder
+  + equals(Object): boolean
+  + parseFrom(ByteBuffer): ImageResponses
+  + parseFrom(ByteBuffer, ExtensionRegistryLite): ImageResponses
+  + parseFrom(byte[], ExtensionRegistryLite): ImageResponses
+  # internalGetFieldAccessorTable(): FieldAccessorTable
+  + toBuilder(): Builder
+  + newBuilder(ImageResponses): Builder
+  + parseFrom(byte[]): ImageResponses
+  + parseDelimitedFrom(InputStream): ImageResponses
+  + newBuilder(): Builder
+  + getResponsesOrBuilder(int): ImageResponseOrBuilder
+  + parseFrom(ByteString, ExtensionRegistryLite): ImageResponses
+  + parseFrom(InputStream): ImageResponses
+  + parser(): Parser<ImageResponses>
+  + hashCode(): int
+  + parseDelimitedFrom(InputStream, ExtensionRegistryLite): ImageResponses
+  # newInstance(UnusedPrivateParameter): Object
+  + parseFrom(CodedInputStream, ExtensionRegistryLite): ImageResponses
+  + getResponses(int): ImageResponse
+  + writeTo(CodedOutputStream): void
+  + parseFrom(CodedInputStream): ImageResponses
+  + parseFrom(ByteString): ImageResponses
+  # newBuilderForType(BuilderParent): Builder
+  + parseFrom(InputStream, ExtensionRegistryLite): ImageResponses
+   responsesOrBuilderList: List<ImageResponseOrBuilder>
+   responsesList: List<ImageResponse>
+   responsesCount: int
+   defaultInstanceForType: ImageResponses
+   DEFAULT_INSTANCE: ImageResponses
+   parserForType: Parser<ImageResponses>
+   found: boolean
+   serializedSize: int
+   descriptor: Descriptor
+   initialized: boolean
+}
+interface ImageResponsesOrBuilder << interface >> {
+  + getResponsesOrBuilder(int): ImageResponseOrBuilder
+  + getResponses(int): ImageResponse
+   responsesOrBuilderList: List<ImageResponseOrBuilder>
+   responsesList: List<ImageResponse>
+   responsesCount: int
+   found: boolean
+}
+class ImagenController
+class JwtFilter {
+  # shouldNotFilter(HttpServletRequest): boolean
+  # doFilterInternal(HttpServletRequest, HttpServletResponse, FilterChain): void
+}
+class JwtUtil {
+  - isTokenExpired(String): Boolean
+  - extractAllClaims(String): Claims
+  + extractClaim(String, Function<Claims, T>): T
+  + extractUsername(String): String
+  + generateToken(UserDetails): String
+  - createToken(Map<String, Object>, String): String
+  + validateToken(String, UserDetails): Boolean
+  + extractExpiration(String): Date
+   signingKey: Key
+}
+class LoginRequest {
+  + hashCode(): int
+  # canEqual(Object): boolean
+  + equals(Object): boolean
+  + toString(): String
+   password: String
+   username: String
+}
+class LoginResponseDto {
+  + hashCode(): int
+  + equals(Object): boolean
+  + toString(): String
+  # canEqual(Object): boolean
+   roles: String[]
+   token: String
+   username: String
+   id: String
+   nombre: String
+}
+class Maquina {
+  # canEqual(Object): boolean
+  + builder(): MaquinaBuilder
+  + hashCode(): int
+  + minutosParaProcesarEspecifiacion(Especificacion, Rollo): Long
+  + toString(): String
+  + equals(Object): boolean
+   espesorMinimoMilimetros: Float
+   velocidadTrabajoMetrosPorMinuto: Float
+   id: Long
+   nombre: String
+   anchoMaximoMilimetros: Float
+   anchoMinimoMilimetros: Float
+   esActiva: Boolean
+   tipo: MaquinaTipoEnum
+   activo: Boolean
+   espesorMaximoMilimetros: Float
+   ordenDeTrabajoMaquinas: List<OrdenDeTrabajoMaquina>
+}
+class MaquinaController {
+  + obtenerPorId(Long): ResponseEntity<MaquinaDto>
+  + updateMaquina(Long, MaquinaDto): ResponseEntity<Maquina>
+  + obtenerDisponibles(): ResponseEntity<List<MaquinaDto>>
+  + obtenerTodos(): ResponseEntity<List<MaquinaDto>>
+  + eliminar(Long): ResponseEntity<Void>
+  + crear(MaquinaDto): ResponseEntity<Maquina>
+}
+class MaquinaDto {
+  # canEqual(Object): boolean
+  + equals(Object): boolean
+  + hashCode(): int
+  + builder(): MaquinaDtoBuilder
+  + toString(): String
+   espesorMinimoMilimetros: Float
+   velocidadTrabajoMetrosPorMinuto: Float
+   id: Long
+   nombre: String
+   anchoMaximoMilimetros: Float
+   anchoMinimoMilimetros: Float
+   tipo: MaquinaTipoEnum
+   activo: Boolean
+   espesorMaximoMilimetros: Float
+}
+interface MaquinaMapper << interface >> {
+  + toDto(Maquina): MaquinaDto
+  + toEntityList(List<MaquinaDto>): List<Maquina>
+  + toEntity(MaquinaDto): Maquina
+  + toDtoList(List<Maquina>): List<MaquinaDto>
+}
+class MaquinaMapperImpl {
+  + toDto(Maquina): MaquinaDto
+  + toEntityList(List<MaquinaDto>): List<Maquina>
+  + toEntity(MaquinaDto): Maquina
+  + toDtoList(List<Maquina>): List<MaquinaDto>
+}
+interface MaquinaRepository << interface >> {
+  + findByActivoIsTrue(): List<Maquina>
+  + findById(Long): Optional<Maquina>
+  + findByIdIn(List<Long>): List<Maquina>
+}
+class MaquinaRepositoryImpl {
+  + findByIdCustom(Long): Optional<Maquina>
+}
+interface MaquinaService << interface >> {
+  + findByIdIn(List<Long>): List<Maquina>
+  + save(MaquinaDto): Maquina
+  + findAllIDsOfAvailableMachinesEntity(): List<Maquina>
+  + findById(Long): MaquinaDto
+  + deleteById(Long): boolean
+  + findAll(): List<MaquinaDto>
+  + findAllIDsOfAvailableMachinesDto(): List<MaquinaDto>
+}
+class MaquinaServiceImpl {
+  + findAll(): List<MaquinaDto>
+  + findAllIDsOfAvailableMachinesDto(): List<MaquinaDto>
+  + findById(Long): MaquinaDto
+  + findAllIDsOfAvailableMachinesEntity(): List<Maquina>
+  + save(MaquinaDto): Maquina
+  + findByIdIn(List<Long>): List<Maquina>
+  + deleteById(Long): boolean
+}
+enum MaquinaTipoEnum << enumeration >> {
+  + valueOf(String): MaquinaTipoEnum
+  + values(): MaquinaTipoEnum[]
+}
+class MedidaDeCalidad {
+  + hashCode(): int
+  # canEqual(Object): boolean
+  + toString(): String
+  + equals(Object): boolean
+   espesorMedido: Float
+   id: Long
+   anchoMedido: Float
+   rebabaMedido: Float
+}
+class MedidaDeCalidadDto {
+  + toString(): String
+  + equals(Object): boolean
+  # canEqual(Object): boolean
+  + builder(): MedidaDeCalidadDtoBuilder
+  + hashCode(): int
+   valor: Float
+   tipo: String
+   id: Long
+   unidad: String
+}
+interface MedidaDeCalidadRepository << interface >>
+class ModificarRolloRequestDto {
+  + toString(): String
+  + equals(Object): boolean
+  # canEqual(Object): boolean
+  + hashCode(): int
+  + builder(): ModificarRolloRequestDtoBuilder
+   id: Long
+   anchoMM: Float
+   pesoKG: Float
+}
+class OpenApiConfig {
+  + customOpenAPI(): OpenAPI
+}
+class OrdenDeTrabajo {
+  + builder(): OrdenDeTrabajoBuilder
+  + toString(): String
+  + hashCode(): int
+  + equals(Object): boolean
+  # canEqual(Object): boolean
+  + procesarRollo(): List<Rollo>
+  - validarDimensiones(): void
+  - crearHijoPorLargo(List<Rollo>): void
+  + neededWidth(): Float
+  + neededThickness(): Float
+  - crearHijoPorAncho(List<Rollo>): void
+  + neededLengthFromOriginalRoll(): Float
+  - crearHijo(Float, Float, TipoRollo): Rollo
+  ~ equalsD(Float, Float): boolean
+  + primeraOrdenMaquina(): OrdenDeTrabajoMaquina
+  + yaComenzo(): boolean
+  + todosLosProcesosEstanFinalizados(): boolean
+  + rolloIgualQueEspecificacion(): boolean
+  + fechaFinalizacionPrimeraMaquina(): LocalDateTime
+  + esPrimeraOTM(OrdenDeTrabajoMaquina): boolean
+  + fechaInicioPrimeraMaquina(): LocalDateTime
+  - crearHijoProducto(List<Rollo>): void
+   fechaFin: LocalDateTime
+   fechaInicio: LocalDateTime
+   id: Long
+   fechaEstimadaDeInicio: LocalDateTime
+   observaciones: String
+   rollo: Rollo
+   rolloProducto: Rollo
+   fechaEstimadaDeFin: LocalDateTime
+   activa: Boolean
+   estado: EstadoOrdenTrabajoEnum
+   nombre: String
+   ordenDeVenta: OrdenVenta
+   ordenDeTrabajoMaquinas: List<OrdenDeTrabajoMaquina>
+}
+class OrdenDeTrabajoController {
+  + obtenerProximaOrdenPendienteConMaquina(Long, Pageable): ResponseEntity<Page<OrdenDeTrabajoMaquinaDto>>
+  - validarModificacion(OrdenDeTrabajo): void
+  + crearOrdenDeTrabajo(OrdenDeTrabajoDto): ResponseEntity<?>
+  + simularCancelacion(Long): ResponseEntity<CancelacionSimulacionDto>
+  - validarDimensiones(Bloque, Float, Float): void
+  - procesarOrdenVenta(OrdenDeTrabajoDto): OrdenVenta
+  + obtenerOrdenDeTrabajo(Long): ResponseEntity<OrdenDeTrabajoResponseDto>
+  - procesarRollo(OrdenDeTrabajoDto, OrdenDeTrabajo, OrdenVenta): List<Rollo>
+  - configurarOrdenFinal(OrdenDeTrabajo, OrdenDeTrabajoDto): void
+  + cortarBloque(Bloque, Float, Float): List<Bloque>
+  + obtenerTodasLasOrdenes(FiltroOrdenDeTrabajoDto): ResponseEntity<List<OrdenDeTrabajoResponseDto>>
+  - agregarSobranteHorizontal(List<Bloque>, Bloque, Float, Float): void
+  + obtenerOrdenesDeTrabajoConMaquina(Long): ResponseEntity<List<OrdenDeTrabajoResponseDto>>
+  + modificarOrdenDeTrabajo(Long, OrdenDeTrabajo): ResponseEntity<OrdenDeTrabajoResponseDto>
+  - procesarMaquinas(OrdenDeTrabajoDto, OrdenDeTrabajo): void
+  - crearOrdenDeTrabajoMaquina(OrdenDeTrabajo, Maquina, MaquinaDto): OrdenDeTrabajoMaquina
+  + obtenerOrdenesDeTrabajoConRolloID(Long): ResponseEntity<List<OrdenDeTrabajoResponseDto>>
+  - agregarSobranteVertical(List<Bloque>, Bloque, Float, Float): void
+  - crearOrdenBasica(OrdenDeTrabajoDto): OrdenDeTrabajo
+  + cancelarOrdenDeTrabajo(Long): ResponseEntity<OrdenDeTrabajoResponseDto>
+  - actualizarOrden(OrdenDeTrabajo, OrdenDeTrabajo): void
+}
+class OrdenDeTrabajoDto {
+  + equals(Object): boolean
+  # canEqual(Object): boolean
+  + toString(): String
+  + hashCode(): int
+   rolloId: Long
+   observaciones: String
+   fechaFin: LocalDateTime
+   fechaInicio: LocalDateTime
+   maquinas: List<MaquinaDto>
+   ordenDeVentaId: Long
+}
+class OrdenDeTrabajoMaquina {
+  + equals(Object): boolean
+  + toString(): String
+  + builder(): OrdenDeTrabajoMaquinaBuilder
+  + hashCode(): int
+  # canEqual(Object): boolean
+  + anular(): void
+   fechaFin: LocalDateTime
+   rolloAUsar: Rollo
+   fechaInicio: LocalDateTime
+   id: Long
+   estado: EstadoOrdenTrabajoMaquinaEnum
+   maquina: Maquina
+   ordenDeTrabajo: OrdenDeTrabajo
+   observaciones: String
+}
+class OrdenDeTrabajoMaquinaController {
+  + obtenerOrdenesDeTrabajoPorMaquina(Long): ResponseEntity<List<OrdenDeTrabajoMaquinaDto>>
+  + iniciar(Long): ResponseEntity<Void>
+}
+class OrdenDeTrabajoMaquinaDto {
+  + toString(): String
+  + builder(): OrdenDeTrabajoMaquinaDtoBuilder
+  + hashCode(): int
+  + equals(Object): boolean
+  # canEqual(Object): boolean
+   maquinaId: Long
+   ordenDeTrabajoId: Long
+   fechaFin: LocalDateTime
+   fechaInicio: LocalDateTime
+   id: Long
+   estado: EstadoOrdenTrabajoMaquinaEnum
+   observaciones: String
+   rolloAUsar: RolloDto
+}
+class OrdenDeTrabajoMaquinaId {
+  # canEqual(Object): boolean
+  + hashCode(): int
+  + toString(): String
+  + equals(Object): boolean
+   maquinaId: Long
+   ordenTrabajoId: Long
+}
+interface OrdenDeTrabajoMaquinaMapper << interface >> {
+  + toDto(OrdenDeTrabajoMaquina): OrdenDeTrabajoMaquinaDto
+  + toDtoList(List<OrdenDeTrabajoMaquina>): List<OrdenDeTrabajoMaquinaDto>
+}
+class OrdenDeTrabajoMaquinaMapperImpl {
+  + toDtoList(List<OrdenDeTrabajoMaquina>): List<OrdenDeTrabajoMaquinaDto>
+  + toDto(OrdenDeTrabajoMaquina): OrdenDeTrabajoMaquinaDto
+}
+interface OrdenDeTrabajoMaquinaRepository << interface >> {
+  + findTopByMaquina_IdAndEstadoOrderByFechaInicioAsc(Long, EstadoOrdenTrabajoMaquinaEnum): OrdenDeTrabajoMaquina
+  + findByMaquinaId(Long): List<OrdenDeTrabajoMaquina>
+  + existsByMaquinaIsAndEstadoIs(Maquina, EstadoOrdenTrabajoMaquinaEnum): Boolean
+  + findByMaquinaIdAndEstadoInOrderByFechaInicioAsc(Long, List<EstadoOrdenTrabajoMaquinaEnum>, Pageable): Page<OrdenDeTrabajoMaquina>
+  + findOrdenDeTrabajoMaquinaByEstadoInAndFechaFinAfterAndFechaFinBeforeAndMaquinaIn(List<EstadoOrdenTrabajoMaquinaEnum>, LocalDateTime, LocalDateTime, List<Maquina>): List<OrdenDeTrabajoMaquina>
+  + findOrdenDeTrabajoMaquinaByEstadoAndFechaFinAfterAndFechaFinBeforeAndMaquinaIn(String, LocalDateTime, LocalDateTime, List<Maquina>): List<OrdenDeTrabajoMaquina>
+  + findTopByOrdenDeTrabajo_IdOrderByFechaInicioDesc(Long): OrdenDeTrabajoMaquina
+}
+class OrdenDeTrabajoMaquinaResponseDto {
+  # canEqual(Object): boolean
+  + toString(): String
+  + equals(Object): boolean
+  + hashCode(): int
+  + builder(): OrdenDeTrabajoMaquinaResponseDtoBuilder
+   fechaFin: LocalDateTime
+   fechaInicio: LocalDateTime
+   id: Long
+   estado: EstadoOrdenTrabajoMaquinaEnum
+   maquina: MaquinaDto
+   observaciones: String
+   rolloAUsar: RolloDto
+}
+interface OrdenDeTrabajoMaquinaResponseMapper << interface >> {
+  + toEntity(OrdenDeTrabajoMaquinaResponseDto, OrdenDeTrabajo): OrdenDeTrabajoMaquina
+  + toEntityList(List<OrdenDeTrabajoMaquinaResponseDto>, OrdenDeTrabajo): List<OrdenDeTrabajoMaquina>
+}
+class OrdenDeTrabajoMaquinaResponseMapperImpl {
+  + toEntity(OrdenDeTrabajoMaquinaResponseDto, OrdenDeTrabajo): OrdenDeTrabajoMaquina
+  + toEntityList(List<OrdenDeTrabajoMaquinaResponseDto>, OrdenDeTrabajo): List<OrdenDeTrabajoMaquina>
+}
+interface OrdenDeTrabajoMaquinaService << interface >> {
+  + findFirstByMaquinaId(Long): OrdenDeTrabajoMaquina
+  + findByMaquinaIdPaginated(Long, Pageable): Page<OrdenDeTrabajoMaquina>
+  + hayOTMEnCursoParaMaquina(Maquina): Boolean
+  + iniciarOrden(Long): void
+  + findByMaquinaId(Long): List<OrdenDeTrabajoMaquina>
+  + findById(Long): OrdenDeTrabajoMaquina
+}
+class OrdenDeTrabajoMaquinaServiceImpl {
+  + findFirstByMaquinaId(Long): OrdenDeTrabajoMaquina
+  + findByMaquinaId(Long): List<OrdenDeTrabajoMaquina>
+  + hayOTMEnCursoParaMaquina(Maquina): Boolean
+  + findByMaquinaIdPaginated(Long, Pageable): Page<OrdenDeTrabajoMaquina>
+  + iniciarOrden(Long): void
+  + findById(Long): OrdenDeTrabajoMaquina
+}
+interface OrdenDeTrabajoRepository << interface >> {
+  + findAll(): List<OrdenDeTrabajo>
+  + findById(Long): Optional<OrdenDeTrabajo>
+  + findByOrdenDeTrabajoMaquinas_Id(Long): OrdenDeTrabajo
+  + findByIdFetchRollo(Long): Optional<OrdenDeTrabajo>
+  + findByRolloId(Long): List<OrdenDeTrabajo>
+  + findTopByOrdenDeVenta_IdOrderByFechaFinDesc(Long): Optional<OrdenDeTrabajo>
+  + findAll(Specification<OrdenDeTrabajo>): List<OrdenDeTrabajo>
+}
+class OrdenDeTrabajoResponseDto {
+  # canEqual(Object): boolean
+  + hashCode(): int
+  + builder(): OrdenDeTrabajoResponseDtoBuilder
+  + equals(Object): boolean
+  + toString(): String
+   fechaFin: LocalDateTime
+   fechaInicio: LocalDateTime
+   id: Long
+   rolloProducto: RolloDto
+   rollo: RolloDto
+   fechaEstimadaDeInicio: LocalDateTime
+   observaciones: String
+   fechaEstimadaDeFin: LocalDateTime
+   activa: Boolean
+   estado: EstadoOrdenTrabajoEnum
+   nombre: String
+   controlDeCalidad: ControlDeCalidadDto
+   ordenDeTrabajoMaquinas: List<OrdenDeTrabajoMaquinaResponseDto>
+   ordenDeVenta: OrdenVentaSimpleDto
+}
+interface OrdenDeTrabajoResponseMapper << interface >> {
+  + toDtoList(List<OrdenDeTrabajo>): List<OrdenDeTrabajoResponseDto>
+  + toDto(OrdenDeTrabajo): OrdenDeTrabajoResponseDto
+  + toEntity(OrdenDeTrabajoResponseDto): OrdenDeTrabajo
+  + toEntityList(List<OrdenDeTrabajoResponseDto>): List<OrdenDeTrabajo>
+}
+class OrdenDeTrabajoResponseMapperImpl {
+  + toDtoList(List<OrdenDeTrabajo>): List<OrdenDeTrabajoResponseDto>
+  + toEntity(OrdenDeTrabajoResponseDto): OrdenDeTrabajo
+  + toEntityList(List<OrdenDeTrabajoResponseDto>): List<OrdenDeTrabajo>
+  - mapControlDeCalidad(ControlDeCalidad): ControlDeCalidadDto
+  - mapOrdenDeTrabajoMaquinas(List<OrdenDeTrabajoMaquina>): List<OrdenDeTrabajoMaquinaResponseDto>
+  - mapOrdenDeTrabajoMaquina(OrdenDeTrabajoMaquina): OrdenDeTrabajoMaquinaResponseDto
+  + toDto(OrdenDeTrabajo): OrdenDeTrabajoResponseDto
+  - mapOrdenVentaSimple(OrdenVenta): OrdenVentaSimpleDto
+}
+interface OrdenDeTrabajoService << interface >> {
+  + save(OrdenDeTrabajo): OrdenDeTrabajo
+  + simularCancelacion(Long): CancelacionSimulacionDto
+  + saveAllDtos(List<OrdenDeTrabajoResponseDto>): List<OrdenDeTrabajo>
+  + filtrarOrdenes(FiltroOrdenDeTrabajoDto): List<OrdenDeTrabajo>
+  + findById(Long): Optional<OrdenDeTrabajo>
+  + findByProcesoId(Long): OrdenDeTrabajo
+  + findOrdenDeTrabajoMaquinaByEstadoInAndFechaFinAfterAndFechaFinBeforeAndMaquinaIn(List<EstadoOrdenTrabajoMaquinaEnum>, LocalDateTime, LocalDateTime, List<Maquina>): List<OrdenDeTrabajoMaquina>
+  + cancelarOrdenDeTrabajo(Long): OrdenDeTrabajo
+  + findAll(): List<OrdenDeTrabajo>
+  + findByRolloId(Long): List<OrdenDeTrabajo>
+  + desactivar(Long): Optional<OrdenDeTrabajo>
+  + update(Long, OrdenDeTrabajo): Optional<OrdenDeTrabajo>
+}
+class OrdenDeTrabajoServiceImpl {
+  + simularCancelacion(Long): CancelacionSimulacionDto
+  + findById(Long): Optional<OrdenDeTrabajo>
+  - validarCancelacion(OrdenDeTrabajo): void
+  + save(OrdenDeTrabajo): OrdenDeTrabajo
+  + saveAllDtos(List<OrdenDeTrabajoResponseDto>): List<OrdenDeTrabajo>
+  + filtrarOrdenes(FiltroOrdenDeTrabajoDto): List<OrdenDeTrabajo>
+  + findOrdenDeTrabajoMaquinaByEstadoInAndFechaFinAfterAndFechaFinBeforeAndMaquinaIn(List<EstadoOrdenTrabajoMaquinaEnum>, LocalDateTime, LocalDateTime, List<Maquina>): List<OrdenDeTrabajoMaquina>
+  - procesarAncestros(Rollo, Set<OrdenVenta>, Set<OrdenDeTrabajo>, Set<Rollo>): void
+  + desactivar(Long): Optional<OrdenDeTrabajo>
+  + findAll(): List<OrdenDeTrabajo>
+  - procesarDescendientes(Rollo, Set<OrdenVenta>, Set<OrdenDeTrabajo>, Set<Rollo>): void
+  + cancelarOrdenDeTrabajo(Long): OrdenDeTrabajo
+  - cancelarOrden(OrdenDeTrabajo): void
+  + findByRolloId(Long): List<OrdenDeTrabajo>
+  + update(Long, OrdenDeTrabajo): Optional<OrdenDeTrabajo>
+  - recolectarAfectados(OrdenDeTrabajo): CancelacionAfectados
+  - mapToOrdenVentaSimpleDto(OrdenVenta): OrdenVentaSimpleDto
+  + findByProcesoId(Long): OrdenDeTrabajo
+}
+class OrdenVenta {
+  + builder(): OrdenVentaBuilder
+  + hashCode(): int
+  # canEqual(Object): boolean
+  + toString(): String
+  + equals(Object): boolean
+   id: Long
+   estado: EstadoOrdenVentaEnum
+   cliente: Cliente
+   especificacion: Especificacion
+   observaciones: String
+   razonReplanifiacion: String
+   fechaEntregaEstimada: LocalDateTime
+   fechaCreacion: LocalDateTime
+}
+class OrdenVentaController {
+  + crearOrden(OrdenVentaDto): ResponseEntity<?>
+  + obtenerOrdenPorId(Long): ResponseEntity<OrdenVentaDto>
+  + eliminarOrden(Long): ResponseEntity<Void>
+  + actualizarOrden(Long, OrdenVentaDto): ResponseEntity<OrdenVentaDto>
+  + anular(Long): ResponseEntity<Object>
+  + finalizar(Long): ResponseEntity<?>
+  + obtenerTodasLasOrdenes(FiltroOrdenVentaDTO): ResponseEntity<List<OrdenVentaDto>>
+}
+class OrdenVentaDto {
+  + equals(Object): boolean
+  + toString(): String
+  # canEqual(Object): boolean
+  + hashCode(): int
+  + builder(): OrdenVentaDtoBuilder
+   especificacion: EspecificacionDto
+   orderId: Long
+   estado: EstadoOrdenVentaEnum
+   observaciones: String
+   razonReplanifiacion: String
+   fechaEntregaEstimada: LocalDateTime
+   fechaCreacion: LocalDateTime
+   cliente: ClienteDto
+}
+interface OrdenVentaMapper << interface >> {
+  + toDtoList(List<OrdenVenta>): List<OrdenVentaDto>
+  + toDto(OrdenVenta): OrdenVentaDto
+  + toEntityList(List<OrdenVentaDto>): List<OrdenVenta>
+  + toEntity(OrdenVentaDto): OrdenVenta
+}
+class OrdenVentaMapperImpl {
+  + toDto(OrdenVenta): OrdenVentaDto
+  + toEntityList(List<OrdenVentaDto>): List<OrdenVenta>
+  + toEntity(OrdenVentaDto): OrdenVenta
+  + toDtoList(List<OrdenVenta>): List<OrdenVentaDto>
+}
+interface OrdenVentaRepository << interface >> {
+  + findAll(Specification<OrdenVenta>): List<OrdenVenta>
+  + updateOrdenDeVentaEstado(Long, EstadoOrdenVentaEnum): void
+  + findByIdIn(List<Long>): List<OrdenVenta>
+  + findByOrdenDeTrabajoIdFetchClienteEspecificacion(Long): OrdenVenta
+  + findAll(): List<OrdenVenta>
+}
+interface OrdenVentaService << interface >> {
+  + findById(Long): OrdenVentaDto
+  + findByIdIn(List<Long>): List<OrdenVenta>
+  + deleteById(Long): void
+  + trabajoFinalizado(Long): Boolean
+  + findAll(): List<OrdenVentaDto>
+  + save(OrdenVentaDto): OrdenVentaDto
+  + setToProgamada(List<Long>): List<OrdenVentaDto>
+  + anular(Long): void
+  + searchByFiltros(FiltroOrdenVentaDTO): List<OrdenVentaDto>
+  + finalizar(Long, OrdenDeTrabajo): void
+}
+class OrdenVentaServiceImpl {
+  + searchByFiltros(FiltroOrdenVentaDTO): List<OrdenVentaDto>
+  + save(OrdenVentaDto): OrdenVentaDto
+  + setToProgamada(List<Long>): List<OrdenVentaDto>
+  + anular(Long): void
+  + findAll(): List<OrdenVentaDto>
+  + findById(Long): OrdenVentaDto
+  + deleteById(Long): void
+  + findByIdIn(List<Long>): List<OrdenVenta>
+  + trabajoFinalizado(Long): Boolean
+  + finalizar(Long, OrdenDeTrabajo): void
+}
+class OrdenVentaSimpleDto {
+  + hashCode(): int
+  + equals(Object): boolean
+  # canEqual(Object): boolean
+  + builder(): OrdenVentaSimpleDtoBuilder
+  + toString(): String
+   especificacion: EspecificacionDto
+   orderId: Long
+   estado: EstadoOrdenVentaEnum
+   observaciones: String
+   fechaCreacion: String
+   fechaEntregaEstimada: String
+   cliente: ClienteDto
+}
+class Plan<A, B>
+class PlannerController {
+  + generatePlan(PlannerDTO): ResponseEntity<?>
+  + generatePlan(Plan<List<OrdenDeTrabajoResponseDto>, List<RolloDto>>): ResponseEntity<Plan<List<OrdenDeTrabajoResponseDto>, List<RolloDto>>>
+}
+class PlannerDTO {
+  + hashCode(): int
+  + toString(): String
+  + builder(): PlannerDTOBuilder
+  + equals(Object): boolean
+  # canEqual(Object): boolean
+   usarTodosLosRollosDisponibles: boolean
+   MULTIPLIER_OF_WASTE: int
+   TOP_DAYS_IN_ADVANCE: int
+   largoDesperdicio: int
+   horaDeInicioLaboral: int
+   horasDeGracia: int
+   usarTodasLasMaquinas: boolean
+   POPULATION_SIZE_PER_SALE: int
+   rolloIDs: List<Long>
+   maquinasIDs: List<Long>
+   horaDeFinLaboral: int
+   valid_days_of_the_week: List<Integer>
+   anchoDesperdicio: int
+   ordenesDeVentaIDs: List<Long>
+}
+class PlannerGA {
+  - $default$MIN_LENGTH(): int
+  + toString(): String
+  + equals(Object): boolean
+  - $default$MIN_WIDTH(): int
+  - $default$TOP_DAYS_IN_ADVANCE(): int
+  - $default$valid_days_of_the_week(): List<Integer>
+  + hashCode(): int
+  - $default$COUNT(): int
+  # canEqual(Object): boolean
+  - $default$CURRENT_DATE(): LocalDateTime
+  + builder(): PlannerGABuilder
+  - $default$POPULATION_SIZE_PER_SALE(): int
+  - $default$MULTIPLIER_OF_WASTE(): int
+  + execute(): Plan<List<OrdenDeTrabajo>, List<Rollo>>
+  - checkRepeatedTypeMachinesInOV(List<int[]>): boolean
+  - calcPenaltyForWastedRolls(List<Rollo>): double
+  + getCompatibleRolls(int): List<Long>
+  + evaluate(Genotype<IntegerGene>): Double
+  - isThereAInvalidCombinationOfMachinesForRollAndSale(int, int, Rollo, OrdenVenta): boolean
+  - checkRollTypeMismatch(List<int[]>): boolean
+  ~ maxDate(LocalDateTime, LocalDateTime, LocalDateTime): LocalDateTime
+  - checkInvalidMachineCombination(List<int[]>): boolean
+  ~ checkRollCharacteristics(OrdenVenta, Rollo): boolean
+  + generateJobOrders(List<int[]>): Plan<List<OrdenDeTrabajo>, List<Rollo>>
+  ~ equalsD(Float, Float): boolean
+  - checkRepeatedOrdenesVentasIDs(List<int[]>): boolean
+  + num_sales(): int
+  ~ toChromosomeList(Genotype<IntegerGene>): List<Integer>
+  - checkRollThicknessMismatch(List<int[]>): boolean
+  ~ toBlocks(Genotype<IntegerGene>): List<int[]>
+  - getRolloById(long): Rollo
+  + repair(List<Integer>, RandomGenerator): void
+  - calcScoreForDiffDates(List<OrdenDeTrabajo>): double
+  - generateUniqueRandomId(): Long
+  - compatibleMachine2(long): List<Long>
+  - getMaquinaByID(Long): Maquina
+  - genotypeFactory(): Factory<Genotype<IntegerGene>>
+  - childrenCandidatesOfRoll(Map<Integer, List<Rollo>>, int, OrdenVenta): List<Rollo>
+  ~ pickRandom(RandomGenerator, List<Long>): long
+  - calcPenaltyForAvailableChildrenRolls(List<Rollo>): double
+  - getMaquinasIDsByType(MaquinaTipoEnum): List<Long>
+  - getOrdenVentaById(long): OrdenVenta
+  ~ concat(List<T>, List<T>): List<T>
+  ~ toGenes(List<Integer>): List<IntegerGene>
+   rollosIDs: List<Long>
+   rollos: List<Rollo>
+   COUNT: int
+   MULTIPLIER_OF_WASTE: int
+   TOP_DAYS_IN_ADVANCE: int
+   ordenesDeTrabajoMaquina: List<OrdenDeTrabajoMaquina>
+   horaDeInicioLaboral: int
+   MIN_WIDTH: int
+   POPULATION_SIZE_PER_SALE: int
+   MIN_LENGTH: int
+   maquinasIDs: List<Long>
+   horaDeFinLaboral: int
+   valid_days_of_the_week: List<Integer>
+   grace_hours: int
+   CURRENT_DATE: LocalDateTime
+   maquinas: List<Maquina>
+   ordenesDeVenta: List<OrdenVenta>
+   ordenesDeVentaIDs: List<Long>
+}
+interface PlannerMapper << interface >> {
+  + toEntity(PlannerDTO): PlannerGA
+}
+class PlannerMapperImpl {
+  + toEntity(PlannerDTO): PlannerGA
+}
+class PlannerTest {
+  ~ planner(): void
+}
+class Proveedor {
+  # canEqual(Object): boolean
+  + toString(): String
+  + equals(Object): boolean
+  + hashCode(): int
+  + builder(): ProveedorBuilder
+   id: Long
+   activo: Boolean
+   nombre: String
+}
+class ProveedorController {
+  + createProveedor(ProveedorDto): ResponseEntity<Proveedor>
+  + getProveedorById(Long): ResponseEntity<ProveedorDto>
+  + deleteProveedor(Long): ResponseEntity<Void>
+  + updateProveedor(Long, ProveedorDto): ResponseEntity<Proveedor>
+   allProveedores: ResponseEntity<List<ProveedorDto>>
+}
+class ProveedorDto {
+  + builder(): ProveedorDtoBuilder
+  + hashCode(): int
+  # canEqual(Object): boolean
+  + equals(Object): boolean
+  + toString(): String
+   id: Long
+   activo: Boolean
+   nombre: String
+}
+interface ProveedorMapper << interface >> {
+  + toDto(Proveedor): ProveedorDto
+  + toDtoList(List<Proveedor>): List<ProveedorDto>
+  + toEntity(ProveedorDto): Proveedor
+}
+class ProveedorMapperImpl {
+  + toEntity(ProveedorDto): Proveedor
+  + toDtoList(List<Proveedor>): List<ProveedorDto>
+  + toDto(Proveedor): ProveedorDto
+}
+interface ProveedorRepository << interface >>
+interface ProveedorService << interface >> {
+  + findById(Long): ProveedorDto
+  + deleteById(Long): boolean
+  + findAll(): List<ProveedorDto>
+  + save(ProveedorDto): Proveedor
+}
+class ProveedorServiceImpl {
+  + save(ProveedorDto): Proveedor
+  + findById(Long): ProveedorDto
+  + deleteById(Long): boolean
+  + findAll(): List<ProveedorDto>
+}
+class ResourceNotFoundException
+class Rol {
+  + toString(): String
+  # canEqual(Object): boolean
+  + equals(Object): boolean
+  + hashCode(): int
+   id: Long
+   nombre: String
+}
+class RolController {
+  + deleteRol(Long): ResponseEntity<Void>
+  + createRol(Rol): ResponseEntity<Rol>
+  + getRolById(Long): ResponseEntity<Rol>
+  + updateRol(Long, Rol): ResponseEntity<Rol>
+   allRoles: ResponseEntity<List<Rol>>
+}
+interface RolRepository << interface >> {
+  + findByNombre(String): Optional<Rol>
+}
+interface RolService << interface >> {
+  + findAll(): List<Rol>
+  + deleteById(Long): void
+  + save(Rol): Rol
+  + findById(Long): Rol
+}
+class RolServiceImpl {
+  + save(Rol): Rol
+  + findAll(): List<Rol>
+  + findById(Long): Rol
+  + deleteById(Long): void
+}
+class Rollo {
+  + toString(): String
+  + builder(): RolloBuilder
+  + equals(Object): boolean
+  + calcularPeso(Float, Float, Float): float
+  + hashCode(): int
+  # canEqual(Object): boolean
+  + clone(): Object
+   tipoMaterial: TipoMaterial
+   hijos: List<Rollo>
+   id: Long
+   espesorMM: Float
+   pesoKG: Float
+   asociadaAOrdenDeTrabajo: Boolean
+   estado: EstadoRollo
+   fechaIngreso: LocalDateTime
+   largo: float
+   anchoMM: Float
+   rolloPadreId: Long
+   tipoRollo: TipoRollo
+   ordeDeTrabajoAsociadaID: Long
+   proveedorId: Long
+   codigoProveedor: String
+   rolloPadre: Rollo
+}
+class RolloController {
+  + createRollo(RolloDto): ResponseEntity<?>
+  + getRollosById(Long): ResponseEntity<RolloDto>
+  + anularRollo(Long): ResponseEntity<Void>
+  + getAllRollos(FiltroRolloDto): ResponseEntity<List<RolloDto>>
+  + updateRollo(Long, RolloDto): ResponseEntity<RolloDto>
+  + obtenerUltimoProductoParaOrdenDeVentaId(Long): ResponseEntity<?>
+  + getRollosDisponibles(Long): ResponseEntity<List<RolloDto>>
+  + getRolloByIdConArbolDeRollosHijos(Long): ResponseEntity<RolloDto>
+  + deleteRollo(Long): ResponseEntity<Void>
+  + simularAnularRollo(Long): ResponseEntity<SimulacionAnulacionRolloResponse>
+  + getRolloByIdConRollosPadres(Long): ResponseEntity<RolloDto>
+   rollosById: ResponseEntity<EnumSet<TipoMaterial>>
+}
+class RolloDto {
+  # canEqual(Object): boolean
+  + hashCode(): int
+  + equals(Object): boolean
+  + builder(): RolloDtoBuilder
+  + toString(): String
+   tipoMaterial: TipoMaterial
+   hijos: List<RolloDto>
+   id: Long
+   espesorMM: Float
+   pesoKG: Float
+   asociadaAOrdenDeTrabajo: Boolean
+   estado: EstadoRollo
+   fechaIngreso: LocalDateTime
+   anchoMM: Float
+   rolloPadre: RolloDto
+   rolloPadreId: Long
+   tipoRollo: TipoRollo
+   ordeDeTrabajoAsociadaID: Long
+   proveedorId: Long
+   codigoProveedor: String
+}
+interface RolloMapper << interface >> {
+  + toDto(Rollo): RolloDto
+  + toDtoOnlyWithRolloPadreID(Rollo): RolloDto
+  + toEntityList(List<RolloDto>): List<Rollo>
+  + toDtoListOnlyWithRolloPadreID(List<Rollo>): List<RolloDto>
+  + toDtoList(List<Rollo>): List<RolloDto>
+  + toDtoWithRolloHijos(Rollo): RolloDto
+  + toEntity(RolloDto): Rollo
+}
+class RolloMapperImpl {
+  + toDtoListOnlyWithRolloPadreID(List<Rollo>): List<RolloDto>
+  + toDtoWithRolloHijos(Rollo): RolloDto
+  + toDtoOnlyWithRolloPadreID(Rollo): RolloDto
+  + toEntity(RolloDto): Rollo
+  + toEntityList(List<RolloDto>): List<Rollo>
+  + toDto(Rollo): RolloDto
+  + toDtoList(List<Rollo>): List<RolloDto>
+}
+interface RolloRepository << interface >> {
+  + existsRolloByProveedorIdAndCodigoProveedor(Long, String): boolean
+  + findByRolloPadreId(Long): List<Rollo>
+  + findByIdIn(List<Long>): List<Rollo>
+  + findLastProductForOrdenDeVentaId(Long): Optional<Rollo>
+  + findByEstadoInAndAsociadaAOrdenDeTrabajoIs(List<EstadoRollo>, Boolean): List<Rollo>
+}
+interface RolloService << interface >> {
+  + findById(Long): RolloDto
+  + findByIdConRollosPadres(Long): RolloDto
+  + save(RolloDto): RolloDto
+  + obtenerArbolCompletoDeRollosHijos(Long): RolloDto
+  + deleteById(Long): boolean
+  + findAll(): List<RolloDto>
+  + obtenerRollosDisponiblesParaOrdenVenta(Long): List<RolloDto>
+  + simularAnularRollo(Long): List<Long>
+  + filtrarRollos(FiltroRolloDto): List<RolloDto>
+  + estaDisponible(Rollo): boolean
+  + findEntitiesByEstadosAndAsociado(List<EstadoRollo>, Boolean): List<Rollo>
+  + findEntitiesByIdIn(List<Long>): List<Rollo>
+  + modificarRollo(ModificarRolloRequestDto): RolloDto
+  + findLastProductForOrdenDeVentaId(Long): Optional<RolloDto>
+  + existsRolloByProveedorIdAndCodigoProveedor(Long, String): boolean
+  + anularRollo(Long): boolean
+}
+class RolloServiceImpl {
+  + findAll(): List<RolloDto>
+  + filtrarRollos(FiltroRolloDto): List<RolloDto>
+  - inicializarRecursivamente(Rollo): void
+  + findLastProductForOrdenDeVentaId(Long): Optional<RolloDto>
+  + findByIdConRollosPadres(Long): RolloDto
+  + obtenerArbolCompletoDeRollosHijos(Long): RolloDto
+  + findById(Long): RolloDto
+  + obtenerRollosDisponiblesParaOrdenVenta(Long): List<RolloDto>
+  + estaDisponible(Rollo): boolean
+  + simularAnularRollo(Long): List<Long>
+  + findEntitiesByEstadosAndAsociado(List<EstadoRollo>, Boolean): List<Rollo>
+  - procesarCancelacionOrdenesTrabajo(Rollo): void
+  + existsRolloByProveedorIdAndCodigoProveedor(Long, String): boolean
+  + modificarRollo(ModificarRolloRequestDto): RolloDto
+  + anularRollo(Long): boolean
+  + save(RolloDto): RolloDto
+  + deleteById(Long): boolean
+  + findEntitiesByIdIn(List<Long>): List<Rollo>
+}
+class SecurityConfig {
+  + passwordEncoder(): PasswordEncoder
+  ~ corsConfigurationSource(): CorsConfigurationSource
+  + securityFilterChain(HttpSecurity): SecurityFilterChain
+  + authenticationManager(AuthenticationConfiguration): AuthenticationManager
+}
+class SimulacionAnulacionRolloResponse {
+  + equals(Object): boolean
+  # canEqual(Object): boolean
+  + hashCode(): int
+  + toString(): String
+   ids: List<Long>
+}
+enum TipoMaterial << enumeration >> {
+  + valueOf(String): TipoMaterial
+  + values(): TipoMaterial[]
+}
+enum TipoRollo << enumeration >> {
+  + values(): TipoRollo[]
+  + valueOf(String): TipoRollo
+}
+class UnprocessableContentException
+class UserDetailsImpl {
+   password: String
+   credentialsNonExpired: boolean
+   enabled: boolean
+   accountNonLocked: boolean
+   accountNonExpired: boolean
+   usuario: Usuario
+   authorities: Collection<GrantedAuthority>
+   username: String
+}
+class Usuario {
+  + equals(Object): boolean
+  # canEqual(Object): boolean
+  + toString(): String
+  + hashCode(): int
+   password: String
+   username: String
+   id: Long
+   roles: Set<Rol>
+   nombre: String
+}
+class UsuarioController {
+  + updateUsuario(Long, Usuario): ResponseEntity<Usuario>
+  + createUsuario(Usuario): ResponseEntity<Usuario>
+  + getUsuarioById(Long): ResponseEntity<Usuario>
+  + deleteUsuario(Long): ResponseEntity<Void>
+   allUsuarios: ResponseEntity<List<Usuario>>
+}
+interface UsuarioRepository << interface >> {
+  + findByUsername(String): Optional<Usuario>
+}
+interface UsuarioService << interface >> {
+  + findById(Long): Usuario
+  + save(Usuario): Usuario
+  + findByUsername(String): Usuario
+  + deleteById(Long): void
+  + findAll(): List<Usuario>
+}
+class UsuarioServiceImpl {
+  + save(Usuario): Usuario
+  + findAll(): List<Usuario>
+  + findByUsername(String): Usuario
+  + deleteById(Long): void
+  + findById(Long): Usuario
+}
+class WebSocketConfig {
+  + registerStompEndpoints(StompEndpointRegistry): void
+  + configureMessageBroker(MessageBrokerRegistry): void
+}
+
+AnalysisServiceImpl                      -[#008200,dashed]-^  AnalysisService                         
+CertificadoCalidadServiceImpl            -[#008200,dashed]-^  CertificadoCalidadService               
+CertificadoDeCalidadMapperImpl           -[#008200,dashed]-^  CertificadoDeCalidadMapper              
+ClienteMapperImpl                        -[#008200,dashed]-^  ClienteMapper                           
+ClienteServiceImpl                       -[#008200,dashed]-^  ClienteService                          
+ControlDeCalidadServiceImpl              -[#008200,dashed]-^  ControlDeCalidadService                 
+DefectoServiceImpl                       -[#008200,dashed]-^  DefectoService                          
+EspecificacionMapperImpl                 -[#008200,dashed]-^  EspecificacionMapper                    
+FileStorageServiceImpl                   -[#008200,dashed]-^  FileStorageService                      
+ImageRequest                             -[#008200,dashed]-^  ImageRequestOrBuilder                   
+ImageResponse                            -[#008200,dashed]-^  ImageResponseOrBuilder                  
+ImageResponses                           -[#008200,dashed]-^  ImageResponsesOrBuilder                 
+MaquinaMapperImpl                        -[#008200,dashed]-^  MaquinaMapper                           
+MaquinaServiceImpl                       -[#008200,dashed]-^  MaquinaService                          
+OrdenDeTrabajoMaquinaMapperImpl          -[#008200,dashed]-^  OrdenDeTrabajoMaquinaMapper             
+OrdenDeTrabajoMaquinaResponseMapperImpl  -[#008200,dashed]-^  OrdenDeTrabajoMaquinaResponseMapper     
+OrdenDeTrabajoMaquinaServiceImpl         -[#008200,dashed]-^  OrdenDeTrabajoMaquinaService            
+OrdenDeTrabajoResponseMapperImpl         -[#008200,dashed]-^  OrdenDeTrabajoResponseMapper            
+OrdenDeTrabajoServiceImpl                -[#008200,dashed]-^  OrdenDeTrabajoService                   
+OrdenVentaMapperImpl                     -[#008200,dashed]-^  OrdenVentaMapper                        
+OrdenVentaServiceImpl                    -[#008200,dashed]-^  OrdenVentaService                       
+PlannerMapperImpl                        -[#008200,dashed]-^  PlannerMapper                           
+ProveedorMapperImpl                      -[#008200,dashed]-^  ProveedorMapper                         
+ProveedorServiceImpl                     -[#008200,dashed]-^  ProveedorService                        
+RolServiceImpl                           -[#008200,dashed]-^  RolService                              
+RolloMapperImpl                          -[#008200,dashed]-^  RolloMapper                             
+RolloServiceImpl                         -[#008200,dashed]-^  RolloService                            
+UsuarioServiceImpl                       -[#008200,dashed]-^  UsuarioService                          
+@enduml
