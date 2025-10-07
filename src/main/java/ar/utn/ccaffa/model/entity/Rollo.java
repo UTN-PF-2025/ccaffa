@@ -29,6 +29,11 @@ public class Rollo implements Cloneable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "proveedor_id", insertable = false, updatable = false)
+    private Proveedor proveedor;
+
+
     @Column(name = "proveedor_id", nullable = false)
     @NotNull(message = "El id de proveedor es obligatorio")
     private Long proveedorId;

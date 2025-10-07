@@ -119,19 +119,4 @@ public class RolloController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/obtenerUltimoProductoParaOrdenDeVenta/{id}")
-    public ResponseEntity<?> obtenerUltimoProductoParaOrdenDeVentaId(@PathVariable Long id) {
-
-        if (this.ordenService.trabajoFinalizado(id)){
-            ErrorResponse error = ErrorResponse.builder()
-                    .status("ROLLO_PRODUCTO_NO_DISPONIBLE")
-                    .message("El rollo todavía no esta producido")
-                    .build();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-        }
-
-        Optional<RolloDto> rollo = rolloService.findLastProductForOrdenDeVentaId(id);
-        return ResponseEntity.ok(rollo);
-
-    }
 }

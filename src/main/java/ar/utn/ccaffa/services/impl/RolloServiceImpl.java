@@ -81,6 +81,24 @@ public class RolloServiceImpl implements RolloService {
     }
 
     @Override
+    public List<RolloDto> saveAll(List<RolloDto> rollos) {
+        List<Rollo> rollosEntity = new ArrayList<>();
+
+        for (RolloDto rollo: rollos){
+            Rollo rolloEntity = this.rolloMapper.toEntity(rollo);
+            if (rollo.getRolloPadreId() != null) {
+                rolloEntity.setRolloPadre(rolloRepository.getReferenceById(rollo.getRolloPadreId()));
+            } else {
+                rolloEntity.setRolloPadre(null);
+            }
+            rollosEntity.add(rolloEntity);
+        }
+
+        List<Rollo> guardados = rolloRepository.saveAll(rollosEntity);
+        return this.rolloMapper.toDtoListOnlyWithRolloPadreID(guardados);
+    }
+
+    @Override
     public boolean deleteById(Long id) {
         log.info("Eliminando rollo con ID: {}", id);
         if (!rolloRepository.existsById(id)) {

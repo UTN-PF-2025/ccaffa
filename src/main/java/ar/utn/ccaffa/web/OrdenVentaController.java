@@ -5,10 +5,12 @@ import ar.utn.ccaffa.exceptions.ErrorResponse;
 import ar.utn.ccaffa.model.dto.EspecificacionDto;
 import ar.utn.ccaffa.model.dto.FiltroOrdenVentaDTO;
 import ar.utn.ccaffa.model.dto.OrdenVentaDto;
+import ar.utn.ccaffa.model.dto.RolloDto;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import ar.utn.ccaffa.model.entity.OrdenVenta;
 import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoRepository;
 import ar.utn.ccaffa.services.interfaces.OrdenVentaService;
+import ar.utn.ccaffa.services.interfaces.RolloService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
@@ -27,6 +29,7 @@ public class OrdenVentaController {
 
     private final OrdenVentaService ordenVentaService;
     private final OrdenDeTrabajoRepository ordenDeTrabajoRepository;
+    private final RolloService rolloService;
 
     @GetMapping
     public ResponseEntity<List<OrdenVentaDto>> obtenerTodasLasOrdenes(FiltroOrdenVentaDTO filtroOrdenVentaDTO) {
@@ -136,4 +139,20 @@ public class OrdenVentaController {
         this.ordenVentaService.finalizar(id, ordenesDeTrabajo.get());
         return ResponseEntity.ok("Orden de Venta finalizada correctamente");
     }
+    @GetMapping("/obtenerUltimoProductoParaOrdenDeVenta/{id}")
+    public ResponseEntity<?> obtenerUltimoProductoParaOrdenDeVentaId(@PathVariable Long id) {
+
+        if (!this.ordenVentaService.trabajoFinalizado(id)){
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("ROLLO_PRODUCTO_NO_DISPONIBLE")
+                    .message("El rollo todavía no está producido")
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+
+        Optional<RolloDto> rollo = rolloService.findLastProductForOrdenDeVentaId(id);
+        return ResponseEntity.ok(rollo);
+
+    }
+
 }

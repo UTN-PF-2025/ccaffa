@@ -97,7 +97,7 @@ public class OrdenVentaServiceImpl implements OrdenVentaService {
         OrdenVentaDto ordenVentaDto = this.findById(id);
         if (ordenVentaDto == null) return false;
 
-        return ordenVentaDto.getEstado() == EstadoOrdenVentaEnum.TRABAJO_FINALIZADO;
+        return (ordenVentaDto.getEstado() == EstadoOrdenVentaEnum.TRABAJO_FINALIZADO || ordenVentaDto.getEstado() == EstadoOrdenVentaEnum.FINALIZADA);
     }
 
     @Override

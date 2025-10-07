@@ -23,6 +23,8 @@ public interface RolloService {
 
     boolean existsRolloByProveedorIdAndCodigoProveedor(Long proovedorId, String codigoProveedor);
     RolloDto save(RolloDto rollo);
+
+    List<RolloDto> saveAll(List<RolloDto> rollos);
     boolean deleteById(Long id);
     RolloDto modificarRollo(ModificarRolloRequestDto request);
     boolean anularRollo(Long id);

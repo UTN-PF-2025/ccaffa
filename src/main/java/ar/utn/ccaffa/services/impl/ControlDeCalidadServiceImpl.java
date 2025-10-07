@@ -10,6 +10,7 @@ import ar.utn.ccaffa.model.entity.*;
 import ar.utn.ccaffa.services.interfaces.ControlDeCalidadService;
 import ar.utn.ccaffa.services.interfaces.ProveedorService;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -201,7 +202,7 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
 
         // Si Termino la primera OTM
         if (ordenDeTrabajo.esPrimeraOTM(ordenDeTrabajoMaquina)) {
-            Rollo rolloDeOrdenDeTrabajo = ordenDeTrabajo.getRollo();
+            Rollo rolloDeOrdenDeTrabajo = (Rollo) Hibernate.unproxy(ordenDeTrabajo.getRollo());
             List<Rollo> rollosHijos = rolloDeOrdenDeTrabajo.getHijos().stream().toList();
             for (Rollo rh : rollosHijos) {
                 rh.setEstado(EstadoRollo.DISPONIBLE);

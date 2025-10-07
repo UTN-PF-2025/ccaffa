@@ -181,11 +181,16 @@ public class PlannerController {
             rolloOrden.setAsociadaAOrdenDeTrabajo(true);
             rolloOrden.setOrdeDeTrabajoAsociadaID(orden.getId());
             rollosOrdenes.add(rolloOrden);
+
+            Rollo rolloProductoOrden = orden.getRolloProducto();
+            rolloProductoOrden.setAsociadaAOrdenDeTrabajo(true);
+            rolloProductoOrden.setOrdeDeTrabajoAsociadaID(orden.getId());
+            rolloProductoOrden.setRolloPadreId(rolloOrden.getId());
+            rollosOrdenes.add(rolloProductoOrden);
         }
 
         List<RolloDto> rollosOrdenAGuardar = this.rolloMapper.toDtoListOnlyWithRolloPadreID(rollosOrdenes);
-        rollosOrdenAGuardar.forEach(this.rolloService::save);
-
+        this.rolloService.saveAll(rollosOrdenAGuardar);
 
 
         List<Long> ordenesDeVentaIDs = ordenesDeTrabajo.stream().map(ot -> ot.getOrdenDeVenta().getOrderId()).distinct().toList();
