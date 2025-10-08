@@ -1,5 +1,6 @@
 package ar.utn.ccaffa.services.interfaces;
 
+import ar.utn.ccaffa.model.dto.CancelacionSimulacionDto;
 import ar.utn.ccaffa.model.dto.FiltroOrdenVentaDTO;
 import ar.utn.ccaffa.model.dto.OrdenVentaDto;
 import ar.utn.ccaffa.model.entity.Defecto;
@@ -25,6 +26,8 @@ public interface OrdenVentaService {
     void deleteById(Long id);
 
     void anular(Long ordenVentaId) throws BadRequestException;
+
+    CancelacionSimulacionDto simularCancelacion(Long id);
 
     void finalizar(Long ordenVentaId, OrdenDeTrabajo ordenDeTrabajo);
 

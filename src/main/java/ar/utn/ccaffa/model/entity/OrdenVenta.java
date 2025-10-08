@@ -55,4 +55,8 @@ public class OrdenVenta {
     @JoinColumn(name = "especificacion_id")
     private Especificacion especificacion;
 
+    public Boolean requierePlanificacion(){
+        return (this.getEstado() == EstadoOrdenVentaEnum.REPLANIFICAR || this.getEstado() == EstadoOrdenVentaEnum.A_PLANIFICAR);
+    }
+
 }

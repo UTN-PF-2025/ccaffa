@@ -3,6 +3,7 @@ package ar.utn.ccaffa.web;
 import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.enums.TipoMaterial;
 import ar.utn.ccaffa.exceptions.ErrorResponse;
+import ar.utn.ccaffa.model.dto.CancelacionSimulacionDto;
 import ar.utn.ccaffa.model.dto.FiltroRolloDto;
 import ar.utn.ccaffa.model.dto.RolloDto;
 import ar.utn.ccaffa.model.dto.SimulacionAnulacionRolloResponse;
@@ -104,12 +105,34 @@ public class RolloController {
     }
 
     @PostMapping("/{id}/anular")
-    public ResponseEntity<Void> anularRollo(@PathVariable Long id) {
+    public ResponseEntity<?> anularRollo(@PathVariable Long id) {
         log.info("Anulando rollo con ID: {}", id);
-        if (rolloService.anularRollo(id)) {
+        try {
+            rolloService.anularRollo(id);
             return ResponseEntity.ok().build();
         }
-        return ResponseEntity.notFound().build();
+        catch (Exception e) {
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("ERROR_EN_LA_ANULACION")
+                    .message(e.getMessage())
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+
+    }
+
+    @GetMapping("/{id}/simular-anulacion")
+    public ResponseEntity<?> simularCancelacion(@PathVariable Long id) {
+        try {
+            CancelacionSimulacionDto simulacion = rolloService.simularCancelacion(id);
+            return ResponseEntity.ok(simulacion);
+        } catch (Exception e) {
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("ERROR_EN_LA_SIMULACION")
+                    .message(e.getMessage())
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
     }
 
     @GetMapping("/{id}/anular")

@@ -4,14 +4,11 @@ import ar.utn.ccaffa.enums.*;
 import ar.utn.ccaffa.exceptions.ErrorResponse;
 import ar.utn.ccaffa.mapper.interfaces.OrdenDeTrabajoMaquinaMapper;
 import ar.utn.ccaffa.mapper.interfaces.OrdenDeTrabajoResponseMapper;
+import ar.utn.ccaffa.model.dto.*;
 import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoMaquinaService;
-import ar.utn.ccaffa.model.dto.OrdenDeTrabajoResponseDto;
 import ar.utn.ccaffa.model.entity.*;
 import ar.utn.ccaffa.repository.interfaces.*;
 import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoService;
-import ar.utn.ccaffa.model.dto.Bloque;
-import ar.utn.ccaffa.model.dto.FiltroOrdenDeTrabajoDto;
-import ar.utn.ccaffa.model.dto.OrdenDeTrabajoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -47,6 +44,14 @@ public class OrdenDeTrabajoController {
                 ErrorResponse error = ErrorResponse.builder()
                         .status("ORDEN_DE_VENTA_NOT_FOUND")
                         .message("No se encontró la orden de venta")
+                        .build();
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+            }
+
+            if (!ordenVenta.requierePlanificacion()){
+                ErrorResponse error = ErrorResponse.builder()
+                        .status("ORDEN_DE_VENTA_YA_TOMADA")
+                        .message("La órden de venta ya esta asociada a otra órden de trabajo. No requeire planificación")
                         .build();
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
             }
@@ -112,26 +117,31 @@ public class OrdenDeTrabajoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/{id}/cancelar")
-    public ResponseEntity<OrdenDeTrabajoResponseDto> cancelarOrdenDeTrabajo(@PathVariable Long id) {
+    @PostMapping("/{id}/anular")
+    public ResponseEntity<?> cancelarOrdenDeTrabajo(@PathVariable Long id) {
         try {
             OrdenDeTrabajo ordenCancelada = ordenDeTrabajoService.cancelarOrdenDeTrabajo(id);
             return ResponseEntity.ok(ordenDeTrabajoResponseMapper.toDto(ordenCancelada));
         } catch (Exception e) {
-            log.error("Error al cancelar la orden de trabajo: {}", e.getMessage());
-            // Considera devolver un ResponseEntity con un estado de error más específico
-            return ResponseEntity.badRequest().build();
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("ERROR_EN_LA_ANULACION")
+                    .message(e.getMessage())
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
     }
 
-    @GetMapping("/{id}/simular-cancelacion")
-    public ResponseEntity<ar.utn.ccaffa.model.dto.CancelacionSimulacionDto> simularCancelacion(@PathVariable Long id) {
+    @GetMapping("/{id}/simular-anulacion")
+    public ResponseEntity<?> simularCancelacion(@PathVariable Long id) {
         try {
-            ar.utn.ccaffa.model.dto.CancelacionSimulacionDto simulacion = ordenDeTrabajoService.simularCancelacion(id);
+            CancelacionSimulacionDto simulacion = ordenDeTrabajoService.simularCancelacion(id);
             return ResponseEntity.ok(simulacion);
         } catch (Exception e) {
-            log.error("Error al simular la cancelación de la orden de trabajo: {}", e.getMessage());
-            return ResponseEntity.badRequest().build();
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("ERROR_EN_LA_SIMULACION")
+                    .message(e.getMessage())
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
     }
 

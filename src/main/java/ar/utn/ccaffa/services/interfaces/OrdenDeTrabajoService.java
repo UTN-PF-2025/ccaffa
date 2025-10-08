@@ -2,6 +2,7 @@ package ar.utn.ccaffa.services.interfaces;
 
 import ar.utn.ccaffa.enums.EstadoOrdenTrabajoEnum;
 import ar.utn.ccaffa.enums.EstadoOrdenTrabajoMaquinaEnum;
+import ar.utn.ccaffa.model.dto.CancelacionSimulacionDto;
 import ar.utn.ccaffa.model.dto.FiltroOrdenDeTrabajoDto;
 import ar.utn.ccaffa.model.dto.OrdenDeTrabajoResponseDto;
 import ar.utn.ccaffa.model.entity.Maquina;
@@ -23,7 +24,7 @@ public interface OrdenDeTrabajoService {
 
     OrdenDeTrabajo cancelarOrdenDeTrabajo(Long id);
 
-    ar.utn.ccaffa.model.dto.CancelacionSimulacionDto simularCancelacion(Long id);
+    CancelacionSimulacionDto simularCancelacion(Long id);
     List<OrdenDeTrabajo> findByRolloId(Long rolloId);
     OrdenDeTrabajo findByProcesoId(Long rolloId);
     List<OrdenDeTrabajo> filtrarOrdenes(FiltroOrdenDeTrabajoDto filtros);

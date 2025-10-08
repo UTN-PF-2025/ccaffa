@@ -1,13 +1,10 @@
 package ar.utn.ccaffa.web;
 
+import ar.utn.ccaffa.enums.EstadoOrdenTrabajoEnum;
 import ar.utn.ccaffa.enums.EstadoOrdenVentaEnum;
 import ar.utn.ccaffa.exceptions.ErrorResponse;
-import ar.utn.ccaffa.model.dto.EspecificacionDto;
-import ar.utn.ccaffa.model.dto.FiltroOrdenVentaDTO;
-import ar.utn.ccaffa.model.dto.OrdenVentaDto;
-import ar.utn.ccaffa.model.dto.RolloDto;
+import ar.utn.ccaffa.model.dto.*;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
-import ar.utn.ccaffa.model.entity.OrdenVenta;
 import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoRepository;
 import ar.utn.ccaffa.services.interfaces.OrdenVentaService;
 import ar.utn.ccaffa.services.interfaces.RolloService;
@@ -111,11 +108,35 @@ public class OrdenVentaController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/anular/{id}")
+    @PostMapping("/{id}/anular")
     public ResponseEntity<Object> anular(@PathVariable Long id) throws BadRequestException {
-        this.ordenVentaService.anular(id);
-        return ResponseEntity.ok("Orden de Venta anulada correctamente");
+        try {
+            this.ordenVentaService.anular(id);
+            return ResponseEntity.ok("Orden de Venta anulada correctamente");
+        }
+        catch (Exception e) {
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("ERROR_EN_LA_ANULACION")
+                    .message(e.getMessage())
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
     }
+
+    @GetMapping("/{id}/simular-anulacion")
+    public ResponseEntity<?> simularCancelacion(@PathVariable Long id) {
+        try {
+            CancelacionSimulacionDto simulacion = ordenVentaService.simularCancelacion(id);
+            return ResponseEntity.ok(simulacion);
+        } catch (Exception e) {
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("ERROR_EN_LA_SIMULACION")
+                    .message(e.getMessage())
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+    }
+
 
     @PostMapping("/finalizar/{id}")
     public ResponseEntity<?> finalizar(@PathVariable Long id) throws BadRequestException {
@@ -128,7 +149,7 @@ public class OrdenVentaController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
 
-        Optional<OrdenDeTrabajo> ordenesDeTrabajo = this.ordenDeTrabajoRepository.findTopByOrdenDeVenta_IdOrderByFechaFinDesc(id);
+        Optional<OrdenDeTrabajo> ordenesDeTrabajo = this.ordenDeTrabajoRepository.findTopByOrdenDeVenta_IdAndEstadoInOrderByIdDesc(id, List.of(EstadoOrdenTrabajoEnum.FINALIZADA));
         if (ordenesDeTrabajo.isEmpty()){
             ErrorResponse error = ErrorResponse.builder()
                     .status("ORDEN_DE_TRABAJO_NO_EXISTE")
