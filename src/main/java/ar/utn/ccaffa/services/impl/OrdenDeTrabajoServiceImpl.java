@@ -134,7 +134,7 @@ public class OrdenDeTrabajoServiceImpl implements OrdenDeTrabajoService {
         // 4. Replanificar todas las órdenes de venta afectadas
         afectados.getOrdenesVentaAReplanificar().forEach(ordenVenta -> {
             ordenVenta.setEstado(EstadoOrdenVentaEnum.REPLANIFICAR);
-            ordenVenta.setRazonReplanifiacion("Se canceló la órden de trabajo asociada");
+            ordenVenta.setRazonReplanifiacion("Se anuló la órden de trabajo asociada");
             this.ordenVentaRepository.save(ordenVenta);
         });
 
@@ -184,7 +184,7 @@ public class OrdenDeTrabajoServiceImpl implements OrdenDeTrabajoService {
 
                 List<Rollo> rollosHermanos = rolloRepository.findByRolloPadreId(rolloPadre.getId());
                 for (Rollo rolloHermano : rollosHermanos) {
-                    if (rolloHermano.getEstado() != EstadoRollo.CANCELADO){ // Se tiene que hacer la validación por si la orden que involucra al rollo producto ya fue cancelada antes
+                    if (rolloHermano.esAnulable()){
                         rollosACancelar.add(rolloHermano);
                         List<OrdenDeTrabajo> ordenesHermano = findByRolloId(rolloHermano.getId());
                         for (OrdenDeTrabajo ordenHermano : ordenesHermano) {
@@ -237,7 +237,7 @@ public class OrdenDeTrabajoServiceImpl implements OrdenDeTrabajoService {
     }
 
     private void validarCancelacion(OrdenDeTrabajo orden) {
-        if (EstadoOrdenTrabajoEnum.ANULADA.equals(orden.getEstado()) || EstadoOrdenTrabajoEnum.FINALIZADA.equals(orden.getEstado())) {
+        if (!EstadoOrdenTrabajoEnum.PROGRAMADA.equals(orden.getEstado())) {
             throw new IllegalStateException("No se puede cancelar una orden que ya está " + orden.getEstado());
         }
     }

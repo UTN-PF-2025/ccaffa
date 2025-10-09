@@ -102,6 +102,13 @@ public class PlannerController {
             maquinas = this.maquinaService.findByIdIn(maquinasIDs);
             maquinasIDs.addAll(plannerInfo.getMaquinasIDs());
         }
+        if (maquinasIDs.isEmpty()){
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("MAQUINAS_NO_DISPONIBLES")
+                    .message("No hay maquinas disponibles")
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
         maquinasIDs.add(0L);
         plannerGA.setMaquinasIDs(maquinasIDs);
         plannerGA.setMaquinas(maquinas);
@@ -113,7 +120,13 @@ public class PlannerController {
             rollos = this.rolloService.findEntitiesByIdIn(rollosIDs);
             rollosIDs.addAll(plannerInfo.getRolloIDs());
         }
-
+        if (rollosIDs.isEmpty()){
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("ROLLOS_NO_DISPONIBLES")
+                    .message("No hay rollos disponibles")
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
         plannerGA.setRollosIDs(rollosIDs);
         plannerGA.setRollos(rollos);
 

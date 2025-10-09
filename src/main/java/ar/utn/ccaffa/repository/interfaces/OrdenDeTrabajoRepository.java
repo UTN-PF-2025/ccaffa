@@ -1,7 +1,7 @@
 package ar.utn.ccaffa.repository.interfaces;
 
+import ar.utn.ccaffa.enums.EstadoOrdenTrabajoEnum;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
-import ar.utn.ccaffa.model.entity.OrdenVenta;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,7 +16,7 @@ public interface OrdenDeTrabajoRepository extends JpaRepository<OrdenDeTrabajo, 
     List<OrdenDeTrabajo> findByRolloId(Long rolloId);
     @EntityGraph(attributePaths = {"ordenDeTrabajoMaquinas.maquina", "rollo", "ordenDeVenta.especificacion", "ordenDeVenta.cliente"})
     OrdenDeTrabajo findByOrdenDeTrabajoMaquinas_Id(Long ordenDeTrabajoMaquinaId);
-    Optional<OrdenDeTrabajo> findTopByOrdenDeVenta_IdOrderByFechaFinDesc(Long ordenDeVentaId);
+    Optional<OrdenDeTrabajo> findTopByOrdenDeVenta_IdAndEstadoInOrderByIdDesc(Long ordenDeVentaId, List<EstadoOrdenTrabajoEnum> estados);
 
 
 
