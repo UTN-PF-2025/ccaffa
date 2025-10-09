@@ -300,15 +300,15 @@ public class CertificadoCalidadServiceImpl implements CertificadoCalidadService 
         PdfPTable izquierda3 = new PdfPTable(3);
         EspecificacionDto especificacion = ordenVentaOriginal.getEspecificacion();
         izquierda3.addCell(new Phrase("CANTIDAD(Kg): "));
-        izquierda3.addCell(new Phrase(especificacion.getCantidad()));
+        izquierda3.addCell(new Phrase(especificacion.getCantidad().toString()));
         izquierda3.addCell(new Phrase(" "));
 
         izquierda3.addCell(new Phrase(ANCHO_MM));
-        izquierda3.addCell(new Phrase(especificacion.getAncho()));
+        izquierda3.addCell(new Phrase(especificacion.getAncho().toString()));
         izquierda3.addCell(new Phrase(MAS_MENOS + especificacion.getToleranciaAncho()));
 
         izquierda3.addCell(new Phrase(ESPESOR_MM));
-        izquierda3.addCell(new Phrase(especificacion.getEspesor()));
+        izquierda3.addCell(new Phrase(especificacion.getEspesor().toString()));
         izquierda3.addCell(new Phrase(MAS_MENOS + especificacion.getToleranciaEspesor()));
 
         izquierda3.addCell(new Phrase(DUREZA_RB));
@@ -322,10 +322,10 @@ public class CertificadoCalidadServiceImpl implements CertificadoCalidadService 
         derecha2.addCell(new Phrase("Valor Calidad"));
 
         derecha2.addCell(new Phrase("DIAMETRO INTERNO"));
-        derecha2.addCell(new Phrase(especificacion.getDiametroInterno()));
+        derecha2.addCell(new Phrase(especificacion.getDiametroInterno().toString()));
 
         derecha2.addCell(new Phrase("DIAMETRO EXTERNO"));
-        derecha2.addCell(new Phrase(especificacion.getDiametroExterno()));
+        derecha2.addCell(new Phrase(especificacion.getDiametroExterno().toString()));
 
         derecha2.addCell(new Phrase("Cant Rollos"));
         derecha2.addCell(new Phrase(dto.getCantidadOriginal()));
@@ -344,11 +344,11 @@ public class CertificadoCalidadServiceImpl implements CertificadoCalidadService 
         // TODO: MODIFICAR POR LOS EL ANCHO MEDIO Y ESPESO MEDIO
         PdfPTable table = new PdfPTable(3);
         table.addCell(new Phrase(ANCHO_MM));
-        table.addCell(new Phrase(controlProceso.getAnchoOriginal()));
+        table.addCell(new Phrase(controlProceso.getAnchoOriginal().toString()));
         table.addCell(new Phrase(MAS_MENOS + controlProceso.getToleranciaAncho()));
 
         table.addCell(new Phrase(ESPESOR_MM));
-        table.addCell(new Phrase(controlProceso.getEspesorOriginal()));
+        table.addCell(new Phrase(controlProceso.getEspesorOriginal().toString()));
         table.addCell(new Phrase(MAS_MENOS + controlProceso.getToleranciaEspesor()));
 
         table.addCell(new Phrase(DUREZA_RB));
