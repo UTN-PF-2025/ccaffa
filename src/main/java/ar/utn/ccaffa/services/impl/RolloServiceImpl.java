@@ -79,6 +79,20 @@ public class RolloServiceImpl implements RolloService {
     }
 
     @Override
+    public RolloDto modify(RolloDto rollo){
+        RolloDto rolloDB = this.findById(rollo.getId());
+        if(rolloDB == null){
+            throw new IllegalArgumentException("No existe el rollo a modificar");
+        }
+        if (rolloDB.getAsociadaAOrdenDeTrabajo()){
+            throw new IllegalArgumentException("No se puede modficar un rollo asociado a una órden de trabajo");
+        }
+        if (rolloDB.getTipoRollo() == TipoRollo.PRODUCTO && rollo.getTipoRollo() != TipoRollo.PRODUCTO ){
+            throw new IllegalArgumentException("Incorrecto cambio de tipo");
+        }
+        return this.save(rollo);
+    }
+    @Override
     public List<RolloDto> saveAll(List<RolloDto> rollos) {
         List<Rollo> rollosEntity = new ArrayList<>();
 

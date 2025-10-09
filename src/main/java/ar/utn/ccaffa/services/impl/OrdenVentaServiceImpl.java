@@ -97,7 +97,7 @@ public class OrdenVentaServiceImpl implements OrdenVentaService {
         if(!ordenVentaAAnular.esAnulable())
             throw new IllegalStateException("La órden no se encuentra en un estado anulable");
 
-        Optional<OrdenDeTrabajo> ordenesDeTrabajo = this.ordenDeTrabajoRepository.findTopByOrdenDeVenta_IdAndEstadoInOrderByIdDesc(ordenVentaAAnular.getOrderId(), List.of(EstadoOrdenTrabajoEnum.PROGRAMADA, EstadoOrdenTrabajoEnum.EN_CURSO));
+        Optional<OrdenDeTrabajo> ordenesDeTrabajo = this.ordenDeTrabajoRepository.findTopByOrdenDeVenta_IdAndEstadoInOrderByIdDesc(ordenVentaAAnular.getOrderId(), List.of(EstadoOrdenTrabajoEnum.PROGRAMADA, EstadoOrdenTrabajoEnum.EN_CURSO, EstadoOrdenTrabajoEnum.FINALIZADA));
 
         if (ordenesDeTrabajo.isEmpty()){
             return CancelacionSimulacionDto.builder()

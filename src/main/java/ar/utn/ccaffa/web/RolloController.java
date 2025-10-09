@@ -89,9 +89,18 @@ public class RolloController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RolloDto> updateRollo(@PathVariable Long id, @RequestBody RolloDto rollo) {
+    public ResponseEntity<?> updateRollo(@PathVariable Long id, @RequestBody RolloDto rollo) {
         rollo.setId(id);
-        return ResponseEntity.ok(rolloService.save(rollo));
+        try {
+            return ResponseEntity.ok(rolloService.modify(rollo));
+        }
+        catch (Exception e){
+            ErrorResponse error = ErrorResponse.builder()
+                    .status("ERROR_EN_LA_MODIFICACION")
+                    .message(e.getMessage())
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
     }
 
 

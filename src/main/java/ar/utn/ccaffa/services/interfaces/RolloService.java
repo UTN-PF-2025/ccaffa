@@ -25,6 +25,8 @@ public interface RolloService {
     boolean existsRolloByProveedorIdAndCodigoProveedor(Long proovedorId, String codigoProveedor);
     RolloDto save(RolloDto rollo);
 
+    RolloDto modify(RolloDto rollo);
+
     List<RolloDto> saveAll(List<RolloDto> rollos);
     boolean deleteById(Long id);
     RolloDto modificarRollo(ModificarRolloRequestDto request);
