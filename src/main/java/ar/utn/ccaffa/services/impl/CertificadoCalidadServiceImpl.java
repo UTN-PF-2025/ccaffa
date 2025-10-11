@@ -74,7 +74,7 @@ public class CertificadoCalidadServiceImpl implements CertificadoCalidadService 
             String nombreArchivo = construirNombreArchivo(controlProceso, ot);
             inicializarDocumento(nombreArchivo);
 
-            agregarEncabezado(controlProceso, fechaEmision, ot);
+            agregarEncabezado(controlProceso, fechaEmision, ot, ordenVentaDto);
             agregarEspacio();
             agregarSeccionPartidas(certificadoRequestDTO);
             agregarEspacio();
@@ -272,10 +272,10 @@ public class CertificadoCalidadServiceImpl implements CertificadoCalidadService 
         }
     }
 
-    private void agregarEncabezado(ControlDeProcesoDto dto, LocalDate fechaEmision, OrdenDeTrabajo ot) throws DocumentException {
+    private void agregarEncabezado(ControlDeProcesoDto dto, LocalDate fechaEmision, OrdenDeTrabajo ot, OrdenVentaDto ordenVentaDto) throws DocumentException {
         definirTitulo(Element.ALIGN_CENTER, CERTIFICADO_DE_CALIDAD);
         agregarCampo(documentParagraph, Element.ALIGN_LEFT, "FECHA: " + fechaEmision);
-        agregarCampo(documentParagraph, Element.ALIGN_LEFT, "CLIENTE:\t" + dto.getNombreCliente());
+        agregarCampo(documentParagraph, Element.ALIGN_LEFT, "CLIENTE:\t" + ordenVentaDto.getCliente().getName());
         agregarCampo(documentParagraph, Element.ALIGN_RIGHT, "O.T.: " + ot.getId());
     }
 
@@ -344,11 +344,11 @@ public class CertificadoCalidadServiceImpl implements CertificadoCalidadService 
         // TODO: MODIFICAR POR LOS EL ANCHO MEDIO Y ESPESO MEDIO
         PdfPTable table = new PdfPTable(3);
         table.addCell(new Phrase(ANCHO_MM));
-        table.addCell(new Phrase(controlProceso.getAnchoOriginal().toString()));
+        table.addCell(new Phrase(controlProceso.getAnchoMedio().toString()));
         table.addCell(new Phrase(MAS_MENOS + controlProceso.getToleranciaAncho()));
 
         table.addCell(new Phrase(ESPESOR_MM));
-        table.addCell(new Phrase(controlProceso.getEspesorOriginal().toString()));
+        table.addCell(new Phrase(controlProceso.getEspesorMedio().toString()));
         table.addCell(new Phrase(MAS_MENOS + controlProceso.getToleranciaEspesor()));
 
         table.addCell(new Phrase(DUREZA_RB));
