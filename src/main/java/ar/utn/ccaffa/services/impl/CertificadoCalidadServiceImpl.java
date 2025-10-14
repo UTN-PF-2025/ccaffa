@@ -31,6 +31,11 @@ import java.util.stream.Stream;
 @Service
 public class CertificadoCalidadServiceImpl implements CertificadoCalidadService {
 
+    public static final Font FONT_TITULO = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16, Font.BOLD);
+    public static final Font FONT_SUBTITULO = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, Font.BOLD);
+    public static final Font FONT_NORMAL = FontFactory.getFont(FontFactory.HELVETICA, 10);
+    public static final Font FONT_CELDA_HEADER = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, Font.BOLD);
+
     public static final String ANCHO_MM = "ANCHO(mm): ";
     public static final String ESPESOR_MM = "ESPESOR(mm): ";
     public static final String DUREZA_RB = "DUREZA(Rb): ";
@@ -43,6 +48,8 @@ public class CertificadoCalidadServiceImpl implements CertificadoCalidadService 
     public static final String COMPOSICION_AZUFRE = "0,014";
     public static final String COMPOSICION_ALUMINIO = "0,029";
     public static final String COMPOSICION_SILICIO = "0,02";
+    public static final String SAE_1006 = "SAE 1006";
+    public static final String OK = "OK";
 
     private final ControlDeCalidadService controlDeCalidadService;
     private final CertificadoDeCalidadRepository certificadoDeCalidadRepository;
@@ -72,24 +79,15 @@ public class CertificadoCalidadServiceImpl implements CertificadoCalidadService 
             LocalDate fechaEmision = LocalDate.now();
 
             String nombreArchivo = construirNombreArchivo(controlProceso, ot);
+
             inicializarDocumento(nombreArchivo);
-
             agregarEncabezado(controlProceso, fechaEmision, ot, ordenVentaDto);
-            agregarEspacio();
             agregarSeccionPartidas(certificadoRequestDTO);
-            agregarEspacio();
-
             agregarSeccionSolicitado(certificadoRequestDTO, ordenVentaDto);
-            agregarEspacio();
-
             agregarSeccionControlado(certificadoRequestDTO, controlProceso);
-            agregarEspacio();
-
             agregarSeccionCalidad();
-            agregarEspacio();
-
             armarTablaComposicion(certificadoRequestDTO);
-
+            agregarPieDePagina();
             cerrarDocumento();
 
             guardarCertificado(certificadoRequestDTO, fechaEmision, controlProceso, nombreArchivo);
@@ -100,24 +98,49 @@ public class CertificadoCalidadServiceImpl implements CertificadoCalidadService 
     }
 
     private void agregarSeccionCalidad() throws DocumentException {
-        PdfPTable table = new PdfPTable(2);
-        table.setTotalWidth(210);
-        table.setLockedWidth(true);
-        table.addCell(new Phrase("CALIDAD"));
-        table.addCell(new Phrase("SAE 1006"));
-        table.addCell(new Phrase("PLANITUD"));
-        table.addCell(new Phrase("OK"));
-        table.addCell(new Phrase("SUPERFICIE"));
-        table.addCell(new Phrase("OK"));
-        table.addCell(new Phrase("CAMBER"));
-        table.addCell(new Phrase("OK"));
-        table.addCell(new Phrase("PLEGADO"));
-        table.addCell(new Phrase("OK"));
-        table.addCell(new Phrase("REBABA"));
-        table.addCell(new Phrase("OK"));
-        table.addCell(new Phrase("CAMBER"));
-        table.addCell(new Phrase("OK"));
+        Paragraph titulo = new Paragraph("CALIDAD", FONT_SUBTITULO);
+        titulo.setSpacingAfter(10f);
+        documentParagraph.add(titulo);
+
+        PdfPTable table = crearTablaConEstilo(2);
+
+        agregarCeldaConEstilo(table, "PARÁMETRO", FONT_CELDA_HEADER, BaseColor.LIGHT_GRAY);
+        agregarCeldaConEstilo(table, "RESULTADO", FONT_CELDA_HEADER, BaseColor.LIGHT_GRAY);
+
+
+        String[][] datosCalidad = {
+                {"CALIDAD", SAE_1006},
+                {"PLANITUD", OK},
+                {"SUPERFICIE", OK},
+                {"CAMBER", OK},
+                {"PLEGADO", OK},
+                {"REBABA", OK}
+        };
+
+        for (String[] dato : datosCalidad) {
+            agregarCeldaConEstilo(table, dato[0], FONT_NORMAL, null);
+            agregarCeldaConEstilo(table, dato[1], FONT_NORMAL, null);
+        }
+
         documentParagraph.add(table);
+    }
+
+    private PdfPTable crearTablaConEstilo(int numColumns) {
+        PdfPTable table = new PdfPTable(numColumns);
+        table.setWidthPercentage(100);
+        table.setSpacingBefore(10f);
+        table.setSpacingAfter(10f);
+        return table;
+    }
+
+    private void agregarCeldaConEstilo(PdfPTable table, String texto, Font font, BaseColor backgroundColor) {
+        PdfPCell cell = new PdfPCell(new Phrase(texto, font));
+        if (backgroundColor != null) {
+            cell.setBackgroundColor(backgroundColor);
+        }
+        cell.setPadding(5f);
+        cell.setBorderWidth(1f);
+        table.addCell(cell);
     }
 
     @Override
@@ -219,9 +242,9 @@ public class CertificadoCalidadServiceImpl implements CertificadoCalidadService 
     }
 
     private void definirTitulo(int alignCenter, String titulo) throws DocumentException {
-        Paragraph paragraph = new Paragraph(titulo);
+        Paragraph paragraph = new Paragraph(titulo, FONT_TITULO);
         paragraph.setAlignment(alignCenter);
-        paragraph.setFont(FontFactory.getFont(FontFactory.HELVETICA_BOLD, 40, Font.BOLD));
+        paragraph.setSpacingAfter(20f);
         documentParagraph.add(paragraph);
     }
 
@@ -274,9 +297,29 @@ public class CertificadoCalidadServiceImpl implements CertificadoCalidadService 
 
     private void agregarEncabezado(ControlDeProcesoDto dto, LocalDate fechaEmision, OrdenDeTrabajo ot, OrdenVentaDto ordenVentaDto) throws DocumentException {
         definirTitulo(Element.ALIGN_CENTER, CERTIFICADO_DE_CALIDAD);
-        agregarCampo(documentParagraph, Element.ALIGN_LEFT, "FECHA: " + fechaEmision);
-        agregarCampo(documentParagraph, Element.ALIGN_LEFT, "CLIENTE:\t" + ordenVentaDto.getCliente().getName());
-        agregarCampo(documentParagraph, Element.ALIGN_RIGHT, "O.T.: " + ot.getId());
+
+        PdfPTable headerTable = crearTablaConEstilo(2);
+        headerTable.setWidthPercentage(80);
+
+        agregarCeldaConEstilo(headerTable, "FECHA: " + fechaEmision, FONT_NORMAL, null);
+        agregarCeldaConEstilo(headerTable, "O.T.: " + ot.getId(), FONT_NORMAL, null);
+        agregarCeldaConEstilo(headerTable, "CLIENTE: " + ordenVentaDto.getCliente().getName(), FONT_NORMAL, null);
+        agregarCeldaConEstilo(headerTable, "N° CERTIFICADO: " + construirNumeroCertificado(new CertificadoRequestDTO()), FONT_NORMAL, null);
+
+        documentParagraph.add(headerTable);
+        agregarEspacio(0);
+    }
+
+    private void agregarPieDePagina() throws DocumentException {
+        agregarEspacio(20f);
+
+        Paragraph firma = new Paragraph("_________________________", FONT_NORMAL);
+        firma.setAlignment(Element.ALIGN_CENTER);
+        documentParagraph.add(firma);
+
+        Paragraph responsable = new Paragraph("Responsable de Calidad", FONT_NORMAL);
+        responsable.setAlignment(Element.ALIGN_CENTER);
+        documentParagraph.add(responsable);
     }
 
     private void agregarSeccionPartidas(CertificadoRequestDTO dto) throws DocumentException {
@@ -285,13 +328,13 @@ public class CertificadoCalidadServiceImpl implements CertificadoCalidadService 
 
     private void agregarSeccionSolicitado(CertificadoRequestDTO dto, OrdenVentaDto ordenVentaOriginal) throws DocumentException {
         documentParagraph.add(new Paragraph("SOLICITADO"));
-        agregarEspacio();
+        agregarEspacio(0);
         documentParagraph.add(crearTablaDatosSolicitados(dto, ordenVentaOriginal));
     }
 
     private void agregarSeccionControlado(CertificadoRequestDTO dto, ControlDeProcesoDto controlProceso) throws DocumentException {
         documentParagraph.add(new Paragraph("CONTROLADO"));
-        agregarEspacio();
+        agregarEspacio(0);
         documentParagraph.add(crearTablaDatosControlados(dto, controlProceso));
     }
 
@@ -319,7 +362,7 @@ public class CertificadoCalidadServiceImpl implements CertificadoCalidadService 
         PdfPTable derecha2 = new PdfPTable(2);
 
         derecha2.addCell(new Phrase("CALIDAD "));
-        derecha2.addCell(new Phrase("Valor Calidad"));
+        derecha2.addCell(new Phrase(SAE_1006));
 
         derecha2.addCell(new Phrase("DIAMETRO INTERNO"));
         derecha2.addCell(new Phrase(especificacion.getDiametroInterno().toString()));
@@ -356,9 +399,15 @@ public class CertificadoCalidadServiceImpl implements CertificadoCalidadService 
         table.addCell(new Phrase(MAS_MENOS + " "));
         return table;
     }
+    private void agregarEspacio(float puntos) throws DocumentException {
+        documentParagraph.add(new Paragraph(" "));
+        if (puntos > 0) {
+            documentParagraph.add(Chunk.NEWLINE);
+        }
+    }
 
     private void agregarEspacio() throws DocumentException {
-        documentParagraph.add(new Paragraph(" "));
+        agregarEspacio(5f);
     }
 
 }
