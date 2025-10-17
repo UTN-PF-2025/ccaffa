@@ -56,6 +56,7 @@ public class OrdenDeTrabajoController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
             }
 
+            ordenVenta.setEstado(EstadoOrdenVentaEnum.PROGRAMADA);
             // 2. Crear y guardar la orden de trabajo básica para obtener un ID
             OrdenDeTrabajo orden = crearOrdenBasica(request);
             orden.setOrdenDeVenta(ordenVenta);
@@ -197,7 +198,6 @@ public class OrdenDeTrabajoController {
         }
 
         OrdenVenta ordenVenta = ordenVentaOpt.get();
-        ordenVenta.setEstado(EstadoOrdenVentaEnum.PROGRAMADA);
         return ordenVenta;
     }
 

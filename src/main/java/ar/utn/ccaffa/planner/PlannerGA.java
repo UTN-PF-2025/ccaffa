@@ -149,8 +149,12 @@ public class PlannerGA {
 
         Maquina maquina1 = getMaquinaByID(m1);
 
-        if (maquina1.getTipo() == MaquinaTipoEnum.CORTADORA)
-            return  getMaquinasIDsByType(MaquinaTipoEnum.LAMINADORA);
+        if (maquina1.getTipo() == MaquinaTipoEnum.CORTADORA) {
+            List<Long> machines2 = new ArrayList<>();
+            machines2.addAll(getMaquinasIDsByType(MaquinaTipoEnum.LAMINADORA));
+            machines2.add(0L);
+            return  machines2;
+        }
 
         if (maquina1.getTipo() == MaquinaTipoEnum.LAMINADORA)
             return  List.of(0L);
