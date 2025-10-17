@@ -17,9 +17,16 @@ public class CertificadoController {
     private final CertificadoCalidadService certificadoCalidadService;
 
     @PostMapping
-    public ResponseEntity<String> generar(@RequestBody CertificadoRequestDTO certificadoRequest) {
-        certificadoCalidadService.generarCertificado(certificadoRequest);
-        return ResponseEntity.ok("Certificado generado");
+    public ResponseEntity<byte[]> generar(@RequestBody CertificadoRequestDTO certificadoRequest) {
+        byte[] pdfData = certificadoCalidadService.generarCertificado(certificadoRequest);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "certificado.pdf");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(pdfData);
     }
 
     @GetMapping(value = "/{id}")
