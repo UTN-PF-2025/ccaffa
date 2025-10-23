@@ -49,6 +49,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/ordenes-venta/**").hasAnyAuthority("vendedor", "produccion")
                 .requestMatchers(HttpMethod.GET,"/api/ordenes-trabajo/{id}").hasAnyAuthority("supervisor", "operario")
                 .requestMatchers(HttpMethod.GET,"/api/ordenes-trabajo").hasAnyAuthority("supervisor", "operario","produccion")
+                .requestMatchers(HttpMethod.POST,"/api/ordenes-trabajo").hasAuthority("produccion")
                 .requestMatchers(HttpMethod.GET,"/api/ordenes-trabajo/programaciones-maquinas/**").hasAuthority("operario")
                 .requestMatchers("/api/ordenes-trabajo/**").hasAuthority("produccion")
                 .requestMatchers("/api/planner/**").hasAuthority("produccion")
