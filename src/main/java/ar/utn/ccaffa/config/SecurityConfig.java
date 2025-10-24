@@ -54,6 +54,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/images/**").permitAll() 
                 .requestMatchers("/api/camaras/{id}/upload").permitAll()
                 .requestMatchers("/api/images/{id}/{filename}").permitAll()
+                            .requestMatchers("/api/metrics/**").permitAll()
                 .requestMatchers("/api/camaras/**").hasAnyRole("OPERADOR", "ADMIN")
                 .anyRequest().authenticated()
                 //.anyRequest().permitAll() // Permite todas las requests sin autenticación
