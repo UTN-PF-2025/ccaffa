@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,13 +22,23 @@ public class MetricsController {
     private final OrdenDeTrabajoMaquinaRepository ordenDeTrabajoMaquinaRepository;
     private final OrdenDeTrabajoRepository ordenDeTrabajoRepository;
     private final RolloRepository rolloRepository;
+    private final DefectoRepository defectoRepository;
+    private final ControlDeCalidadRepository controlDeCalidadRepository;
 
-    public MetricsController(UsuarioRepository usuarioRepository, OrdenVentaRepository ordenVentaRepository, OrdenDeTrabajoMaquinaRepository ordenDeTrabajoMaquinaRepository, OrdenDeTrabajoRepository ordenDeTrabajoRepository, RolloRepository rolloRepository) {
+    public MetricsController(UsuarioRepository usuarioRepository,
+                             OrdenVentaRepository ordenVentaRepository,
+                             OrdenDeTrabajoMaquinaRepository ordenDeTrabajoMaquinaRepository,
+                             OrdenDeTrabajoRepository ordenDeTrabajoRepository,
+                             RolloRepository rolloRepository,
+                             DefectoRepository defectoRepository,
+                             ControlDeCalidadRepository controlDeCalidadRepository) {
         this.usuarioRepository = usuarioRepository;
         this.ordenVentaRepository = ordenVentaRepository;
         this.ordenDeTrabajoMaquinaRepository = ordenDeTrabajoMaquinaRepository;
         this.ordenDeTrabajoRepository = ordenDeTrabajoRepository;
         this.rolloRepository = rolloRepository;
+        this.defectoRepository = defectoRepository;
+        this.controlDeCalidadRepository = controlDeCalidadRepository;
     }
 
     @GetMapping("/usuarios/total")
@@ -58,6 +69,16 @@ public class MetricsController {
     @GetMapping("/rollos_pesoTotal/{fechaIngresoDesde}")
     public ResponseEntity<List<RolloMetricsPesoByEstadoAndTipo>>rollos_pesoTotal(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime fechaIngresoDesde) {
         return new ResponseEntity<>(rolloRepository.pesoTotal(fechaIngresoDesde), HttpStatus.OK);
+    }
+
+    @GetMapping("/defecto_total/{fechaCreacionDesde}")
+    public ResponseEntity<List<DefectoMetricsTotalByRechazado>>defecto_total(@PathVariable LocalDate fechaCreacionDesde) {
+        return new ResponseEntity<>(defectoRepository.totalByRechazado(fechaCreacionDesde), HttpStatus.OK);
+    }
+
+    @GetMapping("/ocontrol_de_calidad_by_estado/{fechaControlDesde}")
+    public ResponseEntity<List<ControlDeCalidadMetricsTotalByEstado>>ocontrol_de_calidad_by_estado(@PathVariable  @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime fechaControlDesde) {
+        return new ResponseEntity<>(controlDeCalidadRepository.totalByEstado(fechaControlDesde), HttpStatus.OK);
     }
 
 }
