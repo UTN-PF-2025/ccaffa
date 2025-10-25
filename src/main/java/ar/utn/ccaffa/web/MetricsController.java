@@ -76,7 +76,7 @@ public class MetricsController {
         return new ResponseEntity<>(defectoRepository.totalByRechazado(fechaCreacionDesde), HttpStatus.OK);
     }
 
-    @GetMapping("/ocontrol_de_calidad_by_estado/{fechaControlDesde}")
+    @GetMapping("/control_de_calidad_by_estado/{fechaControlDesde}")
     public ResponseEntity<List<ControlDeCalidadMetricsTotalByEstado>>ocontrol_de_calidad_by_estado(@PathVariable  @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime fechaControlDesde) {
         return new ResponseEntity<>(controlDeCalidadRepository.totalByEstado(fechaControlDesde), HttpStatus.OK);
     }
