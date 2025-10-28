@@ -1,8 +1,12 @@
 package ar.utn.ccaffa.repository.interfaces;
 
 import ar.utn.ccaffa.enums.EstadoRollo;
+import ar.utn.ccaffa.model.dto.metrics.OTMMetricsTotalByEstado;
+import ar.utn.ccaffa.model.dto.metrics.RolloMetricsPesoByEstadoAndTipo;
+import ar.utn.ccaffa.model.dto.metrics.RolloMetricsTotalByEstadoAndTipo;
 import ar.utn.ccaffa.model.entity.Rollo;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,4 +24,9 @@ public interface RolloRepository extends JpaRepository<Rollo, Long>, JpaSpecific
     @Query("SELECT rp FROM Rollo rp LEFT JOIN OrdenDeTrabajo  ot ON ot.id = rp.ordeDeTrabajoAsociadaID  WHERE ot.ordenDeVenta.id = :ordenDeVentaId AND rp.tipoRollo = 'PRODUCTO' ORDER BY rp.id DESC LIMIT 1")
     Optional<Rollo> findLastProductForOrdenDeVentaId(@Param("ordenDeVentaId") Long ordenDeVentaId);
 
+    @Query("SELECT new ar.utn.ccaffa.model.dto.metrics.RolloMetricsTotalByEstadoAndTipo(e.estado, COUNT(e), e.tipoMaterial, e.tipoRollo) FROM Rollo e WHERE e.fechaIngreso >= :fechaIngresoDesde  GROUP BY e.estado, e.tipoMaterial, e.tipoRollo")
+    List<RolloMetricsTotalByEstadoAndTipo> total(@Param("fechaIngresoDesde") LocalDateTime fechaIngresoDesde);
+
+    @Query("SELECT new ar.utn.ccaffa.model.dto.metrics.RolloMetricsPesoByEstadoAndTipo(e.estado, SUM(e.pesoKG), e.tipoMaterial, e.tipoRollo) FROM Rollo e WHERE e.fechaIngreso >= :fechaIngresoDesde  GROUP BY e.estado, e.tipoMaterial, e.tipoRollo")
+    List<RolloMetricsPesoByEstadoAndTipo> pesoTotal(@Param("fechaIngresoDesde") LocalDateTime fechaIngresoDesde);
 }

@@ -42,7 +42,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/login", "/api/ws/**").permitAll() 
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/maquinas/**").permitAll()
-                .requestMatchers(HttpMethod.GET,"/api/metrics/**").hasAnyAuthority("produccion", "deposito", "vendedor")
+                .requestMatchers(HttpMethod.GET,"/api/metrics/**").permitAll()
                 .requestMatchers(HttpMethod.GET,"/api/rollos/tipoMateriales").hasAnyAuthority("vendedor", "deposito")
                 .requestMatchers("/api/proveedores/**").hasAuthority("deposito")
                 .requestMatchers("/api/rollos/**").hasAnyAuthority("produccion", "deposito")
