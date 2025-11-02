@@ -1,6 +1,7 @@
 package ar.utn.ccaffa.repository.interfaces;
 
 import ar.utn.ccaffa.enums.EstadoOrdenVentaEnum;
+import ar.utn.ccaffa.model.dto.metrics.OVMetricsTotalByEstado;
 import ar.utn.ccaffa.model.entity.OrdenVenta;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,6 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -37,4 +39,6 @@ public interface OrdenVentaRepository extends JpaRepository<OrdenVenta, Long>, J
     @Query("update OrdenVenta ov set ov.estado = :estado where ov.id = :ordenVentaId")
     void updateOrdenDeVentaEstado(@Param("ordenVentaId") Long ordenVentaId, @Param("estado") EstadoOrdenVentaEnum estado);
 
+    @Query("SELECT new ar.utn.ccaffa.model.dto.metrics.OVMetricsTotalByEstado(e.estado, COUNT(e)) FROM OrdenVenta e WHERE e.fechaCreacion >= :fechaCreacionDesde  GROUP BY e.estado")
+    List<OVMetricsTotalByEstado> totalByEstado(@Param("fechaCreacionDesde") LocalDateTime fechaCreacionDesde);
 }
