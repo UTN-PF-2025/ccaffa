@@ -24,7 +24,7 @@ public interface OrdenDeTrabajoRepository extends JpaRepository<OrdenDeTrabajo, 
 
 
     @Override
-    @EntityGraph(attributePaths = {"ordenDeTrabajoMaquinas.maquina", "rollo", "ordenDeVenta.especificacion", "ordenDeVenta.cliente"})
+    @EntityGraph(attributePaths = {"ordenDeTrabajoMaquinas.maquina", "rollo", "rolloProducto", "ordenDeVenta.especificacion", "ordenDeVenta.cliente"})
     List<OrdenDeTrabajo> findAll(Specification<OrdenDeTrabajo> spec);
 
     @Query("select ot from OrdenDeTrabajo ot left join fetch ot.rollo where ot.id = :id")

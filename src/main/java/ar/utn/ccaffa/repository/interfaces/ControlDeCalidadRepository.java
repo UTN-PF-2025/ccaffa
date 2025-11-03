@@ -22,7 +22,7 @@ public interface ControlDeCalidadRepository extends JpaRepository<ControlDeCalid
     ControlDeCalidad findByOrdenDeTrabajoMaquinaId(Long id);
 
     @Override
-    @EntityGraph(attributePaths = {"usuario"})
+    @EntityGraph(attributePaths = {"usuario", "medidasDeCalidad"})
     List<ControlDeCalidad> findAll(Specification<ControlDeCalidad> spec);
 
     @Query("SELECT new ar.utn.ccaffa.model.dto.metrics.ControlDeCalidadMetricsTotalByEstado(e.estado, COUNT(e)) FROM ControlDeCalidad e WHERE e.fechaControl >= :fechaControlDesde  GROUP BY e.estado")
