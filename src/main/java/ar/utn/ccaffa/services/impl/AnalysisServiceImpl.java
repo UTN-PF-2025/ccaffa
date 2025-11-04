@@ -2,6 +2,7 @@ package ar.utn.ccaffa.services.impl;
 
 import ar.utn.ccaffa.grpc.ImageClassifierGrpc;
 import ar.utn.ccaffa.grpc.ImageRequest;
+import ar.utn.ccaffa.grpc.ImageResponse;
 import ar.utn.ccaffa.grpc.ImageResponses;
 import ar.utn.ccaffa.model.dto.AnalysisResponse;
 import ar.utn.ccaffa.model.entity.ControlDeCalidad;
@@ -20,7 +21,13 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Random;
@@ -69,19 +76,29 @@ public class AnalysisServiceImpl implements AnalysisService {
             if (response != null && response.getFound()) {
                 log.info("¡Defecto detectado! Detalles: {} (cameraId={})", response.getResponsesList(), effectiveCameraId);
 
-                // 6. Guardar la imagen en el sistema de archivos bajo subdirectorio de cámara
-                String filePath = fileStorageService.save(fileBytes, originalFilename, effectiveCameraId);
-                log.info("Imagen con defecto guardada en: {}", filePath);
-
                 // Buscar el control de calidad y añadir el nuevo defecto
                 ControlDeCalidad controlDeCalidad = controlDeCalidadRepository.findById(Long.valueOf(id))
                         .orElseThrow(() -> new RuntimeException("Control de Calidad no encontrado con ID: " + id));
+                StringBuilder defectDescriptions = new StringBuilder();
+                defectDescriptions.append("Defectos detectados:").append("\n");
+                for (ImageResponse defDesc : response.getResponsesList()) {
+                    if (defDesc.getProbability() > 0.8 && !defDesc.getClassName().equals("normal")) {
+                        String desc = String.format("  Defecto: %s (Probabilidad: %.2f)", defDesc.getClassName(), defDesc.getProbability());
+                        defectDescriptions.append(desc).append("\n");
+                    }
+                }
+
+                // 6. Modificar la imagen para añadir la descripción y guardarla
+                byte[] imageWithDescription = createImageWithDescription(fileBytes, defectDescriptions.toString());
+                String filePath = fileStorageService.save(imageWithDescription, originalFilename, effectiveCameraId);
+                log.info("Imagen con defecto y descripción guardada en: {}", filePath);
+
 
                 Defecto defecto = new Defecto();
-                defecto.setImagen(filePath);
+                defecto.setImagen(filePath.replace("\\", "/"));
                 defecto.setFecha(LocalDate.now());
                 defecto.setTipo("Defecto de Fleje");
-                defecto.setDescripcion("Defecto detectado por el sistema de visión.");
+                defecto.setDescripcion(defectDescriptions.toString());
                 defecto.setEsRechazado(false);
                 defecto.setControlDeCalidad(controlDeCalidad); // Establecer la relación
 
@@ -91,7 +108,7 @@ public class AnalysisServiceImpl implements AnalysisService {
                 AnalysisResponse analysis = new AnalysisResponse();
                 analysis.setDefect(true);
                 analysis.setDetails("Defecto detectado en " + originalFilename);
-                analysis.setImageId(filePath);
+                analysis.setImageId(filePath.replace("\\", "/"));
                 analysis.setId(defecto.getId());
                 analysis.setCameraId(effectiveCameraId);
 
@@ -111,6 +128,50 @@ public class AnalysisServiceImpl implements AnalysisService {
         } finally {
             if (channel != null) {
                 channel.shutdown();
+            }
+        }
+    }
+
+    private byte[] createImageWithDescription(byte[] originalImageBytes, String description) throws IOException {
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(originalImageBytes)) {
+            BufferedImage originalImage = ImageIO.read(bais);
+            if (originalImage == null) {
+                throw new IOException("No se pudo decodificar la imagen.");
+            }
+
+            int originalWidth = originalImage.getWidth();
+            int originalHeight = originalImage.getHeight();
+            int sidebarWidth = 400; // Ancho del panel para el texto
+            int newWidth = originalWidth + sidebarWidth;
+
+            // Crear una nueva imagen más ancha
+            BufferedImage newImage = new BufferedImage(newWidth, originalHeight, BufferedImage.TYPE_INT_RGB);
+            Graphics2D g2d = newImage.createGraphics();
+
+            // Rellenar el fondo del panel de texto con blanco
+            g2d.setColor(Color.WHITE);
+            g2d.fillRect(originalWidth, 0, sidebarWidth, originalHeight);
+
+            // Dibujar la imagen original en la nueva
+            g2d.drawImage(originalImage, 0, 0, null);
+
+            // Configurar fuente y color para el texto
+            g2d.setColor(Color.BLACK);
+            g2d.setFont(new Font("Arial", Font.PLAIN, 18));
+
+            // Dibujar el texto línea por línea
+            int y = 30; // Posición Y inicial
+            for (String line : description.split("\n")) {
+                g2d.drawString(line, originalWidth + 20, y);
+                y += 30; // Espacio entre líneas
+            }
+
+            g2d.dispose();
+
+            // Convertir la nueva imagen a byte[]
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                ImageIO.write(newImage, "jpg", baos);
+                return baos.toByteArray();
             }
         }
     }

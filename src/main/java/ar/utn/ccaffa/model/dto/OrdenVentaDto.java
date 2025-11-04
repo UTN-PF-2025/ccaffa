@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -25,4 +26,14 @@ public class OrdenVentaDto {
     private String razonReplanifiacion;
     private ClienteDto cliente;
     private EspecificacionDto especificacion;
+
+    public boolean esAnulable(){
+        List<EstadoOrdenVentaEnum> estadosAnulables = List.of(
+                EstadoOrdenVentaEnum.PROGRAMADA,
+                EstadoOrdenVentaEnum.REPLANIFICAR,
+                EstadoOrdenVentaEnum.A_PLANIFICAR,
+                EstadoOrdenVentaEnum.TRABAJO_FINALIZADO
+        );
+        return estadosAnulables.contains(this.getEstado());
+    }
 }

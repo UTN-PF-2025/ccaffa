@@ -1,6 +1,7 @@
 package ar.utn.ccaffa.services.interfaces;
 
 import ar.utn.ccaffa.enums.EstadoRollo;
+import ar.utn.ccaffa.model.dto.CancelacionSimulacionDto;
 import ar.utn.ccaffa.model.dto.FiltroRolloDto;
 import ar.utn.ccaffa.model.dto.RolloDto;
 import ar.utn.ccaffa.model.dto.ModificarRolloRequestDto;
@@ -24,10 +25,14 @@ public interface RolloService {
     boolean existsRolloByProveedorIdAndCodigoProveedor(Long proovedorId, String codigoProveedor);
     RolloDto save(RolloDto rollo);
 
+    RolloDto modify(RolloDto rollo);
+
     List<RolloDto> saveAll(List<RolloDto> rollos);
     boolean deleteById(Long id);
     RolloDto modificarRollo(ModificarRolloRequestDto request);
     boolean anularRollo(Long id);
+
+    CancelacionSimulacionDto simularCancelacion(Long id);
 
     boolean estaDisponible(Rollo rollo);
     List<Long> simularAnularRollo(Long id);
