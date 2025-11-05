@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class AddMedidaRequest {
-    private Float espesorMedido;
-    private Float anchoMedido;
-    private Float rebabaMedido;
+    private Float espesorMedio;
+    private Float anchoMedio;
+    private Float rebabaMedio;
 }

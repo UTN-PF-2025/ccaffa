@@ -65,9 +65,9 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
                 .orElseThrow(() -> new RuntimeException("Control de Calidad no encontrado con ID: " + controlDeCalidadId));
 
         MedidaDeCalidad nuevaMedida = new MedidaDeCalidad();
-        nuevaMedida.setEspesorMedido(request.getEspesorMedido());
-        nuevaMedida.setAnchoMedido(request.getAnchoMedido());
-        nuevaMedida.setRebabaMedido(request.getRebabaMedido());
+        nuevaMedida.setEspesorMedido(request.getEspesorMedio());
+        nuevaMedida.setAnchoMedido(request.getAnchoMedio());
+        nuevaMedida.setRebabaMedido(request.getRebabaMedio());
         medidaDeCalidadRepository.save(nuevaMedida);
 
         // Añadir la nueva medida a la lista existente
