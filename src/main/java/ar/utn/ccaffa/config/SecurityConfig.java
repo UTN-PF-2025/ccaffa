@@ -43,7 +43,7 @@ public class SecurityConfig {
                 .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers("/api/auth/login", "/api/ws/**").permitAll() 
                 .requestMatchers("/api/auth/**").permitAll()
-                    .requestMatchers("/api/usuarios/**").permitAll()
+                .requestMatchers("/api/usuarios/**").permitAll()
                 .requestMatchers("/api/maquinas/**").permitAll()
                 .requestMatchers(HttpMethod.GET,"/api/metrics/**").permitAll()
                 .requestMatchers(HttpMethod.GET,"/api/rollos/tipoMateriales").hasAnyAuthority("vendedor", "deposito", "admin")
