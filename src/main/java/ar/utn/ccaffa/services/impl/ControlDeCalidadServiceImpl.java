@@ -212,6 +212,9 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
             rolloRepository.save(rolloDeOrdenDeTrabajo);
             rolloRepository.saveAll(rollosHijos);
             rollosAEtiquetar.addAll(rollosHijos);
+        } else {
+            // Termino la segunda
+            rollosAEtiquetar.add(ordenDeTrabajo.getRolloProducto());
         }
 
         if (!control.getDefectos().isEmpty() || control.getEstado().equals(EstadoControlDeCalidadEnum.A_CORREGIR)) {
