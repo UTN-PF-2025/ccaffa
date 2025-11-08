@@ -10,9 +10,14 @@ import ar.utn.ccaffa.model.dto.SimulacionAnulacionRolloResponse;
 import ar.utn.ccaffa.services.interfaces.OrdenVentaService;
 import ar.utn.ccaffa.services.interfaces.RolloService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.time.LocalDateTime;
 import java.util.EnumSet;
@@ -22,6 +27,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/rollos")
 @Slf4j
+@Tag(name = "Rollos", description = "API para gestionar rollos")
 public class RolloController {
 
     private final RolloService rolloService;
@@ -33,10 +39,16 @@ public class RolloController {
     }
 
     @GetMapping
-    public ResponseEntity<List<RolloDto>> getAllRollos(FiltroRolloDto filtros) {
-        log.info("Obteniendo todos los rollos");
-        List<RolloDto> rollos = rolloService.filtrarRollos(filtros);
-        return ResponseEntity.ok(rollos);
+    @Operation(
+        summary = "Obtener rollos con paginación", 
+        description = "Retorna una página de rollos filtrados por los criterios especificados"
+    )
+    public ResponseEntity<Page<RolloDto>> getAllRollos(
+            FiltroRolloDto filtros,
+            @Parameter(description = "Parámetros de paginación") Pageable pageable) {
+        log.info("Obteniendo rollos paginados");
+        Page<RolloDto> rollosPage = rolloService.filtrarRollos(filtros, pageable);
+        return ResponseEntity.ok(rollosPage);
     }
 
 

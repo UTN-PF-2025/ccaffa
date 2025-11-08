@@ -18,6 +18,7 @@ Sistema integral para la gestión de producción y control de calidad en la indu
 - 👥 **Gestión de Usuarios**: Autenticación JWT con roles y permisos
 - 📊 **Planificación Inteligente**: Algoritmo genético para optimización de producción
 - 📜 **Certificados PDF**: Generación automática de certificados de calidad
+- 📃 **Paginación**: Endpoints con paginación para optimizar el rendimiento
 - 🔐 **Seguridad**: Autenticación JWT y autorización basada en roles
 - 📡 **WebSockets**: Comunicación en tiempo real
 - 🌐 **CORS**: Configurado para múltiples orígenes
@@ -166,7 +167,7 @@ La API está organizada en los siguientes módulos:
 - `DELETE /api/maquinas/{id}` - Eliminar máquina
 
 ### **Rollos**
-- `GET /api/rollos` - Listar rollos (con filtros)
+- `GET /api/rollos` - Listar rollos con paginación (parámetros: page, size, sort)
 - `GET /api/rollos/{id}` - Obtener rollo
 - `GET /api/rollos/{id}/conRollosPadres` - Obtener rollo con padres
 - `GET /api/rollos/{id}/arbolDeRollosHijos` - Obtener árbol de rollos hijos
@@ -179,7 +180,7 @@ La API está organizada en los siguientes módulos:
 - `GET /api/rollos/{id}/anular` - Simular anulación de rollo
 
 ### **Órdenes de Venta**
-- `GET /api/ordenes-venta` - Listar órdenes (con filtros)
+- `GET /api/ordenes-venta` - Listar órdenes con paginación (parámetros: page, size, sort)
 - `GET /api/ordenes-venta/{id}` - Obtener orden
 - `POST /api/ordenes-venta` - Crear orden
 - `PUT /api/ordenes-venta/{id}` - Actualizar orden
@@ -188,7 +189,7 @@ La API está organizada en los siguientes módulos:
 - `POST /api/ordenes-venta/finalizar/{id}` - Finalizar orden
 
 ### **Órdenes de Trabajo**
-- `GET /api/ordenes-trabajo` - Listar órdenes (con filtros)
+- `GET /api/ordenes-trabajo` - Listar órdenes con paginación (parámetros: page, size, sort)
 - `GET /api/ordenes-trabajo/{id}` - Obtener orden
 - `POST /api/ordenes-trabajo` - Crear orden
 - `PUT /api/ordenes-trabajo/{id}` - Modificar orden
@@ -199,7 +200,7 @@ La API está organizada en los siguientes módulos:
 - `GET /api/ordenes-trabajo/programaciones-maquinas/maquina/{id}` - Programaciones de máquina (paginado)
 
 ### **Control de Calidad**
-- `GET /api/controles-calidad` - Listar controles
+- `GET /api/controles-calidad` - Listar controles con paginación (parámetros: page, size, sort)
 - `GET /api/controles-calidad/{id}` - Obtener control
 - `POST /api/controles-calidad` - Crear control
 - `PUT /api/controles-calidad/{id}` - Actualizar control
@@ -380,6 +381,45 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 ```
 
 ---
+
+## 📄 Paginación
+
+Todos los endpoints principales de listados ahora soportan paginación con los siguientes parámetros:
+
+- `page`: Número de página (0-based)
+- `size`: Cantidad de elementos por página
+- `sort`: Propiedad y dirección de ordenamiento (formato: `propiedad,(asc|desc)`)
+
+**Ejemplo de uso:**
+
+```bash
+# Obtener la primera página de rollos, con 10 elementos por página, ordenados por id descendente
+curl -X GET "http://localhost:8080/api/rollos?page=0&size=10&sort=id,desc" \
+  -H "Authorization: Bearer TU_TOKEN_AQUI"
+```
+
+**Respuesta:**
+
+```json
+{
+  "content": [
+    { /* datos del rollo */ },
+    /* ... más rollos ... */
+  ],
+  "pageable": {
+    "pageNumber": 0,
+    "pageSize": 10,
+    "sort": { "orders": [{ "direction": "DESC", "property": "id" }] }
+  },
+  "totalElements": 150,
+  "totalPages": 15,
+  "last": false,
+  "first": true,
+  "size": 10,
+  "number": 0,
+  "numberOfElements": 10
+}
+```
 
 ## 🔧 Configuración Avanzada
 

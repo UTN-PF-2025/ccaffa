@@ -19,6 +19,8 @@ import ar.utn.ccaffa.repository.interfaces.RolloRepository;
 import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoService;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,8 +71,8 @@ public class OrdenDeTrabajoServiceImpl implements OrdenDeTrabajoService {
     }
 
     @Override
-    public List<OrdenDeTrabajo> findAll() {
-        return repository.findAll();
+    public Page<OrdenDeTrabajo> findAll(Pageable pageable) {
+        return repository.findAll(pageable);
     }
 
     @Override
@@ -311,7 +313,12 @@ public class OrdenDeTrabajoServiceImpl implements OrdenDeTrabajoService {
     }
 
     @Override
-    public List<OrdenDeTrabajo> filtrarOrdenes(FiltroOrdenDeTrabajoDto filtros) {
+    public Page<OrdenDeTrabajo> filtrarOrdenes(FiltroOrdenDeTrabajoDto filtros, Pageable pageable) {
+        Specification<OrdenDeTrabajo> spec = crearSpecification(filtros);
+        return repository.findAll(spec, pageable);
+    }
+    
+    private Specification<OrdenDeTrabajo> crearSpecification(FiltroOrdenDeTrabajoDto filtros) {
         Specification<OrdenDeTrabajo> spec = Specification.where(null);
 
         if (filtros.getId() != null) {
@@ -350,8 +357,7 @@ public class OrdenDeTrabajoServiceImpl implements OrdenDeTrabajoService {
             spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("fechaFin"), filtros.getFechaFinalizacionHasta()));
         }
 
-
-        return repository.findAll(spec);
+        return spec;
     }
 
     @Override

@@ -204,10 +204,43 @@ curl -X POST http://localhost:8080/api/maquinas \
 
 ## Rollos
 
-### Listar rollos
+### Listar rollos (paginados)
 ```bash
-curl -X GET http://localhost:8080/api/rollos \
+curl -X GET "http://localhost:8080/api/rollos?page=0&size=10&sort=id,desc" \
   -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Respuesta:**
+```json
+{
+  "content": [
+    {
+      "id": 10,
+      "codigoProveedor": "ROLLO-010",
+      "proveedorId": 1,
+      "tipoMaterial": "POLIETILENO",
+      "estado": "DISPONIBLE",
+      "pesoKG": 750.0,
+      "anchoMM": 200.0,
+      "espesorMM": 0.08,
+      "largoM": 1500.0,
+      "fechaIngreso": "2025-01-10T12:30:00"
+    },
+    // ... más rollos ...
+  ],
+  "pageable": {
+    "pageNumber": 0,
+    "pageSize": 10,
+    "sort": { "orders": [{ "direction": "DESC", "property": "id" }] }
+  },
+  "totalElements": 150,
+  "totalPages": 15,
+  "last": false,
+  "first": true,
+  "size": 10,
+  "number": 0,
+  "numberOfElements": 10
+}
 ```
 
 ### Listar rollos con filtros
@@ -294,9 +327,9 @@ curl -X DELETE http://localhost:8080/api/rollos/10 \
 
 ## Órdenes de Venta
 
-### Listar órdenes de venta
+### Listar órdenes de venta (paginadas)
 ```bash
-curl -X GET http://localhost:8080/api/ordenes-venta \
+curl -X GET "http://localhost:8080/api/ordenes-venta?page=0&size=10&sort=fechaEntregaEstimada,asc" \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
@@ -371,9 +404,9 @@ curl -X DELETE http://localhost:8080/api/ordenes-venta/5 \
 
 ## Órdenes de Trabajo
 
-### Listar órdenes de trabajo
+### Listar órdenes de trabajo (paginadas)
 ```bash
-curl -X GET http://localhost:8080/api/ordenes-trabajo \
+curl -X GET "http://localhost:8080/api/ordenes-trabajo?page=0&size=10&sort=fechaEstimadaDeInicio,desc" \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
@@ -459,9 +492,9 @@ curl -X GET "http://localhost:8080/api/ordenes-trabajo/programaciones-maquinas/m
 
 ## Control de Calidad
 
-### Listar controles de calidad
+### Listar controles de calidad (paginados)
 ```bash
-curl -X GET http://localhost:8080/api/controles-calidad \
+curl -X GET "http://localhost:8080/api/controles-calidad?page=0&size=10&sort=fechaControl,desc" \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
@@ -622,7 +655,10 @@ curl -X POST http://localhost:8080/api/defectos/1/IMG001/rechazar \
    - Rollos: `DISPONIBLE`, `EN_USO`, `CONSUMIDO`, `ANULADO`
    - Máquinas: `DISPONIBLE`, `EN_USO`, `MANTENIMIENTO`
 
-6. **Paginación**: Algunos endpoints soportan paginación con `?page=0&size=10`
+6. **Paginación**: Todos los endpoints principales ahora soportan paginación con los siguientes parámetros:
+   - `page`: Número de página (0-based)
+   - `size`: Cantidad de elementos por página
+   - `sort`: Propiedad y dirección de ordenamiento (ej: `id,desc` o `fechaCreacion,asc`)
 
 ---
 

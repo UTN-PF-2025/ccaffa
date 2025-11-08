@@ -5,9 +5,13 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
+import org.springdoc.core.customizers.OperationCustomizer;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +25,15 @@ public class OpenApiConfig {
     private String applicationName;
 
     @Bean
-    public OpenAPI customOpenAPI() {
+    public GroupedOpenApi publicApi() {
+        return GroupedOpenApi.builder()
+                .group("public")
+                .pathsToMatch("/api/**")
+                .build();
+    }
+    
+    @Bean
+    public OpenAPI customOpenAPI(@Value("${spring.application.name}") String appName) {
         final String securitySchemeName = "bearerAuth";
         
         return new OpenAPI()
@@ -59,5 +71,34 @@ public class OpenApiConfig {
                                         .scheme("bearer")
                                         .bearerFormat("JWT")
                                         .description("Ingrese el token JWT obtenido del endpoint /api/auth/login")));
+    }
+    
+    @Bean
+    public OperationCustomizer paginationDocumentation() {
+        return (operation, handlerMethod) -> {
+            if (operation.getDescription() != null && operation.getDescription().contains("paginación")) {
+                operation.addParametersItem(new Parameter()
+                        .in("query")
+                        .name("page")
+                        .description("Número de página (0-based)")
+                        .required(false)
+                        .schema(new Schema<Integer>().type("integer").example(0)));
+                
+                operation.addParametersItem(new Parameter()
+                        .in("query")
+                        .name("size")
+                        .description("Cantidad de elementos por página")
+                        .required(false)
+                        .schema(new Schema<Integer>().type("integer").example(10)));
+                
+                operation.addParametersItem(new Parameter()
+                        .in("query")
+                        .name("sort")
+                        .description("Criterio de ordenamiento, formato: propiedad,(asc|desc). Puede repetirse para múltiples criterios")
+                        .required(false)
+                        .schema(new Schema<String>().type("string").example("id,desc")));
+            }
+            return operation;
+        };
     }
 }

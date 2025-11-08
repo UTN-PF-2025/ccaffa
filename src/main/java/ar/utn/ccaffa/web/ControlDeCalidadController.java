@@ -14,15 +14,21 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import ar.utn.ccaffa.services.impl.UserDetailsImpl;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/controles-calidad")
 @RequiredArgsConstructor
+@Tag(name = "Controles de Calidad", description = "API para gestionar controles de calidad")
 public class ControlDeCalidadController {
 
     private final ControlDeCalidadService controlDeCalidadService;
@@ -82,9 +88,15 @@ public class ControlDeCalidadController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<ControlDeCalidad>> getAllControlesCalidad(FiltroControlDeCalidad filtros) {
-        List<ControlDeCalidad> controlesCalidad = controlDeCalidadService.filtrarControlesCalidad(filtros);
-        return ResponseEntity.ok(controlesCalidad);
+    @Operation(
+        summary = "Obtener controles de calidad con paginación", 
+        description = "Retorna una página de controles de calidad filtrados por los criterios especificados"
+    )
+    public ResponseEntity<Page<ControlDeCalidad>> getAllControlesCalidad(
+            FiltroControlDeCalidad filtros,
+            @Parameter(description = "Parámetros de paginación") Pageable pageable) {
+        Page<ControlDeCalidad> controlesCalidadPage = controlDeCalidadService.filtrarControlesCalidad(filtros, pageable);
+        return ResponseEntity.ok(controlesCalidadPage);
     }
 
     @GetMapping("/{id}")

@@ -4,6 +4,8 @@ import java.util.List;
 
 import ar.utn.ccaffa.model.dto.*;
 import ar.utn.ccaffa.model.entity.ControlDeCalidad;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ControlDeCalidadService {
     ControlDeCalidad createControlDeCalidad(CreateControlDeCalidadRequest request);
@@ -16,9 +18,9 @@ public interface ControlDeCalidadService {
 
    // ControlDeProcesoDto getControlDeProcesoByOrdenTrabajo(Long ordenTrabajoId);
 
-    List<ControlDeCalidad> getAllControlesCalidad();
+    Page<ControlDeCalidad> getAllControlesCalidad(Pageable pageable);
 
-    List<ControlDeCalidad> filtrarControlesCalidad(FiltroControlDeCalidad filtros);
+    Page<ControlDeCalidad> filtrarControlesCalidad(FiltroControlDeCalidad filtros, Pageable pageable);
 
     ControlDeCalidad getControlDeCalidadById(Long id);
 

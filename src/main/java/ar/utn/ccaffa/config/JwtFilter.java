@@ -33,15 +33,24 @@ public class JwtFilter extends OncePerRequestFilter {
             return true;
         }
         boolean isCameraUpload = path.startsWith("/api/camaras/") && path.endsWith("/upload");
+        boolean isSwaggerRelated = path.equals("/swagger-test") || 
+                           path.equals("/v3-test") ||
+                           path.equals("/swagger-ui.html") ||
+                           path.startsWith("/swagger-ui/") ||
+                           path.startsWith("/swagger-resources/") ||
+                           path.startsWith("/swagger-resources") ||
+                           path.startsWith("/v3/api-docs") ||
+                           path.startsWith("/v3/api-docs/public");
+        
+        System.out.println("URI path: " + path + ", isSwaggerRelated: " + isSwaggerRelated);
+                
         return path.startsWith("/api/auth/")
                 || path.startsWith("/api/ws")
                 || path.startsWith("/api/images/")
                 || isCameraUpload
                 || path.startsWith("/actuator")
                 || path.startsWith("/error")
-                || path.startsWith("/v3/api-docs")
-                || path.startsWith("/swagger-ui")
-                || path.startsWith("/swagger-resources");
+                || isSwaggerRelated;
     }
 
     @Override
