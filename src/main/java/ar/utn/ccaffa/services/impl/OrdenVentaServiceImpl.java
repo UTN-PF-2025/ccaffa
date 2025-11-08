@@ -4,8 +4,9 @@ import ar.utn.ccaffa.enums.EstadoOrdenTrabajoEnum;
 import ar.utn.ccaffa.enums.EstadoOrdenVentaEnum;
 import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.exceptions.ResourceNotFoundException;
-import ar.utn.ccaffa.exceptions.UnprocessableContentException;
 import ar.utn.ccaffa.mapper.interfaces.OrdenVentaMapper;
+import ar.utn.ccaffa.mapper.interfaces.RolloMapper;
+import ar.utn.ccaffa.model.dto.CancelacionSimulacionDto;
 import ar.utn.ccaffa.model.dto.FiltroOrdenVentaDTO;
 import ar.utn.ccaffa.model.dto.OrdenVentaDto;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
@@ -20,9 +21,9 @@ import ar.utn.ccaffa.services.interfaces.OrdenVentaService;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class OrdenVentaServiceImpl implements OrdenVentaService {
@@ -31,14 +32,17 @@ public class OrdenVentaServiceImpl implements OrdenVentaService {
     private final OrdenDeTrabajoRepository ordenDeTrabajoRepository;
     private final OrdenDeTrabajoService ordenDeTrabajoService;
 
+    private final RolloMapper rolloMapper;
+
     private final RolloRepository rolloRepository;
 
-    public OrdenVentaServiceImpl(OrdenVentaRepository ordenVentaRepository, OrdenVentaMapper ordenVentaMapper, OrdenDeTrabajoRepository ordenDeTrabajoRepository, OrdenDeTrabajoService ordenDeTrabajoService, RolloRepository rolloRepository) {
+    public OrdenVentaServiceImpl(OrdenVentaRepository ordenVentaRepository, OrdenVentaMapper ordenVentaMapper, OrdenDeTrabajoRepository ordenDeTrabajoRepository, OrdenDeTrabajoService ordenDeTrabajoService, RolloRepository rolloRepository, RolloMapper rolloMapper) {
         this.ordenVentaRepository = ordenVentaRepository;
         this.ordenVentaMapper = ordenVentaMapper;
         this.ordenDeTrabajoRepository = ordenDeTrabajoRepository;
         this.ordenDeTrabajoService = ordenDeTrabajoService;
         this.rolloRepository = rolloRepository;
+        this.rolloMapper = rolloMapper;
     }
 
     @Override
@@ -71,20 +75,43 @@ public class OrdenVentaServiceImpl implements OrdenVentaService {
     @Override
     public void anular(Long ordenVentaId) {
         OrdenVentaDto ordenVentaAAnular = this.findById(ordenVentaId);
-        Optional<OrdenDeTrabajo> ordenesDeTrabajo = this.ordenDeTrabajoRepository.findTopByOrdenDeVenta_IdOrderByFechaFinDesc(ordenVentaAAnular.getOrderId());
-        if(ordenesDeTrabajo.isEmpty()){
-            ordenVentaAAnular.setEstado(EstadoOrdenVentaEnum.ANULADA);
-            this.save(ordenVentaAAnular);
-        } else {
+
+        if(!ordenVentaAAnular.esAnulable())
+            throw new IllegalStateException("La órden no se encuentra en un estado anulable");
+
+        Optional<OrdenDeTrabajo> ordenesDeTrabajo = this.ordenDeTrabajoRepository.findTopByOrdenDeVenta_IdAndEstadoInOrderByIdDesc(ordenVentaAAnular.getOrderId(), List.of(EstadoOrdenTrabajoEnum.PROGRAMADA, EstadoOrdenTrabajoEnum.EN_CURSO));
+
+        if(ordenesDeTrabajo.isPresent()){
             OrdenDeTrabajo ordenDeTrabajo = ordenesDeTrabajo.get();
-            if(ordenDeTrabajo.yaComenzo()){
-                throw new UnprocessableContentException("Orden de Venta - Anulación");
-            } else {
-                this.ordenDeTrabajoService.cancelarOrdenDeTrabajo(ordenDeTrabajo.getId());
-                ordenVentaAAnular.setEstado(EstadoOrdenVentaEnum.ANULADA);
-                this.save(ordenVentaAAnular);
-            }
+            this.ordenDeTrabajoService.cancelarOrdenDeTrabajo(ordenDeTrabajo.getId());
         }
+
+        ordenVentaAAnular.setEstado(EstadoOrdenVentaEnum.ANULADA);
+        this.save(ordenVentaAAnular);
+    }
+
+    @Override
+    public CancelacionSimulacionDto simularCancelacion(Long id) {
+        OrdenVentaDto ordenVentaAAnular = this.findById(id);
+
+        if(!ordenVentaAAnular.esAnulable())
+            throw new IllegalStateException("La órden no se encuentra en un estado anulable");
+
+        Optional<OrdenDeTrabajo> ordenesDeTrabajo = this.ordenDeTrabajoRepository.findTopByOrdenDeVenta_IdAndEstadoInOrderByIdDesc(ordenVentaAAnular.getOrderId(), List.of(EstadoOrdenTrabajoEnum.PROGRAMADA, EstadoOrdenTrabajoEnum.EN_CURSO, EstadoOrdenTrabajoEnum.FINALIZADA));
+
+        if (ordenesDeTrabajo.isEmpty()){
+            return CancelacionSimulacionDto.builder()
+                    .ordenesVentaAReplanificar(List.of(ordenVentaAAnular))
+                    .rollosACancelar(new ArrayList<>())
+                    .ordenesTrabajoACancelar(new ArrayList<>())
+                    .build() ;
+        }
+
+
+        OrdenDeTrabajo ordenDeTrabajo = ordenesDeTrabajo.get();
+
+        return this.ordenDeTrabajoService.simularCancelacion(ordenDeTrabajo.getId());
+
     }
 
     @Override

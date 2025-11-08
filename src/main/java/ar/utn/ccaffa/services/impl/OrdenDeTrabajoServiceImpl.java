@@ -2,16 +2,14 @@ package ar.utn.ccaffa.services.impl;
 import ar.utn.ccaffa.enums.EstadoOrdenTrabajoMaquinaEnum;
 import ar.utn.ccaffa.enums.EstadoOrdenVentaEnum;
 import ar.utn.ccaffa.mapper.interfaces.OrdenDeTrabajoResponseMapper;
-import ar.utn.ccaffa.model.dto.FiltroOrdenDeTrabajoDto;
-import ar.utn.ccaffa.model.dto.OrdenDeTrabajoResponseDto;
+import ar.utn.ccaffa.mapper.interfaces.OrdenVentaMapper;
+import ar.utn.ccaffa.model.dto.*;
 import ar.utn.ccaffa.model.entity.Maquina;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajoMaquina;
 import ar.utn.ccaffa.enums.EstadoOrdenTrabajoEnum;
 import ar.utn.ccaffa.enums.EstadoRollo;
 import ar.utn.ccaffa.mapper.interfaces.RolloMapper;
-import ar.utn.ccaffa.model.dto.CancelacionSimulacionDto;
-import ar.utn.ccaffa.model.dto.OrdenVentaSimpleDto;
 import ar.utn.ccaffa.model.entity.OrdenVenta;
 import ar.utn.ccaffa.model.entity.Rollo;
 import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoMaquinaRepository;
@@ -40,19 +38,23 @@ public class OrdenDeTrabajoServiceImpl implements OrdenDeTrabajoService {
     private final RolloRepository rolloRepository;
     private final OrdenVentaRepository ordenVentaRepository;
     private final OrdenDeTrabajoResponseMapper ordenDeTrabajoResponseMapper;
+
+    private final OrdenVentaMapper ordenVentaMapper;
     private final RolloMapper rolloMapper;
 
     public OrdenDeTrabajoServiceImpl(OrdenDeTrabajoRepository repository,
                                      OrdenDeTrabajoMaquinaRepository ordenDeTrabajoMaquinaRepository,
                                      RolloRepository rolloRepository,
                                      OrdenVentaRepository ordenVentaRepository,
-                                     OrdenDeTrabajoResponseMapper ordenDeTrabajoResponseMapper, RolloMapper rolloMapper) {
+                                     OrdenDeTrabajoResponseMapper ordenDeTrabajoResponseMapper, RolloMapper rolloMapper,
+                                     OrdenVentaMapper ordenVentaMapper) {
         this.repository = repository;
         this.ordenDeTrabajoMaquinaRepository = ordenDeTrabajoMaquinaRepository;
         this.rolloRepository = rolloRepository;
         this.ordenVentaRepository = ordenVentaRepository;
         this.ordenDeTrabajoResponseMapper = ordenDeTrabajoResponseMapper;
         this.rolloMapper = rolloMapper;
+        this.ordenVentaMapper = ordenVentaMapper;
     }
     @Override
     public OrdenDeTrabajo save(OrdenDeTrabajo orden) {
@@ -111,28 +113,28 @@ public class OrdenDeTrabajoServiceImpl implements OrdenDeTrabajoService {
 
         // 2. Actualizar el estado de los rollos
         afectados.getRollosACancelar().forEach(rollo -> {
-            rollo.setEstado(EstadoRollo.CANCELADO);
-            rolloRepository.save(rollo);
+                rollo.setEstado(EstadoRollo.CANCELADO);
+                rolloRepository.save(rollo);
         });
 
-        // 3. Marcar el rollo padre como disponible si existe
-        if (afectados.getRolloPadre() != null) {
-            Rollo rolloPadre = afectados.getRolloPadre();
-            Rollo rolloAbuelo = rolloPadre.getRolloPadre();
-            if (rolloAbuelo != null && rolloAbuelo.getEstado() == EstadoRollo.DISPONIBLE){
-                rolloPadre.setEstado(EstadoRollo.DISPONIBLE);
-            } else {
-                rolloPadre.setEstado(EstadoRollo.PLANIFICADO);
-            }
-            rolloPadre.setOrdeDeTrabajoAsociadaID(null);
-            rolloPadre.setAsociadaAOrdenDeTrabajo(false);
-            rolloRepository.save(rolloPadre);
+        // 3. Conciliar estado del rollo padre
+        Rollo rolloPadre = afectados.getRolloPadre();
+        Rollo rolloAbuelo = rolloPadre.getRolloPadre();
+
+        if (rolloAbuelo == null || rolloAbuelo.getEstado() == EstadoRollo.DIVIDIDO){
+            rolloPadre.setEstado(EstadoRollo.DISPONIBLE);
+        } else {
+            rolloPadre.setEstado(EstadoRollo.PLANIFICADO);
         }
+        rolloPadre.setOrdeDeTrabajoAsociadaID(null);
+        rolloPadre.setAsociadaAOrdenDeTrabajo(false);
+        rolloRepository.save(rolloPadre);
+
 
         // 4. Replanificar todas las órdenes de venta afectadas
         afectados.getOrdenesVentaAReplanificar().forEach(ordenVenta -> {
             ordenVenta.setEstado(EstadoOrdenVentaEnum.REPLANIFICAR);
-            ordenVenta.setRazonReplanifiacion("Se canceló la órden de trabajo asociada");
+            ordenVenta.setRazonReplanifiacion("Se anuló la órden de trabajo asociada");
             this.ordenVentaRepository.save(ordenVenta);
         });
 
@@ -149,8 +151,8 @@ public class OrdenDeTrabajoServiceImpl implements OrdenDeTrabajoService {
         CancelacionAfectados afectados = recolectarAfectados(ordenACancelar);
 
         // Mapear entidades a DTOs
-        List<OrdenVentaSimpleDto> ordenesVentaDto = afectados.getOrdenesVentaAReplanificar().stream()
-                .map(this::mapToOrdenVentaSimpleDto) // Método de mapeo manual
+        List<OrdenVentaDto> ordenesVentaDto = afectados.getOrdenesVentaAReplanificar().stream()
+                .map(this.ordenVentaMapper::toDto) // Método de mapeo manual
                 .toList();
 
         return CancelacionSimulacionDto.builder()
@@ -170,7 +172,7 @@ public class OrdenDeTrabajoServiceImpl implements OrdenDeTrabajoService {
             ordenesVentaAReplanificar.add(ordenACancelar.getOrdenDeVenta());
         }
 
-        Rollo rolloActual = ordenACancelar.getRollo();
+        Rollo rolloActual = ordenACancelar.getRolloProducto();
         Rollo rolloPadre = null;
 
         if (rolloActual != null) {
@@ -178,19 +180,21 @@ public class OrdenDeTrabajoServiceImpl implements OrdenDeTrabajoService {
             rolloPadre = rolloActual.getRolloPadre();
 
             if (rolloPadre != null) {
-                procesarAncestros(rolloPadre, ordenesVentaAReplanificar, ordenesTrabajoACancelar, rollosACancelar);
+                // procesarAncestros(rolloPadre, ordenesVentaAReplanificar, ordenesTrabajoACancelar, rollosACancelar);
 
                 List<Rollo> rollosHermanos = rolloRepository.findByRolloPadreId(rolloPadre.getId());
                 for (Rollo rolloHermano : rollosHermanos) {
-                    rollosACancelar.add(rolloHermano);
-                    List<OrdenDeTrabajo> ordenesHermano = findByRolloId(rolloHermano.getId());
-                    for (OrdenDeTrabajo ordenHermano : ordenesHermano) {
-                        if (ordenHermano.getOrdenDeVenta() != null) {
-                            ordenesVentaAReplanificar.add(ordenHermano.getOrdenDeVenta());
+                    if (rolloHermano.esAnulable()){
+                        rollosACancelar.add(rolloHermano);
+                        List<OrdenDeTrabajo> ordenesHermano = findByRolloId(rolloHermano.getId());
+                        for (OrdenDeTrabajo ordenHermano : ordenesHermano) {
+                            if (ordenHermano.getOrdenDeVenta() != null) {
+                                ordenesVentaAReplanificar.add(ordenHermano.getOrdenDeVenta());
+                            }
+                            ordenesTrabajoACancelar.add(ordenHermano);
                         }
-                        ordenesTrabajoACancelar.add(ordenHermano);
+                        procesarDescendientes(rolloHermano, ordenesVentaAReplanificar, ordenesTrabajoACancelar, rollosACancelar);
                     }
-                    procesarDescendientes(rolloHermano, ordenesVentaAReplanificar, ordenesTrabajoACancelar, rollosACancelar);
                 }
             } else {
                 procesarDescendientes(rolloActual, ordenesVentaAReplanificar, ordenesTrabajoACancelar, rollosACancelar);
@@ -233,7 +237,7 @@ public class OrdenDeTrabajoServiceImpl implements OrdenDeTrabajoService {
     }
 
     private void validarCancelacion(OrdenDeTrabajo orden) {
-        if (EstadoOrdenTrabajoEnum.ANULADA.equals(orden.getEstado()) || EstadoOrdenTrabajoEnum.FINALIZADA.equals(orden.getEstado())) {
+        if (!EstadoOrdenTrabajoEnum.PROGRAMADA.equals(orden.getEstado())) {
             throw new IllegalStateException("No se puede cancelar una orden que ya está " + orden.getEstado());
         }
     }

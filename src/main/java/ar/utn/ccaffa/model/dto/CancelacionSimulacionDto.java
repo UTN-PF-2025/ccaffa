@@ -8,7 +8,7 @@ import java.util.List;
 @Data
 @Builder
 public class CancelacionSimulacionDto {
-    private List<OrdenVentaSimpleDto> ordenesVentaAReplanificar;
+    private List<OrdenVentaDto> ordenesVentaAReplanificar;
     private List<OrdenDeTrabajoResponseDto> ordenesTrabajoACancelar;
     private List<RolloDto> rollosACancelar;
 }

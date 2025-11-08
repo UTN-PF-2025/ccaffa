@@ -149,8 +149,12 @@ public class PlannerGA {
 
         Maquina maquina1 = getMaquinaByID(m1);
 
-        if (maquina1.getTipo() == MaquinaTipoEnum.CORTADORA)
-            return  getMaquinasIDsByType(MaquinaTipoEnum.LAMINADORA);
+        if (maquina1.getTipo() == MaquinaTipoEnum.CORTADORA) {
+            List<Long> machines2 = new ArrayList<>();
+            machines2.addAll(getMaquinasIDsByType(MaquinaTipoEnum.LAMINADORA));
+            machines2.add(0L);
+            return  machines2;
+        }
 
         if (maquina1.getTipo() == MaquinaTipoEnum.LAMINADORA)
             return  List.of(0L);
@@ -510,7 +514,10 @@ public class PlannerGA {
                 }
                 ordenDeTrabajo.setFechaEstimadaDeInicio(possibleStart);
                 ordenDeTrabajo.setFechaEstimadaDeFin(possibleStart.plusHours(grace_hours));
-                ordenDeTrabajo.setEstado(EstadoOrdenTrabajoEnum.EN_CURSO);
+                ordenDeTrabajo.setEstado(EstadoOrdenTrabajoEnum.FINALIZADA);
+                ordenDeTrabajo.setRolloProducto(ordenDeTrabajo.getRollo());
+                ordenDeTrabajo.getRolloProducto().setTipoRollo(TipoRollo.PRODUCTO);
+                ordenDeTrabajo.getRolloProducto().setEstado(EstadoRollo.DISPONIBLE);
                 jobs.add(ordenDeTrabajo);
                 continue;
             }
@@ -533,11 +540,11 @@ public class PlannerGA {
                 long minutosDeProcesamiento = machine1.minutosParaProcesarEspecifiacion(sale.getEspecificacion(),usingRoll);
                 possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
 
-                if (possibleStart.getHour() <= this.horaDeInicioLaboral){
-                    possibleStart = possibleStart.withHour(this.horaDeInicioLaboral).withMinute(0).withSecond(0);
-                }
 
-                if (possibleEnd.getHour() >= this.horaDeFinLaboral){
+                if (       possibleEnd.getHour()   >= this.horaDeFinLaboral
+                        || possibleEnd.getHour()   <= this.horaDeInicioLaboral
+                        || possibleStart.getHour() <= this.horaDeInicioLaboral
+                        || possibleStart.getHour() >= this.horaDeFinLaboral ){
                     possibleStart = possibleStart.plusDays(1).withHour(this.horaDeInicioLaboral).withMinute(0).withSecond(0);
                     possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
                 }
@@ -597,15 +604,16 @@ public class PlannerGA {
 
                 List<OrdenDeTrabajoMaquina> ordenesDeTrabajoConMaquina = ordenesMaquina.stream().filter(u -> u.getMaquina() == machine2).toList();
 
-                if (possibleStart.getHour() <= this.horaDeInicioLaboral){
-                    possibleStart = possibleStart.withHour(this.horaDeInicioLaboral).withMinute(0).withSecond(0);
-                }
 
                 long minutosDeProcesamiento = machine2.minutosParaProcesarEspecifiacion(sale.getEspecificacion(),usingRoll);
                 possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
 
-                if (possibleStart.getHour() <= this.horaDeInicioLaboral){
-                    possibleStart = possibleStart.withHour(this.horaDeInicioLaboral).withMinute(0).withSecond(0);
+                if (       possibleEnd.getHour()   >= this.horaDeFinLaboral
+                        || possibleEnd.getHour()   <= this.horaDeInicioLaboral
+                        || possibleStart.getHour() <= this.horaDeInicioLaboral
+                        || possibleStart.getHour() >= this.horaDeFinLaboral ){
+                    possibleStart = possibleStart.plusDays(1).withHour(this.horaDeInicioLaboral).withMinute(0).withSecond(0);
+                    possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
                 }
 
                 if (possibleEnd.getHour() >= this.horaDeFinLaboral){

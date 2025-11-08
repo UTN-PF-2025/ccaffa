@@ -108,5 +108,12 @@ public class Rollo implements Cloneable {
         }
         return this;
     }
+    public boolean esAnulable(){
+        List<EstadoRollo> estadosAnulables = List.of(
+                EstadoRollo.PLANIFICADO,
+                EstadoRollo.DISPONIBLE,
+                EstadoRollo.ELABORADO);
+        return estadosAnulables.contains(this.getEstado());
+    }
 
 }

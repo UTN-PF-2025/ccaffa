@@ -1,0 +1,11 @@
+target/
+.git/
+.gitignore
+.idea/
+.vscode/
+*.md
+.DS_Store
+*.iml
+*.log
+storage/*
+!storage/.gitkeep

@@ -3,8 +3,7 @@ package ar.utn.ccaffa.services.impl;
 import ar.utn.ccaffa.enums.*;
 import ar.utn.ccaffa.exceptions.ResourceNotFoundException;
 import ar.utn.ccaffa.mapper.interfaces.RolloMapper;
-import ar.utn.ccaffa.model.dto.FiltroRolloDto;
-import ar.utn.ccaffa.model.dto.RolloDto;
+import ar.utn.ccaffa.model.dto.*;
 import ar.utn.ccaffa.model.entity.Rollo;
 import ar.utn.ccaffa.model.entity.OrdenVenta;
 import ar.utn.ccaffa.model.entity.Especificacion;
@@ -23,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import ar.utn.ccaffa.model.dto.ModificarRolloRequestDto;
 import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoService;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 
@@ -80,6 +78,20 @@ public class RolloServiceImpl implements RolloService {
         return this.rolloMapper.toDtoOnlyWithRolloPadreID(guardado);
     }
 
+    @Override
+    public RolloDto modify(RolloDto rollo){
+        RolloDto rolloDB = this.findById(rollo.getId());
+        if(rolloDB == null){
+            throw new IllegalArgumentException("No existe el rollo a modificar");
+        }
+        if (rolloDB.getAsociadaAOrdenDeTrabajo()){
+            throw new IllegalArgumentException("No se puede modficar un rollo asociado a una órden de trabajo");
+        }
+        if (rolloDB.getTipoRollo() == TipoRollo.PRODUCTO && rollo.getTipoRollo() != TipoRollo.PRODUCTO ){
+            throw new IllegalArgumentException("Incorrecto cambio de tipo");
+        }
+        return this.save(rollo);
+    }
     @Override
     public List<RolloDto> saveAll(List<RolloDto> rollos) {
         List<Rollo> rollosEntity = new ArrayList<>();
@@ -232,8 +244,8 @@ public class RolloServiceImpl implements RolloService {
             spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("espesorMM"), especificacion.getEspesor()));
         }
         
-        if (especificacion.getPesoMaximoPorRollo() != null) {
-            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("pesoKG"), especificacion.getPesoMaximoPorRollo()));
+        if (especificacion.getCantidad() != null) {
+            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("pesoKG"), especificacion.getCantidad()));
         }
         
         List<Rollo> rollosDisponibles = rolloRepository.findAll(spec);
@@ -341,14 +353,44 @@ public class RolloServiceImpl implements RolloService {
         
         Rollo rollo = rolloRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Rollo", "id", id));
-        
-        procesarCancelacionOrdenesTrabajo(rollo);
-        
+
+        if(!rollo.esAnulable())
+            throw new IllegalStateException("El rollo no se encuentra en un estado anulable");
+
+        Long ordenId = rollo.getOrdeDeTrabajoAsociadaID();
+        if (ordenId != null){
+            ordenDeTrabajoService.cancelarOrdenDeTrabajo(ordenId);
+        }
+
         rollo.setEstado(EstadoRollo.CANCELADO);
         rolloRepository.save(rollo);
         
         log.info("Rollo {} anulado exitosamente", id);
         return true;
+    }
+
+    @Override
+    public CancelacionSimulacionDto simularCancelacion(Long id) {
+        Rollo rollo = rolloRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Rollo", "id", id));
+
+        if(!rollo.esAnulable())
+            throw new IllegalStateException("El rollo no se encuentra en un estado anulable");
+
+        Long ordenId = rollo.getOrdeDeTrabajoAsociadaID();
+
+        if (ordenId == null){
+            return CancelacionSimulacionDto.builder()
+                    .rollosACancelar(List.of(this.rolloMapper.toDtoOnlyWithRolloPadreID(rollo)))
+                    .ordenesVentaAReplanificar(new ArrayList<>())
+                    .ordenesTrabajoACancelar(new ArrayList<>())
+                    .build() ;
+        }
+        CancelacionSimulacionDto cancelacionSimulacionDto = this.ordenDeTrabajoService.simularCancelacion(ordenId);
+        cancelacionSimulacionDto.getRollosACancelar().add(this.rolloMapper.toDtoOnlyWithRolloPadreID(rollo));
+
+        return cancelacionSimulacionDto;
+
     }
 
     @Override
