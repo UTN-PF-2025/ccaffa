@@ -244,8 +244,8 @@ public class RolloServiceImpl implements RolloService {
             spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("espesorMM"), especificacion.getEspesor()));
         }
         
-        if (especificacion.getPesoMaximoPorRollo() != null) {
-            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("pesoKG"), especificacion.getPesoMaximoPorRollo()));
+        if (especificacion.getCantidad() != null) {
+            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("pesoKG"), especificacion.getCantidad()));
         }
         
         List<Rollo> rollosDisponibles = rolloRepository.findAll(spec);
