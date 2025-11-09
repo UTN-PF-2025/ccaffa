@@ -18,6 +18,8 @@ import ar.utn.ccaffa.repository.interfaces.RolloRepository;
 import ar.utn.ccaffa.services.interfaces.OrdenDeTrabajoService;
 import ar.utn.ccaffa.services.interfaces.OrdenVentaService;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -46,8 +48,9 @@ public class OrdenVentaServiceImpl implements OrdenVentaService {
     }
 
     @Override
-    public List<OrdenVentaDto> findAll() {
-        return this.ordenVentaMapper.toDtoList(this.ordenVentaRepository.findAll());
+    public Page<OrdenVentaDto> findAll(Pageable pageable) {
+        return this.ordenVentaRepository.findAll(pageable)
+            .map(this.ordenVentaMapper::toDto);
     }
 
     @Override
@@ -128,7 +131,13 @@ public class OrdenVentaServiceImpl implements OrdenVentaService {
     }
 
     @Override
-    public List<OrdenVentaDto> searchByFiltros(FiltroOrdenVentaDTO filtros) {
+    public Page<OrdenVentaDto> searchByFiltros(FiltroOrdenVentaDTO filtros, Pageable pageable) {
+        Specification<OrdenVenta> spec = crearSpecification(filtros);
+        return this.ordenVentaRepository.findAll(spec, pageable)
+            .map(this.ordenVentaMapper::toDto);
+    }
+    
+    private Specification<OrdenVenta> crearSpecification(FiltroOrdenVentaDTO filtros) {
         Specification<OrdenVenta> spec = Specification.where(null);
         if (filtros.getFechaCreacion() != null) {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("fechaCreacion"), filtros.getFechaCreacion()));
@@ -155,7 +164,7 @@ public class OrdenVentaServiceImpl implements OrdenVentaService {
         if(filtros.getClienteId() != null){
             spec = spec.and((root, query, cb) -> cb.equal(root.get("cliente").get("id"), filtros.getClienteId()));
         }
-        return this.ordenVentaMapper.toDtoList(this.ordenVentaRepository.findAll(spec));
+        return spec;
     }
 
     @Override

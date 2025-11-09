@@ -10,9 +10,14 @@ import ar.utn.ccaffa.services.interfaces.OrdenVentaService;
 import ar.utn.ccaffa.services.interfaces.RolloService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
 
@@ -22,6 +27,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/ordenes-venta")
 @RequiredArgsConstructor
+@Tag(name = "Órdenes de Venta", description = "API para gestionar órdenes de venta")
 public class OrdenVentaController {
 
     private final OrdenVentaService ordenVentaService;
@@ -29,9 +35,15 @@ public class OrdenVentaController {
     private final RolloService rolloService;
 
     @GetMapping
-    public ResponseEntity<List<OrdenVentaDto>> obtenerTodasLasOrdenes(FiltroOrdenVentaDTO filtroOrdenVentaDTO) {
-        List<OrdenVentaDto> ordenes = ordenVentaService.searchByFiltros(filtroOrdenVentaDTO);
-        return ResponseEntity.ok(ordenes);
+    @Operation(
+        summary = "Obtener órdenes de venta con paginación", 
+        description = "Retorna una página de órdenes de venta filtradas por los criterios especificados"
+    )
+    public ResponseEntity<Page<OrdenVentaDto>> obtenerTodasLasOrdenes(
+            FiltroOrdenVentaDTO filtroOrdenVentaDTO,
+            @Parameter(description = "Parámetros de paginación") Pageable pageable) {
+        Page<OrdenVentaDto> ordenesPage = ordenVentaService.searchByFiltros(filtroOrdenVentaDTO, pageable);
+        return ResponseEntity.ok(ordenesPage);
     }
 
     @GetMapping("/{id}")

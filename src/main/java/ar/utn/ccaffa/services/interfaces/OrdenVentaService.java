@@ -7,17 +7,19 @@ import ar.utn.ccaffa.model.entity.Defecto;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import ar.utn.ccaffa.model.entity.OrdenVenta;
 import org.apache.coyote.BadRequestException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
 public interface OrdenVentaService {
-    List<OrdenVentaDto> findAll();
+    Page<OrdenVentaDto> findAll(Pageable pageable);
     
     OrdenVentaDto findById(Long id);
 
-    List<OrdenVentaDto> searchByFiltros(FiltroOrdenVentaDTO filtros);
+    Page<OrdenVentaDto> searchByFiltros(FiltroOrdenVentaDTO filtros, Pageable pageable);
 
     OrdenVentaDto save(OrdenVentaDto ordenVenta);
 

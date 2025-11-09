@@ -1,0 +1,67 @@
+ID,Modulo,Endpoint,Metodo,Precondiciones,Datos de Prueba,Pasos,Resultado Esperado,Prioridad,Severidad,Tipo,Estado
+AUTH-01,Autenticación,/api/auth/login,POST,N/A,"username=admin,password=valida","Enviar POST con credenciales válidas","200 OK, body con token, username, roles, nombre, id",Alta,Alta,Funcional,Pendiente
+AUTH-02,Autenticación,/api/auth/login,POST,N/A,"username=admin,password=incorrecta","Enviar POST con password incorrecta","401 Unauthorized o 403 según configuración",Alta,Media,Negativa,Pendiente
+SEC-01,Seguridad,/api/roles,GET,Sin token,N/A,"GET sin Authorization","401 Unauthorized",Alta,Alta,Seguridad,Pendiente
+USU-01,Usuarios,/api/usuarios,GET,Token ROLE_ADMIN o ROLE_USER,N/A,"GET con Authorization","200 OK lista de usuarios",Alta,Media,Funcional,Pendiente
+USU-02,Usuarios,/api/usuarios,POST,Token ROLE_ADMIN,"username, password, nombre, email, roles","POST crear usuario","200 OK usuario creado y password cifrada",Alta,Alta,Funcional,Pendiente
+USU-03,Usuarios,/api/usuarios/{id},PUT,Token ROLE_ADMIN,"actualizar nombre y/o password","PUT con datos","200 OK; si password enviada queda cifrada",Media,Media,Funcional,Pendiente
+USU-04,Usuarios,/api/usuarios/{id},DELETE,Token ROLE_ADMIN,N/A,"DELETE","200 OK / recurso eliminado",Media,Media,Funcional,Pendiente
+ROL-01,Roles,/api/roles,GET,Token ROLE_ADMIN,N/A,"GET","200 OK lista de roles",Alta,Media,Funcional,Pendiente
+CLI-01,Clientes,/api/clientes,GET,Token válido,N/A,"GET","200 OK lista de clientes",Alta,Baja,Funcional,Pendiente
+CLI-02,Clientes,/api/clientes,POST,Token válido,"nombre,cuit,direccion,telefono,email","POST","201 Created cliente creado",Alta,Media,Funcional,Pendiente
+CLI-03,Clientes,/api/clientes/{id},PUT,Token válido,"modificar datos","PUT","200 OK cliente actualizado",Media,Baja,Funcional,Pendiente
+CLI-04,Clientes,/api/clientes/{id},DELETE,Token válido,N/A,"DELETE","204 No Content",Media,Baja,Funcional,Pendiente
+PRO-01,Proveedores,/api/proveedores,GET,Token válido,N/A,"GET","200 OK lista de proveedores",Media,Baja,Funcional,Pendiente
+PRO-02,Proveedores,/api/proveedores,POST,Token válido,"nombre,cuit,direccion,telefono,email","POST","201 Created proveedor creado",Media,Media,Funcional,Pendiente
+MAQ-01,Maquinas,/api/maquinas,GET,Token válido,N/A,"GET","200 OK lista de máquinas",Alta,Baja,Funcional,Pendiente
+MAQ-02,Maquinas,/api/maquinas/disponibles,GET,Token válido,N/A,"GET","200 OK lista de disponibles",Alta,Baja,Funcional,Pendiente
+MAQ-03,Maquinas,/api/maquinas,POST,Token válido,"nombre,tipo,estado,velocidad,capacidad","POST","201 Created máquina creada",Media,Media,Funcional,Pendiente
+ROLLO-01,Rollos,/api/rollos,GET,Token válido,"filtros opcionales","GET","200 OK lista filtrada",Alta,Baja,Funcional,Pendiente
+ROLLO-02,Rollos,/api/rollos,POST,Token válido,"codigoProveedor único, proveedorId, tipoMaterial, ancho,espesor,peso,largo","POST","201 Created con estado DISPONIBLE y flags por defecto",Alta,Alta,Funcional,Pendiente
+ROLLO-03,Rollos,/api/rollos,POST,Token válido,"codigoProveedor repetido con mismo proveedorId","POST","400 Bad Request status=REPEATED_PROVIDER_CODE_AND_PROVIDER",Alta,Media,Negativa,Pendiente
+ROLLO-04,Rollos,/api/rollos/{id},GET,Token válido,"id existente","GET","200 OK detalle del rollo",Media,Baja,Funcional,Pendiente
+ROLLO-05,Rollos,/api/rollos/{id}/anular,POST,Token válido,"id existente","POST","200 OK (anulado)",Media,Media,Funcional,Pendiente
+ROLLO-06,Rollos,/api/rollos/{id}/anular,GET,Token válido,"id existente","GET","200 OK simulación con rollos afectados",Media,Baja,Funcional,Pendiente
+ROLLO-07,Rollos,/api/rollos/{id},DELETE,Token válido,"id existente","DELETE","200 OK o 404 si no existe",Baja,Baja,Funcional,Pendiente
+OV-01,Orden Venta,/api/ordenes-venta,POST,Token válido,"ancho<=0","POST","400 ANCHO_INVALIDO",Alta,Media,Negativa,Pendiente
+OV-02,Orden Venta,/api/ordenes-venta,POST,Token válido,"espesor<=0","POST","400 ESPESOR_INVALIDO",Alta,Media,Negativa,Pendiente
+OV-03,Orden Venta,/api/ordenes-venta,POST,Token válido,"cantidad<=0","POST","400 PESO_INVALIDO",Alta,Media,Negativa,Pendiente
+OV-04,Orden Venta,/api/ordenes-venta,POST,Token válido,"cliente=null","POST","400 CLIENTE_INVALIDO",Alta,Media,Negativa,Pendiente
+OV-05,Orden Venta,/api/ordenes-venta,POST,Token válido,"fechaEntregaEstimada=null","POST","400 FECHA_INVALIDA",Alta,Media,Negativa,Pendiente
+OV-06,Orden Venta,/api/ordenes-venta,POST,Token válido,"payload válido","POST","201 Created con DTO resultante",Alta,Alta,Funcional,Pendiente
+OV-07,Orden Venta,/api/ordenes-venta/{id},PUT,Token válido,"mismatch entre path id y orderId","PUT","400 Bad Request",Media,Media,Negativa,Pendiente
+OV-08,Orden Venta,/api/ordenes-venta/{id},GET,Token válido,"id existente","GET","200 OK DTO",Media,Baja,Funcional,Pendiente
+OV-09,Orden Venta,/api/ordenes-venta/anular/{id},POST,Token válido,"id existente","POST","200 OK 'Orden de Venta anulada correctamente'",Media,Media,Funcional,Pendiente
+OV-10,Orden Venta,/api/ordenes-venta/finalizar/{id},POST,Token válido,"estado != TRABAJO_FINALIZADO","POST","400 TRABAJO_NO_TERMINADO",Alta,Media,Negativa,Pendiente
+OT-01,Orden Trabajo,/api/ordenes-trabajo,POST,Token válido,"ordenDeVentaId válido, rolloId MISSING","POST","400 ROLLO_ID_NOT_FOUND",Crítica,Alta,Negativa,Pendiente
+OT-02,Orden Trabajo,/api/ordenes-trabajo,POST,Token válido,"rolloId inexistente","POST","400 Bad Request (IllegalArgumentException)",Alta,Alta,Negativa,Pendiente
+OT-03,Orden Trabajo,/api/ordenes-trabajo/{id},PUT,Token válido,"orden en estado EN_CURSO","PUT","500 Internal Server Error (validación arroja IllegalStateException)",Alta,Alta,Negativa,Pendiente
+OT-04,Orden Trabajo,/api/ordenes-trabajo/{id}/cancelar,POST,Token válido,"id existente","POST","200 OK DTO cancelada",Alta,Media,Funcional,Pendiente
+OT-05,Orden Trabajo,/api/ordenes-trabajo/{id}/simular-cancelacion,GET,Token válido,"id existente","GET","200 OK simulación",Media,Baja,Funcional,Pendiente
+OT-06,Orden Trabajo,/api/ordenes-trabajo/obtenerOrdenesConRollo/{id},GET,Token válido,"id de rollo","GET","200 OK lista de OTs",Media,Baja,Funcional,Pendiente
+OT-07,Orden Trabajo,/api/ordenes-trabajo/obtenerOrdenesConMaquina/{id},GET,Token válido,"id de máquina","GET","200 OK lista de OTs",Media,Baja,Funcional,Pendiente
+OT-08,Orden Trabajo,/api/ordenes-trabajo/programaciones-maquinas/maquina/{id},GET,Token válido,"sin resultados","GET con ?page=0&size=10","204 No Content",Media,Baja,Funcional,Pendiente
+OTM-01,OT-Máquina,/api/ordenes-trabajo-maquina/por-maquina/{id},GET,Token válido,"id de máquina","GET","200 OK lista de OTM DTO",Media,Baja,Funcional,Pendiente
+OTM-02,OT-Máquina,/api/ordenes-trabajo-maquina/iniciar,POST,Token válido,"id de OTM en body","POST","200 OK (iniciada)",Alta,Media,Funcional,Pendiente
+CC-01,Control Calidad,/api/controles-calidad,POST,Token válido,"ordenDeTrabajoMaquinaId inexistente","POST","400 ORDEN_NO_EXISTENTE",Crítica,Alta,Negativa,Pendiente
+CC-02,Control Calidad,/api/controles-calidad,POST,Token válido,"rollo no disponible","POST","400 ROLLO_NO_DISPONIBLE",Crítica,Alta,Negativa,Pendiente
+CC-03,Control Calidad,/api/controles-calidad,POST,Token válido,"ya hay OTM EN_CURSO para la máquina","POST","400 MAQUINA_OCUPADA",Crítica,Alta,Negativa,Pendiente
+CC-04,Control Calidad,/api/controles-calidad/{id}/medidas,POST,Token válido,"control existente","POST medida válida","200 OK control actualizado",Alta,Media,Funcional,Pendiente
+CC-05,Control Calidad,/api/controles-calidad/{id}/proceso,GET,Token válido,"control existente","GET","200 OK datos de proceso",Media,Baja,Funcional,Pendiente
+CC-06,Control Calidad,/api/controles-calidad/{id}/finalizar,PUT,Token válido,"control en curso","PUT","200 OK lista de rollos a etiquetar",Alta,Media,Funcional,Pendiente
+CC-07,Control Calidad,/api/controles-calidad/{id}/iniciar,PUT,Token válido,"control creado","PUT","200 OK control iniciado",Alta,Media,Funcional,Pendiente
+CC-08,Control Calidad,/api/controles-calidad/{id}/a-corregir,PUT,Token válido,"control existente","PUT","200 OK estado actualizado",Media,Baja,Funcional,Pendiente
+CAM-01,Cámaras,/api/camaras/{id}/upload,POST,Token válido,"file vacío","POST sin archivo o vacío","400 Bad Request mensaje de validación",Alta,Media,Negativa,Pendiente
+CAM-02,Cámaras,/api/camaras/{id}/upload,POST,Token válido,"file válido (jpg/png <10MB)","POST multipart","200 OK 'Archivo enviado a análisis exitosamente.'",Alta,Media,Funcional,Pendiente
+IMG-01,Imágenes,/api/images/{cameraId}/{filename},GET,Token válido,"archivo existente","GET","200 OK, header Content-Disposition inline y content-type correcto",Media,Baja,Funcional,Pendiente
+DEF-01,Defectos,/api/defectos/{id},GET,Token válido,"id existente","GET","200 OK DTO",Media,Baja,Funcional,Pendiente
+DEF-02,Defectos,/api/defectos/{camaraId}/{imageId}/aceptar,PUT,Token válido,"parámetros válidos","PUT","200 OK DTO actualizado (rechazo=false)",Media,Media,Funcional,Pendiente
+DEF-03,Defectos,/api/defectos/{camaraId}/{imageId}/rechazar,PUT,Token válido,"parámetros válidos","PUT","200 OK DTO actualizado (rechazo=true)",Media,Media,Funcional,Pendiente
+PLN-01,Planner,/api/planner/simulate/,POST,Token válido,"ordenesDeVentaIDs vacía","POST","400 ORDENES_DE_VENTAS_VACIO",Alta,Media,Negativa,Pendiente
+PLN-02,Planner,/api/planner/simulate/,POST,Token válido,"usarTodasLasMaquinas=false y maquinasIDs vacío","POST","400 MAQUINAS_VACIO",Alta,Media,Negativa,Pendiente
+PLN-03,Planner,/api/planner/simulate/,POST,Token válido,"usarTodosLosRollosDisponibles=false y rollosIDs vacío","POST","400 ROLLOS_VACIO",Alta,Media,Negativa,Pendiente
+PLN-04,Planner,/api/planner/simulate/,POST,Token válido,"datos válidos","POST","200 OK Plan con listas de OTs y Rollos hijos DTO",Alta,Media,Integración,Pendiente
+PLN-05,Planner,/api/planner/create/,POST,Token válido,"plan válido con IDs temporales","POST","200 OK estructuras creadas y OV programadas",Alta,Alta,Integración,Pendiente
+CERT-01,Certificados,/api/certificados,POST,Token válido,"payload válido","POST","200 OK 'Certificado generado'",Media,Baja,Funcional,Pendiente
+CERT-02,Certificados,/api/certificados/{id},GET,Token válido,"id existente","GET","200 OK DTO certificado",Media,Baja,Funcional,Pendiente
+CERT-03,Certificados,/api/certificados/pdf/{id},GET,Token válido,"id existente","GET","200 OK bytes PDF con Content-Type application/pdf y attachment",Media,Media,Funcional,Pendiente

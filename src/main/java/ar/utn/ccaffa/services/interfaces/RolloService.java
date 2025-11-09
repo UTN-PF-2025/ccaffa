@@ -6,13 +6,15 @@ import ar.utn.ccaffa.model.dto.FiltroRolloDto;
 import ar.utn.ccaffa.model.dto.RolloDto;
 import ar.utn.ccaffa.model.dto.ModificarRolloRequestDto;
 import ar.utn.ccaffa.model.entity.Rollo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface RolloService {
-    List<RolloDto> findAll();
-    List<RolloDto> filtrarRollos(FiltroRolloDto filtros);
+    Page<RolloDto> findAll(Pageable pageable);
+    Page<RolloDto> filtrarRollos(FiltroRolloDto filtros, Pageable pageable);
     RolloDto findById(Long id);
     RolloDto findByIdConRollosPadres(Long id);
     RolloDto obtenerArbolCompletoDeRollosHijos(Long rolloId);

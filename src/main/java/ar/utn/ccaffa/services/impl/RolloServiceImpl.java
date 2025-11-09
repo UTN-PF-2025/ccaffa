@@ -7,12 +7,13 @@ import ar.utn.ccaffa.model.dto.*;
 import ar.utn.ccaffa.model.entity.Rollo;
 import ar.utn.ccaffa.model.entity.OrdenVenta;
 import ar.utn.ccaffa.model.entity.Especificacion;
-import ar.utn.ccaffa.repository.interfaces.OrdenDeTrabajoRepository;
 import ar.utn.ccaffa.repository.interfaces.RolloRepository;
 import ar.utn.ccaffa.repository.interfaces.OrdenVentaRepository;
 import ar.utn.ccaffa.services.interfaces.RolloService;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,9 +45,10 @@ public class RolloServiceImpl implements RolloService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<RolloDto> findAll() {
-        log.info("Buscando todos los rollos");
-        return this.rolloMapper.toDtoList(rolloRepository.findAll());
+    public Page<RolloDto> findAll(Pageable pageable) {
+        log.info("Buscando todos los rollos con paginación");
+        Page<Rollo> rollosPage = rolloRepository.findAll(pageable);
+        return rollosPage.map(this.rolloMapper::toDto);
     }
 
     @Override
@@ -139,8 +141,13 @@ public class RolloServiceImpl implements RolloService {
         }
     }
     @Override
-    public List<RolloDto> filtrarRollos(FiltroRolloDto filtros) {
-
+    public Page<RolloDto> filtrarRollos(FiltroRolloDto filtros, Pageable pageable) {
+        Specification<Rollo> spec = crearSpecification(filtros);
+        Page<Rollo> rollosPage = rolloRepository.findAll(spec, pageable);
+        return rollosPage.map(this.rolloMapper::toDtoOnlyWithRolloPadreID);
+    }
+    
+    private Specification<Rollo> crearSpecification(FiltroRolloDto filtros) {
         Specification<Rollo> spec = Specification.where(null);
 
         if (filtros.getProveedorId() != null) {
@@ -208,7 +215,7 @@ public class RolloServiceImpl implements RolloService {
             ));
         }
 
-        return this.rolloMapper.toDtoListOnlyWithRolloPadreID(rolloRepository.findAll(spec));
+        return spec;
     }
 
     @Override

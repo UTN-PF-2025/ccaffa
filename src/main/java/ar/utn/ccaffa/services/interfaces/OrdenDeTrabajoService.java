@@ -9,6 +9,9 @@ import ar.utn.ccaffa.model.entity.Maquina;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajo;
 import ar.utn.ccaffa.model.entity.OrdenDeTrabajoMaquina;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +20,7 @@ public interface OrdenDeTrabajoService {
     OrdenDeTrabajo save(OrdenDeTrabajo orden);
 
     List<OrdenDeTrabajo> saveAllDtos(List<OrdenDeTrabajoResponseDto> ordenes);
-    List<OrdenDeTrabajo> findAll();
+    Page<OrdenDeTrabajo> findAll(Pageable pageable);
     Optional<OrdenDeTrabajo> findById(Long id);
     Optional<OrdenDeTrabajo> update(Long id, OrdenDeTrabajo orden);
     Optional<OrdenDeTrabajo> desactivar(Long id);
@@ -27,7 +30,7 @@ public interface OrdenDeTrabajoService {
     CancelacionSimulacionDto simularCancelacion(Long id);
     List<OrdenDeTrabajo> findByRolloId(Long rolloId);
     OrdenDeTrabajo findByProcesoId(Long rolloId);
-    List<OrdenDeTrabajo> filtrarOrdenes(FiltroOrdenDeTrabajoDto filtros);
+    Page<OrdenDeTrabajo> filtrarOrdenes(FiltroOrdenDeTrabajoDto filtros, Pageable pageable);
 
     List<OrdenDeTrabajoMaquina> findOrdenDeTrabajoMaquinaByEstadoInAndFechaFinAfterAndFechaFinBeforeAndMaquinaIn(List <EstadoOrdenTrabajoMaquinaEnum> estados, LocalDateTime fechaFinDesde, LocalDateTime fecaFinHasta, List<Maquina> maquinas);
 

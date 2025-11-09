@@ -16,6 +16,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +28,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/ordenes-trabajo")
 @RequiredArgsConstructor
+@Tag(name = "Órdenes de Trabajo", description = "API para gestionar órdenes de trabajo")
 public class OrdenDeTrabajoController {
 
     private final OrdenDeTrabajoService ordenDeTrabajoService;
@@ -100,9 +104,15 @@ public class OrdenDeTrabajoController {
 
 
     @GetMapping
-    public ResponseEntity<List<OrdenDeTrabajoResponseDto>> obtenerTodasLasOrdenes(FiltroOrdenDeTrabajoDto filtros) {
-        List<OrdenDeTrabajo> ordenes = ordenDeTrabajoService.filtrarOrdenes(filtros);
-        List<OrdenDeTrabajoResponseDto> ordenesDto = ordenDeTrabajoResponseMapper.toDtoList(ordenes);
+    @Operation(
+        summary = "Obtener órdenes de trabajo con paginación", 
+        description = "Retorna una página de órdenes de trabajo filtradas por los criterios especificados"
+    )
+    public ResponseEntity<Page<OrdenDeTrabajoResponseDto>> obtenerTodasLasOrdenes(
+            FiltroOrdenDeTrabajoDto filtros,
+            @Parameter(description = "Parámetros de paginación") Pageable pageable) {
+        Page<OrdenDeTrabajo> ordenesPage = ordenDeTrabajoService.filtrarOrdenes(filtros, pageable);
+        Page<OrdenDeTrabajoResponseDto> ordenesDto = ordenesPage.map(ordenDeTrabajoResponseMapper::toDto);
         return ResponseEntity.ok(ordenesDto);
     }
 
