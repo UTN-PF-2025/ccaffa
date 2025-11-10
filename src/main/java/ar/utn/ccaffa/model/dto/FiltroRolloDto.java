@@ -35,5 +35,6 @@ public class FiltroRolloDto {
     private LocalDateTime fechaIngresoHasta;
     private Boolean asociadaAOrdenDeTrabajo;
     private Long rolloPadreId;
+    private Long rolloId;
 }
 

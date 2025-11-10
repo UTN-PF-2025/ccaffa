@@ -210,6 +210,10 @@ public class RolloServiceImpl implements RolloService {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("rolloPadre").get("id"), filtros.getRolloPadreId()));
         }
 
+        if (filtros.getRolloId() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("id"), filtros.getRolloId()));
+        }
+
         if (filtros.getAsociadaAOrdenDeTrabajo() != null) {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("asociadaAOrdenDeTrabajo"), filtros.getAsociadaAOrdenDeTrabajo()
             ));
