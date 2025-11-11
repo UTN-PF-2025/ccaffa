@@ -291,19 +291,16 @@ public class ControlDeCalidadServiceImpl implements ControlDeCalidadService {
         OrdenVenta ordenVenta = ordenDeTrabajo.getOrdenDeVenta();
         ordenVenta.setEstado(EstadoOrdenVentaEnum.EN_CURSO);
 
-        Rollo rolloPadre = ordenDeTrabajo.getRollo();
-        Rollo rolloProducto = rolloPadre.getHijos().stream().filter(rh -> rh.getTipoRollo() == TipoRollo.PRODUCTO).toList().getFirst();
+        Rollo rolloAUsar = ordenTrabajoMaquina.getRolloAUsar();
 
-        rolloPadre.setEstado(EstadoRollo.EN_PROCESAMIENTO);
-        rolloProducto.setEstado(EstadoRollo.EN_PROCESAMIENTO);
+        rolloAUsar.setEstado(EstadoRollo.EN_PROCESAMIENTO);
 
         ControlDeCalidad control = controlDeCalidadRepository.findByOrdenDeTrabajoMaquinaId(id);
 
         control.setEstado(EstadoControlDeCalidadEnum.EN_PROCESO);
         control.setFechaControl(LocalDateTime.now());
 
-        rolloRepository.save(rolloPadre);
-        rolloRepository.save(rolloProducto);
+        rolloRepository.save(rolloAUsar);
         ordenVentaRepository.save(ordenVenta);
         ordenDeTrabajoRepository.save(ordenDeTrabajo);
         ordenDeTrabajoMaquinaRepository.save(ordenTrabajoMaquina);
