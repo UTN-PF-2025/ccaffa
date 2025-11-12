@@ -384,10 +384,10 @@ public class CertificadoCalidadServiceImpl implements CertificadoCalidadService 
         derecha2.addCell(new Phrase(SAE_1006));
 
         derecha2.addCell(new Phrase("DIAMETRO INTERNO"));
-        derecha2.addCell(new Phrase(especificacion.getDiametroInterno().toString()));
+        derecha2.addCell(new Phrase(especificacion.getDiametroInterno() != null ? especificacion.getDiametroInterno().toString():" "));
 
         derecha2.addCell(new Phrase("DIAMETRO EXTERNO"));
-        derecha2.addCell(new Phrase(especificacion.getDiametroExterno().toString()));
+        derecha2.addCell(new Phrase(especificacion.getDiametroExterno() != null ? especificacion.getDiametroExterno().toString(): " "));
 
         derecha2.addCell(new Phrase("Cant Rollos"));
         derecha2.addCell(new Phrase(dto.getCantidadOriginal()));
