@@ -9,7 +9,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://carflej.com.ar:3306/carflejc_control_calidad
+      - SPRING_DATASOURCE_URL=jdbc:mysql://carflej.com.ar:3306/carflejc_demo_ccaffa
       - SPRING_DATASOURCE_USERNAME=carflejc_desarrolladores
       - SPRING_DATASOURCE_PASSWORD=proyectofinal
       - JWT_SECRET=ccaffaSecretKey1234567890123456789012345678901234567890

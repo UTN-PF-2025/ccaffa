@@ -27,7 +27,7 @@ docker run -d \
   --name ccaffa-api \
   -p 8080:8080 \
   -v $(pwd)/storage:/app/storage \
-  -e SPRING_DATASOURCE_URL=jdbc:mysql://carflej.com.ar:3306/carflejc_control_calidad \
+  -e SPRING_DATASOURCE_URL=jdbc:mysql://carflej.com.ar:3306/carflejc_demo_ccaffa \
   -e SPRING_DATASOURCE_USERNAME=carflejc_desarrolladores \
   -e SPRING_DATASOURCE_PASSWORD=proyectofinal \
   -e JWT_SECRET=ccaffaSecretKey1234567890123456789012345678901234567890 \

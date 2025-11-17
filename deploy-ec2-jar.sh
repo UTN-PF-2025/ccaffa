@@ -26,7 +26,7 @@ mkdir -p logs
 # 4. Iniciar la aplicación en background
 echo -e "${YELLOW}🚢 Iniciando aplicación...${NC}"
 nohup java -jar target/ccaffa-0.0.1-SNAPSHOT.jar \
-  --spring.datasource.url=jdbc:mysql://carflej.com.ar:3306/carflejc_control_calidad \
+  --spring.datasource.url=jdbc:mysql://carflej.com.ar:3306/carflejc_demo_ccaffa \
   --spring.datasource.username=carflejc_desarrolladores \
   --spring.datasource.password=proyectofinal \
   --jwt.secret=ccaffaSecretKey1234567890123456789012345678901234567890 \
