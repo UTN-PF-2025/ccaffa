@@ -500,9 +500,9 @@ public class PlannerGA {
                 usingRoll = childrenCandidates.get(0); // grab the one with less area
                 ordenDeTrabajo.setRollo(usingRoll);
             }
-
+            LocalDateTime todayStartHour = maxDate(CURRENT_DATE, CURRENT_DATE, CURRENT_DATE.withHour(this.horaDeInicioLaboral).withMinute(0).withSecond(0));
             // POSSIBLE START DATE OF JOB
-            LocalDateTime possibleStart = maxDate(CURRENT_DATE, sale.getFechaCreacion(), usingRoll.getFechaIngreso());
+            LocalDateTime possibleStart = maxDate(todayStartHour, sale.getFechaCreacion(), usingRoll.getFechaIngreso());
             LocalDateTime possibleEnd = possibleStart;
 
 
@@ -541,9 +541,9 @@ public class PlannerGA {
                 possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
 
 
-                if (       possibleEnd.getHour()   >= this.horaDeFinLaboral
+                if (       possibleEnd.getHour()   > this.horaDeFinLaboral
                         || possibleEnd.getHour()   <= this.horaDeInicioLaboral
-                        || possibleStart.getHour() <= this.horaDeInicioLaboral
+                        || possibleStart.getHour() < this.horaDeInicioLaboral
                         || possibleStart.getHour() >= this.horaDeFinLaboral ){
                     possibleStart = possibleStart.plusDays(1).withHour(this.horaDeInicioLaboral).withMinute(0).withSecond(0);
                     possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
@@ -608,9 +608,9 @@ public class PlannerGA {
                 long minutosDeProcesamiento = machine2.minutosParaProcesarEspecifiacion(sale.getEspecificacion(),usingRoll);
                 possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
 
-                if (       possibleEnd.getHour()   >= this.horaDeFinLaboral
+                if (       possibleEnd.getHour()   > this.horaDeFinLaboral
                         || possibleEnd.getHour()   <= this.horaDeInicioLaboral
-                        || possibleStart.getHour() <= this.horaDeInicioLaboral
+                        || possibleStart.getHour() < this.horaDeInicioLaboral
                         || possibleStart.getHour() >= this.horaDeFinLaboral ){
                     possibleStart = possibleStart.plusDays(1).withHour(this.horaDeInicioLaboral).withMinute(0).withSecond(0);
                     possibleEnd = possibleStart.plusMinutes(minutosDeProcesamiento).plusHours(grace_hours);
