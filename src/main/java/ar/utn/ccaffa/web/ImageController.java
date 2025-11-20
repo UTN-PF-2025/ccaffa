@@ -8,12 +8,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/images")
 @RequiredArgsConstructor
+@Slf4j
 public class ImageController {
 
     private final FileStorageService fileStorageService;
@@ -23,19 +25,28 @@ public class ImageController {
                                               @PathVariable String filename,
                                               HttpServletRequest request) {
         String relativePath = cameraId + "/" + filename;
-        Resource resource = fileStorageService.loadAsResource(relativePath);
-
-        String contentType = null;
+        log.info("Solicitando imagen en ruta relativa: {}", relativePath);
+        
         try {
-            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
-        } catch (IOException ex) {
-            // Fallback
-            contentType = "application/octet-stream";
+            Resource resource = fileStorageService.loadAsResource(relativePath);
+            log.info("Recurso cargado correctamente: {}", resource.getFilename());
+            
+            String contentType = null;
+            try {
+                contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+                log.debug("Tipo de contenido detectado: {}", contentType);
+            } catch (IOException ex) {
+                log.warn("No se pudo determinar el tipo de contenido para {}: {}", filename, ex.getMessage());
+                contentType = "application/octet-stream";
+            }
+            
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+                    .body(resource);
+        } catch (RuntimeException ex) {
+            log.error("Error al cargar el recurso {}: {}", relativePath, ex.getMessage());
+            return ResponseEntity.notFound().build();
         }
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
-                .body(resource);
     }
 }

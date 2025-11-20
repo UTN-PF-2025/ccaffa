@@ -94,14 +94,19 @@ public class FileStorageServiceImpl implements FileStorageService {
     public Resource loadAsResource(String filename) {
         try {
             Path file = rootLocation.resolve(filename);
+            log.info("Intentando cargar archivo desde: {}", file.toAbsolutePath());
             Resource resource = new UrlResource(file.toUri());
-            if (resource.exists() || resource.isReadable()) {
+            
+            if (resource.exists()) {
+                log.info("Archivo encontrado: {}", file.toAbsolutePath());
                 return resource;
             } else {
+                log.error("Archivo no encontrado: {}", file.toAbsolutePath());
                 throw new RuntimeException("No se pudo leer el archivo: " + filename);
             }
         } catch (Exception e) {
-            throw new RuntimeException("No se pudo leer el archivo: " + filename, e);
+            log.error("Error al cargar el archivo {}: {}", filename, e.getMessage());
+            throw new RuntimeException("No se pudo cargar el archivo: " + filename, e);
         }
     }
 }
