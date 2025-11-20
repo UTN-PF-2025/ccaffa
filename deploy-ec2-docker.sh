@@ -32,6 +32,7 @@ docker run -d \
   -e SPRING_DATASOURCE_PASSWORD=proyectofinal \
   -e JWT_SECRET=ccaffaSecretKey1234567890123456789012345678901234567890 \
   -e JWT_EXPIRATION=18000 \
+  -e FILE_STORAGE_PATH=/app/storage/images \
   --restart unless-stopped \
   ccaffa-api:latest
 

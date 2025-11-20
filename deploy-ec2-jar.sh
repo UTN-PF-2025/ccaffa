@@ -31,6 +31,7 @@ nohup java -jar target/ccaffa-0.0.1-SNAPSHOT.jar \
   --spring.datasource.password=proyectofinal \
   --jwt.secret=ccaffaSecretKey1234567890123456789012345678901234567890 \
   --jwt.expiration=18000 \
+  --file.storage.path=/home/ubuntu/ccaffa/storage/images \
   > logs/app.log 2>&1 &
 
 APP_PID=$!
